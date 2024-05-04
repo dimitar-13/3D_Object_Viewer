@@ -139,6 +139,9 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\RenderingSettings.cpp" />
+    <ClCompile Include="src\ShaderClass.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="Dependencies\imgui\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="Dependencies\imgui\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Dependencies\imgui\imgui\imgui.cpp" />
@@ -160,6 +163,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\RenderingSettings.h" />
+    <ClInclude Include="src\ShaderClass.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="Dependencies\imgui\imgui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="Dependencies\imgui\imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h" />

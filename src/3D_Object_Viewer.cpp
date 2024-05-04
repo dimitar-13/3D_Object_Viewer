@@ -14,7 +14,7 @@ int main()
 {
 	if (glfwInit() == GLFW_FALSE)
 	{
-		std::cout << "[ERROR]:GLFW failed to initilize." << '\n';
+		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
 		return -1;
     }
 	GLFWwindow* mainWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT,WIN_TITLE,NULL,NULL);
@@ -30,7 +30,7 @@ int main()
 	{
 		glfwDestroyWindow(mainWin);
 		glfwTerminate();
-		std::cout << "[ERROR]:GLEW failed to initilize." << '\n';
+		std::cout << "[ERROR]:GLEW failed to initialize." << '\n';
 		return -3;
 	}
 	glewExperimental = GL_TRUE;

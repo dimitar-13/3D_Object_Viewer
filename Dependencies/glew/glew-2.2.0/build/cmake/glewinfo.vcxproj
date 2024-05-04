@@ -22,7 +22,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{71B4EDF0-7D46-3B28-9DCA-03E6C2C5E63B}</ProjectGuid>
+    <ProjectGuid>{C8B82419-053E-3BA6-8977-69940ADDE2C4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -59,25 +59,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\c++\TestBuilds\GameRendererLibrary\bin\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\bin\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glewinfo.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glewinfo</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\c++\TestBuilds\GameRendererLibrary\bin\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\bin\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glewinfo.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glewinfo</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\c++\TestBuilds\GameRendererLibrary\bin\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\bin\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">glewinfo.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">glewinfo</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\c++\TestBuilds\GameRendererLibrary\bin\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\bin\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">glewinfo.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">glewinfo</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>
@@ -96,15 +96,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;GLEW_NO_GLU;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GLEW_NO_GLU;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -112,13 +113,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\..\..\lib\Debug\libglew32d.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>lib\Debug\glew32d.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/c++/TestBuilds/GameRendererLibrary/lib/Debug/glewinfo.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/c++/TestBuilds/GameRendererLibrary/bin/Debug/glewinfo.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/lib/Debug/glewinfo.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/bin/Debug/glewinfo.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -127,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -136,17 +137,18 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -154,13 +156,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\..\..\lib\Release\libglew32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>lib\Release\glew32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/c++/TestBuilds/GameRendererLibrary/lib/Release/glewinfo.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/c++/TestBuilds/GameRendererLibrary/bin/Release/glewinfo.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/lib/Release/glewinfo.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/bin/Release/glewinfo.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -169,7 +171,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -178,17 +180,18 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -196,13 +199,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\..\..\lib\MinSizeRel\libglew32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>lib\MinSizeRel\glew32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/c++/TestBuilds/GameRendererLibrary/lib/MinSizeRel/glewinfo.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/c++/TestBuilds/GameRendererLibrary/bin/MinSizeRel/glewinfo.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/lib/MinSizeRel/glewinfo.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/bin/MinSizeRel/glewinfo.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -211,7 +214,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>
@@ -221,15 +224,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;GLEW_STATIC;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GLEW_NO_GLU;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -237,13 +241,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\..\..\lib\RelWithDebInfo\libglew32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>lib\RelWithDebInfo\glew32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/c++/TestBuilds/GameRendererLibrary/lib/RelWithDebInfo/glewinfo.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/c++/TestBuilds/GameRendererLibrary/bin/RelWithDebInfo/glewinfo.pdb</ProgramDataBaseFile>
+      <ImportLibrary>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/lib/RelWithDebInfo/glewinfo.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/bin/RelWithDebInfo/glewinfo.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -251,11 +255,11 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\CMakeLists.txt">
+    <CustomBuild Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-D:\Cmake\bin\cmake.exe -SD:/c++/TestBuilds/GameRendererLibrary -BD:/c++/TestBuilds/GameRendererLibrary --check-stamp-file D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
+D:\Cmake\bin\cmake.exe -SD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake -BD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake --check-stamp-file D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -263,12 +267,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Cmake\share\cmake-3.28\Modules\CMakeCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeCCompilerABI.c;D:\Cmake\share\cmake-3.28\Modules\CMakeCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCompilerIdDetection.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompileFeatures.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerABI.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerId.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeFindBinUtils.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitIncludeInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitLinkInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseLibraryArchitecture.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeRCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeRCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystem.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCompilerCommon.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ADSP-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMCC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\AppleClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Borland-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Cray-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CrayClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GHS-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GNU-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\HP-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IAR-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Intel-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\LCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVHPC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OrangeC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PGI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PathScale-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SCO-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Tasking-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Watcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XL-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\zOS-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CompilerId\VS-10.vcxproj.in;D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\Cmake\share\cmake-3.28\Modules\Internal\FeatureTesting.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeRCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeSystem.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\cmake_uninstall.cmake.in;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-D:\Cmake\bin\cmake.exe -SD:/c++/TestBuilds/GameRendererLibrary -BD:/c++/TestBuilds/GameRendererLibrary --check-stamp-file D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
+D:\Cmake\bin\cmake.exe -SD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake -BD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake --check-stamp-file D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -276,12 +280,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Cmake\share\cmake-3.28\Modules\CMakeCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeCCompilerABI.c;D:\Cmake\share\cmake-3.28\Modules\CMakeCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCompilerIdDetection.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompileFeatures.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerABI.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerId.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeFindBinUtils.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitIncludeInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitLinkInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseLibraryArchitecture.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeRCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeRCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystem.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCompilerCommon.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ADSP-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMCC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\AppleClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Borland-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Cray-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CrayClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GHS-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GNU-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\HP-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IAR-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Intel-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\LCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVHPC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OrangeC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PGI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PathScale-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SCO-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Tasking-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Watcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XL-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\zOS-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CompilerId\VS-10.vcxproj.in;D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\Cmake\share\cmake-3.28\Modules\Internal\FeatureTesting.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeRCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeSystem.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\cmake_uninstall.cmake.in;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-D:\Cmake\bin\cmake.exe -SD:/c++/TestBuilds/GameRendererLibrary -BD:/c++/TestBuilds/GameRendererLibrary --check-stamp-file D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
+D:\Cmake\bin\cmake.exe -SD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake -BD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake --check-stamp-file D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -289,12 +293,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Cmake\share\cmake-3.28\Modules\CMakeCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeCCompilerABI.c;D:\Cmake\share\cmake-3.28\Modules\CMakeCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCompilerIdDetection.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompileFeatures.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerABI.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerId.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeFindBinUtils.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitIncludeInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitLinkInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseLibraryArchitecture.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeRCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeRCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystem.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCompilerCommon.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ADSP-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMCC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\AppleClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Borland-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Cray-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CrayClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GHS-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GNU-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\HP-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IAR-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Intel-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\LCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVHPC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OrangeC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PGI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PathScale-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SCO-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Tasking-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Watcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XL-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\zOS-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CompilerId\VS-10.vcxproj.in;D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\Cmake\share\cmake-3.28\Modules\Internal\FeatureTesting.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeRCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeSystem.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\cmake_uninstall.cmake.in;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-D:\Cmake\bin\cmake.exe -SD:/c++/TestBuilds/GameRendererLibrary -BD:/c++/TestBuilds/GameRendererLibrary --check-stamp-file D:/c++/TestBuilds/GameRendererLibrary/vendors/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
+D:\Cmake\bin\cmake.exe -SD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake -BD:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake --check-stamp-file D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -302,25 +306,25 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Cmake\share\cmake-3.28\Modules\CMakeCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeCCompilerABI.c;D:\Cmake\share\cmake-3.28\Modules\CMakeCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeCompilerIdDetection.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompileFeatures.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerABI.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineCompilerId.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeDetermineSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeFindBinUtils.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitIncludeInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseImplicitLinkInfo.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeParseLibraryArchitecture.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeRCCompiler.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeRCInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystem.cmake.in;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestCompilerCommon.cmake;D:\Cmake\share\cmake-3.28\Modules\CMakeTestRCCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ADSP-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMCC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\ARMClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\AppleClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Borland-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Cray-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\CrayClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GHS-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\GNU-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\HP-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IAR-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Intel-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\LCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVHPC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\OrangeC-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PGI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\PathScale-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SCO-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TI-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Tasking-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\Watcom-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XL-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\Compiler\zOS-C-DetermineCompiler.cmake;D:\Cmake\share\cmake-3.28\Modules\CompilerId\VS-10.vcxproj.in;D:\Cmake\share\cmake-3.28\Modules\FindOpenGL.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageHandleStandardArgs.cmake;D:\Cmake\share\cmake-3.28\Modules\FindPackageMessage.cmake;D:\Cmake\share\cmake-3.28\Modules\GNUInstallDirs.cmake;D:\Cmake\share\cmake-3.28\Modules\Internal\FeatureTesting.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\Windows.cmake;D:\Cmake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeRCCompiler.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\3.28.1\CMakeSystem.cmake;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\cmake_uninstall.cmake.in;D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\glew.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\src\glewinfo.c" />
-    <ResourceCompile Include="D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\glewinfo.rc" />
+    <ClCompile Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\src\glewinfo.c" />
+    <ResourceCompile Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\glewinfo.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\c++\TestBuilds\GameRendererLibrary\ZERO_CHECK.vcxproj">
-      <Project>{49AEF2F2-A7D1-3D9E-B119-1FA8322DCC92}</Project>
+    <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\ZERO_CHECK.vcxproj">
+      <Project>{2DF51C59-657D-3182-9E1B-37FCF7DB1315}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="D:\c++\TestBuilds\GameRendererLibrary\vendors\glew-2.2.0\build\cmake\glew_s.vcxproj">
-      <Project>{A5C21555-9AE2-3EFB-92EC-300E0158E7FB}</Project>
-      <Name>glew_s</Name>
+    <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\glew.vcxproj">
+      <Project>{810CD7D2-7A86-3B24-BD4F-DB29B7B0997B}</Project>
+      <Name>glew</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

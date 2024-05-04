@@ -3,9 +3,6 @@
   <PropertyGroup>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
-  <PropertyGroup>
-    <ResolveNugetPackages>false</ResolveNugetPackages>
-  </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -25,11 +22,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{6854BBF0-F418-34DD-A4E4-E0A747DF8CC0}</ProjectGuid>
+    <ProjectGuid>{05D5A622-611F-37F4-BD0B-F8C5BC58C7EE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
-    <ProjectName>ALL_BUILD</ProjectName>
+    <ProjectName>uninstall</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -108,6 +105,66 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CustomBuild Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\495655bff392e27aa78e9c036daeb4f7\uninstall.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+D:\Cmake\bin\cmake.exe -P D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/cmake_uninstall.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\uninstall</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+D:\Cmake\bin\cmake.exe -P D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/cmake_uninstall.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\uninstall</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+D:\Cmake\bin\cmake.exe -P D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/cmake_uninstall.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\uninstall</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+D:\Cmake\bin\cmake.exe -P D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/cmake_uninstall.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\uninstall</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Dependencies/glew/glew-2.2.0/build/cmake/CMakeLists.txt</Message>
@@ -165,6 +222,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\CMakeFiles\uninstall">
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\ZERO_CHECK.vcxproj">
@@ -172,22 +231,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\glew.vcxproj">
-      <Project>{810CD7D2-7A86-3B24-BD4F-DB29B7B0997B}</Project>
-      <Name>glew</Name>
-    </ProjectReference>
-    <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\glew_s.vcxproj">
-      <Project>{A2922A98-51C7-34F7-B8EA-9081C8C32670}</Project>
-      <Name>glew_s</Name>
-    </ProjectReference>
-    <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\glewinfo.vcxproj">
-      <Project>{C8B82419-053E-3BA6-8977-69940ADDE2C4}</Project>
-      <Name>glewinfo</Name>
-    </ProjectReference>
-    <ProjectReference Include="D:\c++\OpenGl\3D_Object_Viewer\3D_Object_Viewer\Dependencies\glew\glew-2.2.0\build\cmake\visualinfo.vcxproj">
-      <Project>{DE02629B-57F0-380E-9E2E-B5370FD96288}</Project>
-      <Name>visualinfo</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

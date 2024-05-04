@@ -5,8 +5,8 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#define WIN_WIDTH 700
-#define WIN_HEIGHT 700
+#define WIN_WIDTH 1500
+#define WIN_HEIGHT 1500
 #define WIN_TITLE "Object loader"
 glm::vec3 testVec = { 1,3,4 };
 int InitImGui(GLFWwindow* win);
@@ -38,9 +38,16 @@ int main()
 
 	bool isWireframeOn = false;
 	float xPos = 1.0f;
+	constexpr int imguiWinSize = 300;
+	glm::vec3 position = { 0,0,0 };
+	glm::vec3 scale = { 1,1,1 };
+	glm::vec3 rotation = { 0,0,0 };
+
+	uint32_t vertexCount = 4050, triangleCount = 2323, faceCount = 23232;
+
 	while (!glfwWindowShouldClose(mainWin))
 	{
-		glClearColor(1, 0, 0, 1);
+		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -49,11 +56,48 @@ int main()
 		//Render
 
 		//
+		ImGui::SetNextWindowPos({ imguiWinSize,WIN_HEIGHT }, ImGuiCond_FirstUseEver);
+		ImGui::SetWindowPos({ WIN_WIDTH - ImGui::GetWindowWidth(),0}, ImGuiCond_FirstUseEver);
+		//Right panel for model and rendering settings.
 		ImGui::Begin("Test");
 		ImGui::Text("Model view settings");
-		ImGui::InputFloat("x", &xPos);
+		ImGui::InputFloat3("Position",  &position[0]);
+		ImGui::InputFloat3("Rotation", &rotation[0]);
+		ImGui::InputFloat3("Scale", &scale[0]);
+		ImGui::Separator();
+		ImGui::Text("Model rendering settings.");
 		ImGui::Checkbox("Wireframe?", &isWireframeOn);
+		ImGui::Checkbox("Albedo?", &isWireframeOn);
+		ImGui::Checkbox("Specular?", &isWireframeOn);
+		ImGui::Checkbox("Normals?", &isWireframeOn);
+		ImGui::Checkbox("Ambient occlusion?", &isWireframeOn);
 		ImGui::End();
+
+		ImGui::Begin("Model data.");
+		ImGui::Text("Object triangle count:%d", triangleCount);
+		ImGui::Text("Object vertex count:%d", vertexCount);
+		ImGui::Text("Object face count:%d", faceCount);
+		ImGui::Text("Texture count:%d", 6);
+		ImGui::Text("File path %s", "Dummy path");
+
+		ImGui::Separator();
+		ImGui::Text("Scene settings.");
+		ImGui::Checkbox("UseWorldGrid?", &isWireframeOn);
+		ImGui::Checkbox("Enable lights?", &isWireframeOn);
+		ImGui::Checkbox("Enable skybox?", &isWireframeOn);
+		ImGui::End();
+		ImGui::SetNextWindowPos({ imguiWinSize,WIN_HEIGHT }, ImGuiCond_FirstUseEver);
+		ImGui::Begin("Loading panel");
+		ImGui::Text("Loading stuff here.");
+		ImGui::End();
+		
+
+
+		ImGui::SetNextWindowPos({ imguiWinSize,WIN_HEIGHT }, ImGuiCond_FirstUseEver);
+		ImGui::Begin("Loading panel");
+		ImGui::Text("Loading stuff here.");
+		ImGui::End();
+
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

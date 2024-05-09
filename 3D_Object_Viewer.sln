@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3D_Object_Viewer", "3D_Object_Viewer.vcxproj", "{90C00581-DE8C-42A8-BFE2-C5021442254F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4929C101-0261-3047-85DA-332A715A7F5E} = {4929C101-0261-3047-85DA-332A715A7F5E}
+		{5D94880B-C99D-887C-5219-9F7CBE21947C} = {5D94880B-C99D-887C-5219-9F7CBE21947C}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw", "Dependencies\glfw\glfw\build\src\glfw.vcxproj", "{4929C101-0261-3047-85DA-332A715A7F5E}"
@@ -13,6 +14,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "Dependencies\glew\glew-2.2.0\build\vc15\glew_static.vcxproj", "{664E6F0D-6784-4760-9565-D54F8EB1EDF4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glm", "Dependencies\glm\glm\build\glm\glm.vcxproj", "{7654DA41-B235-3F77-AEE2-E7A86CF8C263}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nfd", "Dependencies\nativefiledialog\nativefiledialog\build\vs2010\nfd.vcxproj", "{5D94880B-C99D-887C-5219-9F7CBE21947C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +93,22 @@ Global
 		{7654DA41-B235-3F77-AEE2-E7A86CF8C263}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
 		{7654DA41-B235-3F77-AEE2-E7A86CF8C263}.RelWithDebInfo|x86.ActiveCfg = RelWithDebInfo|x64
 		{7654DA41-B235-3F77-AEE2-E7A86CF8C263}.RelWithDebInfo|x86.Build.0 = RelWithDebInfo|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Debug|x64.ActiveCfg = Debug|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Debug|x64.Build.0 = Debug|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Debug|x86.ActiveCfg = Debug|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Debug|x86.Build.0 = Debug|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.MinSizeRel|x64.Build.0 = Debug|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.MinSizeRel|x86.ActiveCfg = Debug|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.MinSizeRel|x86.Build.0 = Debug|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Release|x64.ActiveCfg = Release|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Release|x64.Build.0 = Release|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Release|x86.ActiveCfg = Release|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.Release|x86.Build.0 = Release|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
+		{5D94880B-C99D-887C-5219-9F7CBE21947C}.RelWithDebInfo|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

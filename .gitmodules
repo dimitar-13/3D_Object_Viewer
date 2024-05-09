@@ -10,3 +10,6 @@
 [submodule "Dependencies/assimp/assimp"]
 	path = Dependencies/assimp/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "Dependencies/nativefiledialog/nativefiledialog"]
+	path = Dependencies/nativefiledialog/nativefiledialog
+	url = https://github.com/mlabbe/nativefiledialog.git

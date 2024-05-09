@@ -5,19 +5,22 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#define WIN_WIDTH 700
-#define WIN_HEIGHT 700
+#include"RenderingSettings.h"
+#define WIN_WIDTH 1500
+#define WIN_HEIGHT 1500
 #define WIN_TITLE "Object loader"
-glm::vec3 testVec = { 1,3,4 };
+
 int InitImGui(GLFWwindow* win);
+void freeData();
+GLFWwindow* mainWin;
 int main()
 {
 	if (glfwInit() == GLFW_FALSE)
 	{
-		std::cout << "[ERROR]:GLFW failed to initilize." << '\n';
+		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
 		return -1;
     }
-	GLFWwindow* mainWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT,WIN_TITLE,NULL,NULL);
+	mainWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT,WIN_TITLE,NULL,NULL);
 	if (mainWin == NULL)
 	{
 		glfwTerminate();
@@ -30,45 +33,13 @@ int main()
 	{
 		glfwDestroyWindow(mainWin);
 		glfwTerminate();
-		std::cout << "[ERROR]:GLEW failed to initilize." << '\n';
+		std::cout << "[ERROR]:GLEW failed to initialize." << '\n';
 		return -3;
 	}
 	glewExperimental = GL_TRUE;
 	InitImGui(mainWin);
 
-	bool isWireframeOn = false;
-	float xPos = 1.0f;
-	while (!glfwWindowShouldClose(mainWin))
-	{
-		glClearColor(1, 0, 0, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		//Render
-
-		//
-		ImGui::Begin("Test");
-		ImGui::Text("Model view settings");
-		ImGui::InputFloat("x", &xPos);
-		ImGui::Checkbox("Wireframe?", &isWireframeOn);
-		ImGui::End();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		glfwSwapBuffers(mainWin);
-		glfwPollEvents();
-	}
-	std::cout << "Done" << '\n';
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	glfwTerminate();
-
+	OBJ_Viewer::RenderingSettings::RenderLoop(mainWin);
 	return 1;
 
 }
@@ -80,4 +51,13 @@ int InitImGui(GLFWwindow* win)
 	ImGui_ImplGlfw_InitForOpenGL(win, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 	return 1;
+}
+
+void freeData()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+	glfwDestroyWindow(mainWin);
+	glfwTerminate();
 }

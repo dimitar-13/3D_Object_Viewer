@@ -7,13 +7,13 @@
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
 #include"ModelLoader.h"
+#include"ShaderClass.h"
+#include"Camera.h"
 #include <nfd.h>
 namespace OBJ_Viewer
 {
-	static class RenderingSettings
+	struct RendererSettings
 	{
-	public:
-		//Might move to cpp file.
 		static inline bool m_isWireFrameRenderingOn;
 		static inline bool m_isRenderAlbedoTextureOn;
 		static inline bool m_isRenderSpecularTextureOn;
@@ -22,13 +22,28 @@ namespace OBJ_Viewer
 		static inline bool m_isWireGridOn;
 		static inline bool m_isRenderAmbientOcclusionTextureOn;
 		static inline bool m_isRenderingLightOn;
-		//TODO:change from void to a Model struct representing a model.
-		static inline Model* currentlyLoadedModel = nullptr;
+	};
+	struct RendererShaders {
+		RendererShaders() :colorShader("ColorShaderPath"), lightShader("LightSHaderPath"), skyboxShader("SkyboxPath") {}
+		ShaderClass colorShader;
+		ShaderClass lightShader;
+		ShaderClass skyboxShader;
+	};
+
+	class Renderer
+	{
 	public:
-		static void RenderLoop(GLFWwindow* mainWin);
-		static void RenderScene();
-		static void RenderImGui();
-		static nfdchar_t* OpenDialog();
+		Renderer();
+	public:
+		RendererSettings m_rendererSettings;
+		Model* currentlyLoadedModel = nullptr;
+		RendererShaders m_rendererShaders;
+		Camera m_Camera;
+	public:
+		 void RenderLoop();
+		 void RenderScene();
+		 void RenderImGui();
+		 nfdchar_t* OpenDialog();
 	};
 }
 

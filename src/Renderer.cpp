@@ -1,7 +1,7 @@
-#include "RenderingSettings.h"
+#include "Renderer.h"
 #include "VertexAttributeObject.h"
 #include"ShaderClass.h"
-
+#include"Application.h"
 constexpr float scaleVal = 1 / 1;
 //Test objs;
 static std::vector<float> vertices = { -0.5f * scaleVal, -0.5f * scaleVal, // bottom left corner
@@ -13,11 +13,14 @@ static std::vector <unsigned int> indices = { 0,1,2, // first triangle (bottom l
 					 0,2,3 }; // second triangle (bottom left - top right - bottom right)
 
 
-void OBJ_Viewer::RenderingSettings::RenderLoop(GLFWwindow* mainWin)
+void OBJ_Viewer::Renderer::RenderLoop()
 {
 	ShaderClass shader("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Shaders/Shader.glsl");
 	VertexAttributeObject vertexAttribObj = { vertices,indices };
-	while (!glfwWindowShouldClose(mainWin))
+
+	GLFWwindow* window = Application::GetGLFW_Window();
+
+	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -35,17 +38,22 @@ void OBJ_Viewer::RenderingSettings::RenderLoop(GLFWwindow* mainWin)
 		RenderScene();
 		RenderImGui();
 
-		glfwSwapBuffers(mainWin);
+		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 }
 
-void OBJ_Viewer::RenderingSettings::RenderScene()
+void OBJ_Viewer::Renderer::RenderScene()
 {
 }
 
-void OBJ_Viewer::RenderingSettings::RenderImGui()
+OBJ_Viewer::Renderer::Renderer():m_Camera({glm::vec3(0),Application::GetWindowSize().m_winWidth,Application::GetWindowSize().m_winHeight})
+{
+
+}
+
+void OBJ_Viewer::Renderer::RenderImGui()
 {
 	//Testing values
 	float xPos = 1.0f;
@@ -63,11 +71,11 @@ void OBJ_Viewer::RenderingSettings::RenderImGui()
 	ImGui::InputFloat3("Scale", &scale[0]);
 	ImGui::Separator();
 	ImGui::Text("Model rendering settings.");
-	ImGui::Checkbox("Wireframe?", &m_isWireFrameRenderingOn);
-	ImGui::Checkbox("Albedo?", &m_isRenderAlbedoTextureOn);
-	ImGui::Checkbox("Specular?", &m_isRenderSpecularTextureOn);
-	ImGui::Checkbox("Normals?", &m_isRenderNormalTextureOn);
-	ImGui::Checkbox("Ambient occlusion?", &m_isRenderAmbientOcclusionTextureOn);
+	ImGui::Checkbox("Wireframe?", &m_rendererSettings.m_isWireFrameRenderingOn);
+	ImGui::Checkbox("Albedo?", &m_rendererSettings.m_isRenderAlbedoTextureOn);
+	ImGui::Checkbox("Specular?", &m_rendererSettings.m_isRenderSpecularTextureOn);
+	ImGui::Checkbox("Normals?", &m_rendererSettings.m_isRenderNormalTextureOn);
+	ImGui::Checkbox("Ambient occlusion?", &m_rendererSettings.m_isRenderAmbientOcclusionTextureOn);
 	ImGui::End();
 
 	ImGui::Begin("Model data.");
@@ -79,9 +87,9 @@ void OBJ_Viewer::RenderingSettings::RenderImGui()
 
 	ImGui::Separator();
 	ImGui::Text("Scene settings.");
-	ImGui::Checkbox("UseWorldGrid?", &m_isWireGridOn);
-	ImGui::Checkbox("Enable lights?", &m_isRenderingLightOn);
-	ImGui::Checkbox("Enable skybox?", &m_isSkyboxOn);
+	ImGui::Checkbox("UseWorldGrid?", &m_rendererSettings.m_isWireGridOn);
+	ImGui::Checkbox("Enable lights?", &m_rendererSettings.m_isRenderingLightOn);
+	ImGui::Checkbox("Enable skybox?", &m_rendererSettings.m_isSkyboxOn);
 	ImGui::End();
 	ImGui::Begin("Loading panel");
 	ImGui::Text("Loading stuff here.");
@@ -106,7 +114,7 @@ void OBJ_Viewer::RenderingSettings::RenderImGui()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-nfdchar_t* OBJ_Viewer::RenderingSettings::OpenDialog()
+nfdchar_t* OBJ_Viewer::Renderer::OpenDialog()
 {
 	nfdchar_t* outPath = NULL;
 	nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPath);

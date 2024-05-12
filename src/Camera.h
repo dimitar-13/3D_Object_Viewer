@@ -3,6 +3,7 @@
 #include<glm/gtc/matrix_transform.hpp>
 namespace OBJ_Viewer
 {
+
 	class Camera
 	{
 	public:

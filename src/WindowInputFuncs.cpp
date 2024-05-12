@@ -15,3 +15,9 @@ void OBJ_Viewer::WindowInputFuncs::scroll_callback(GLFWwindow* window, double xo
 void OBJ_Viewer::WindowInputFuncs::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 }
+
+void OBJ_Viewer::WindowInputFuncs::window_size_callback(GLFWwindow* window, int width, int height)
+{
+	//Sets update the window size;
+	glViewport(0, 0, width, height);
+}

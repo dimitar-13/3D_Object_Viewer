@@ -9,9 +9,17 @@
 #include"ModelLoader.h"
 #include"ShaderClass.h"
 #include"Camera.h"
+#include"WindowHandler.h"
 #include <nfd.h>
+#include"ShaderPath.h"
 namespace OBJ_Viewer
 {
+	class Renderer
+	{
+	public:
+		void RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera);
+	};
+
 	struct RendererSettings
 	{
 		static inline bool m_isWireFrameRenderingOn;
@@ -24,26 +32,27 @@ namespace OBJ_Viewer
 		static inline bool m_isRenderingLightOn;
 	};
 	struct RendererShaders {
-		RendererShaders() :colorShader("ColorShaderPath"), lightShader("LightSHaderPath"), skyboxShader("SkyboxPath") {}
+		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
 		ShaderClass colorShader;
-		ShaderClass lightShader;
-		ShaderClass skyboxShader;
+		//ShaderClass lightShader;
+		//ShaderClass skyboxShader;
 	};
-
-	class Renderer
-	{
+	class RendererCoordinator {
 	public:
-		Renderer();
-	public:
+		RendererCoordinator(Window* m_windowHandler);
+		void RenderLoop();
+		void RenderScene();
+		void RenderImGui();
+		nfdchar_t* OpenDialog();
+	private:
 		RendererSettings m_rendererSettings;
 		Model* currentlyLoadedModel = nullptr;
+		//Camera m_Camera;
+		Window* m_windowHandler = nullptr;
 		RendererShaders m_rendererShaders;
-		Camera m_Camera;
-	public:
-		 void RenderLoop();
-		 void RenderScene();
-		 void RenderImGui();
-		 nfdchar_t* OpenDialog();
+		Renderer m_mainRenderer;
 	};
 }
+
+	
 

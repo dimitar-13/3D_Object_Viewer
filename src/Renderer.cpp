@@ -2,6 +2,7 @@
 #include "VertexAttributeObject.h"
 #include"ShaderClass.h"
 #include"Application.h"
+#include"ModelLoader.h"
 constexpr float scaleVal = 1 / 1;
 //Test objs;
 static std::vector<float> vertices = { -0.5f * scaleVal, -0.5f * scaleVal, // bottom left corner
@@ -13,12 +14,15 @@ static std::vector <unsigned int> indices = { 0,1,2, // first triangle (bottom l
 					 0,2,3 }; // second triangle (bottom left - top right - bottom right)
 
 
-void OBJ_Viewer::Renderer::RenderLoop()
+void OBJ_Viewer::RendererCoordinator::RenderLoop()
 {
-	ShaderClass shader("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Shaders/Shader.glsl");
 	VertexAttributeObject vertexAttribObj = { vertices,indices };
 
-	GLFWwindow* window = Application::GetGLFW_Window();
+	GLFWwindow* window = this->m_windowHandler->GetGLFW_Window();
+
+	Mesh square(vertices, indices,glm::mat4(0));
+	std::vector<Mesh> meshVec = { square };
+	Model defaultModel(meshVec);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -30,11 +34,14 @@ void OBJ_Viewer::Renderer::RenderLoop()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		shader.UseShader();
-		vertexAttribObj.BindBuffer();
-		glDrawElements(GL_TRIANGLES, vertexAttribObj.GetIndexCount(), GL_UNSIGNED_INT, NULL);
-		vertexAttribObj.UnBind();
-
+		m_rendererShaders.colorShader.UseShader();
+		for (const auto& mesh : defaultModel.GetModelMeshes())
+		{
+			mesh.GetMeshVAO().BindBuffer();
+			glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
+			mesh.GetMeshVAO().UnBind();
+		}
+		
 		RenderScene();
 		RenderImGui();
 
@@ -44,16 +51,21 @@ void OBJ_Viewer::Renderer::RenderLoop()
 
 }
 
-void OBJ_Viewer::Renderer::RenderScene()
+void OBJ_Viewer::RendererCoordinator::RenderScene()
 {
+	/*if (this->m_rendererSettings.m_isSkyboxOn)
+		this->m_mainRenderer.RenderObject(this->m_rendererShaders.skyboxShader);
+	if(this->m_rendererSettings.m_isWireGridOn)
+		this->m_mainRenderer.RenderObject();*/
+
 }
 
-OBJ_Viewer::Renderer::Renderer():m_Camera({glm::vec3(0),Application::GetWindowSize().m_winWidth,Application::GetWindowSize().m_winHeight})
+OBJ_Viewer::RendererCoordinator::RendererCoordinator(Window* windowHandler)/*:m_Camera({glm::vec3(0),Application::GetWindowSize().m_winWidth,Application::GetWindowSize().m_winHeight})*/
 {
-
+	m_windowHandler = windowHandler;
 }
 
-void OBJ_Viewer::Renderer::RenderImGui()
+void OBJ_Viewer::RendererCoordinator::RenderImGui()
 {
 	//Testing values
 	float xPos = 1.0f;
@@ -100,11 +112,9 @@ void OBJ_Viewer::Renderer::RenderImGui()
 	{
 		//Loading of object starts.
 		char* path = OpenDialog();
-
 		//Use path to load obj data;
-
+		this->currentlyLoadedModel = ModelLoader::LoadModel(path);
 		free(path);
-
 	}
 	ImGui::Text("Loading stuff here.");
 	ImGui::End();
@@ -114,7 +124,7 @@ void OBJ_Viewer::Renderer::RenderImGui()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-nfdchar_t* OBJ_Viewer::Renderer::OpenDialog()
+nfdchar_t* OBJ_Viewer::RendererCoordinator::OpenDialog()
 {
 	nfdchar_t* outPath = NULL;
 	nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPath);
@@ -126,4 +136,9 @@ nfdchar_t* OBJ_Viewer::Renderer::OpenDialog()
 		
 	}
 	return nullptr;
+}
+
+void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera)
+{
+	//TODO:Implement
 }

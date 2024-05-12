@@ -1,39 +1,37 @@
 #include "Application.h"
 
-bool OBJ_Viewer::Application::init(int winWidth, int winHeight, const char* winTitle)
+OBJ_Viewer::Application::Application()
 {
-	this->m_windowMetrics = { winWidth ,winHeight };
 	if (glfwInit() == GLFW_FALSE)
 	{
 		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
-		return false;
 	}
-	m_appWindow = glfwCreateWindow(winWidth, winHeight, winTitle, NULL, NULL);
-	if (m_appWindow == NULL)
+	
+	WindowMetrics metrics = { 1000,1000 };
+	const char* winTitle = "3D_viewer";
+	this->m_window = WindowHandler::CreateAndBindWindow(metrics, winTitle);
+	if (this->m_window->GetGLFW_Window() == NULL)
 	{
 		glfwTerminate();
 		std::cout << "[ERROR]:GLFW failed to create window." << '\n';
-		return false;
 	}
-	glfwMakeContextCurrent(m_appWindow);
 
 	if (glewInit() != GLEW_OK)
 	{
-		glfwDestroyWindow(m_appWindow);
 		glfwTerminate();
 		std::cout << "[ERROR]:GLEW failed to initialize." << '\n';
-		return false;
 	}
 	glewExperimental = GL_TRUE;
+	glViewport(0, 0, metrics.m_winWidth, metrics.m_winHeight);
 	InitImGui();
-	return true;
 }
+
 OBJ_Viewer::Application::~Application()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-	glfwDestroyWindow(m_appWindow);
+	glfwDestroyWindow(this->m_window->GetGLFW_Window());
 	glfwTerminate();
 }
 void OBJ_Viewer::Application::InitImGui()
@@ -41,6 +39,6 @@ void OBJ_Viewer::Application::InitImGui()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui_ImplGlfw_InitForOpenGL(m_appWindow, true);
+	ImGui_ImplGlfw_InitForOpenGL(this->m_window->GetGLFW_Window(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }

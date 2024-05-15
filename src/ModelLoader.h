@@ -35,8 +35,7 @@ namespace OBJ_Viewer
 		std::vector<Mesh> m_meshes;
 	};
 
-
-	class ModelLoader
+	class  ModelLoader
 	{
 	public:
 		static Model* LoadModel(const char* path);

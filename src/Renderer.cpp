@@ -35,6 +35,7 @@ void OBJ_Viewer::RendererCoordinator::RenderLoop()
 		ImGui::NewFrame();
 
 		m_rendererShaders.colorShader.UseShader();
+		m_rendererShaders.colorShader.UniformSet4x4FloatMatrix("ViewProjMatrix", m_Camera->GetViewProjMatrix());
 		for (const auto& mesh : defaultModel.GetModelMeshes())
 		{
 			mesh.GetMeshVAO().BindBuffer();
@@ -60,9 +61,11 @@ void OBJ_Viewer::RendererCoordinator::RenderScene()
 
 }
 
-OBJ_Viewer::RendererCoordinator::RendererCoordinator(Window* windowHandler)/*:m_Camera({glm::vec3(0),Application::GetWindowSize().m_winWidth,Application::GetWindowSize().m_winHeight})*/
+OBJ_Viewer::RendererCoordinator::RendererCoordinator(Window* windowHandler)/*:m_Camera(})*/
 {
 	m_windowHandler = windowHandler;
+	m_Camera = new Camera(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight);
+	m_windowHandler->GetMousePosNotifier().Attach(m_Camera);
 }
 
 void OBJ_Viewer::RendererCoordinator::RenderImGui()

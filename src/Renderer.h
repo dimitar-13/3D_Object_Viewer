@@ -47,7 +47,7 @@ namespace OBJ_Viewer
 	private:
 		RendererSettings m_rendererSettings;
 		Model* currentlyLoadedModel = nullptr;
-		//Camera m_Camera;
+		Camera* m_Camera;
 		Window* m_windowHandler = nullptr;
 		RendererShaders m_rendererShaders;
 		Renderer m_mainRenderer;

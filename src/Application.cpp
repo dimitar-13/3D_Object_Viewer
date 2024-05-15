@@ -9,7 +9,7 @@ OBJ_Viewer::Application::Application()
 	
 	WindowMetrics metrics = { 1000,1000 };
 	const char* winTitle = "3D_viewer";
-	this->m_window = WindowHandler::CreateAndBindWindow(metrics, winTitle);
+	this->m_window = new Window(metrics, winTitle);
 	if (this->m_window->GetGLFW_Window() == NULL)
 	{
 		glfwTerminate();

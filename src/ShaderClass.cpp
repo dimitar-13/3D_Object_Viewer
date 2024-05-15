@@ -39,7 +39,7 @@ std::vector<std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* p
     sourceFile.open(path);
     if (!sourceFile.is_open())
     {
-        std::cout << "Was not able to open file." <<'\n';
+        std::cout << "Was not able to open file at path:" << path <<'\n';
     }
     std::string line;
     std::vector<std::string>shaderSources(2);

@@ -7,8 +7,9 @@ namespace OBJ_Viewer
 	struct EulerAngles {
 		float m_yawAngle;
 		float m_pitchAngle;
-		EulerAngles operator+=(EulerAngles other) {
-			return { other.m_yawAngle + this->m_yawAngle, other.m_pitchAngle + this->m_pitchAngle};
+		void operator+=(EulerAngles other) {
+			this->m_yawAngle += other.m_yawAngle;
+			this->m_pitchAngle += other.m_pitchAngle;
 		}
 	};
 	class EulerAngleHelper {
@@ -21,7 +22,7 @@ namespace OBJ_Viewer
 
 	class Camera:
 		public IObserver<double,double>,
-			   IObserver<int,int>
+		public IObserver<int,int>
 	{
 	public:
 		Camera(float CameraZoom, int width, int height);
@@ -33,10 +34,9 @@ namespace OBJ_Viewer
 		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
-
 		// Inherited via IObserver
-		void Update(double xpos, double ypos) override;
-		void Update(int newWidht, int newHeight) override;
+		void Update(MessageType type,double xpos, double ypos) override;
+		void Update(MessageType type, int newWidht, int newHeight) override;
 	};
 }
 

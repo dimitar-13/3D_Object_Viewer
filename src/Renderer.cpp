@@ -64,8 +64,10 @@ void OBJ_Viewer::RendererCoordinator::RenderScene()
 OBJ_Viewer::RendererCoordinator::RendererCoordinator(Window* windowHandler)/*:m_Camera(})*/
 {
 	m_windowHandler = windowHandler;
-	m_Camera = new Camera(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight);
-	m_windowHandler->GetMousePosNotifier().Attach(m_Camera);
+	m_Camera =std::make_unique<Camera>(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight);
+	m_windowHandler->GetMousePosNotifier().Attach(m_Camera.get());
+	m_windowHandler->GetScrollChangeNotifier().Attach(m_Camera.get());
+	m_windowHandler->GetWindowSizeChangeNotifier().Attach(m_Camera.get());
 }
 
 void OBJ_Viewer::RendererCoordinator::RenderImGui()

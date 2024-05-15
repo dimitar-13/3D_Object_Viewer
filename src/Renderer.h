@@ -12,6 +12,7 @@
 #include"WindowHandler.h"
 #include <nfd.h>
 #include"ShaderPath.h"
+#include<memory>
 namespace OBJ_Viewer
 {
 	class Renderer
@@ -47,7 +48,7 @@ namespace OBJ_Viewer
 	private:
 		RendererSettings m_rendererSettings;
 		Model* currentlyLoadedModel = nullptr;
-		Camera* m_Camera;
+		std::unique_ptr<Camera> m_Camera;
 		Window* m_windowHandler = nullptr;
 		RendererShaders m_rendererShaders;
 		Renderer m_mainRenderer;

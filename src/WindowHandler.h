@@ -16,12 +16,16 @@ namespace OBJ_Viewer {
 		WindowMetrics GetWindowSize()const { return this->m_windowMetrics; }
 		GLFWwindow* GetGLFW_Window()const { return this->m_glfwWindow; }
 		Notifier<double, double>& GetMousePosNotifier() { return m_posChangeNotifier; }
+		Notifier<double, double>& GetScrollChangeNotifier() { return m_scrollChangeNotifier; }
+		Notifier<int, int>& GetWindowSizeChangeNotifier() { return m_windowSizeChanged; }
 	private:
 		WindowMetrics m_windowMetrics;
 		GLFWwindow* m_glfwWindow;
 		const char* m_winTitle;
 		Notifier<double, double> m_posChangeNotifier;
-	private:
+		Notifier<double, double> m_scrollChangeNotifier;
+		Notifier<int, int> m_windowSizeChanged;
+ 	private:
 		void SetWindowCallback();
 		void glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 		void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

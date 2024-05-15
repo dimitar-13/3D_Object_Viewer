@@ -50,7 +50,7 @@ void OBJ_Viewer::Window::SetWindowCallback()
 void OBJ_Viewer::Window::glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	//Update the window information;
-	m_posChangeNotifier.Notify(xpos, ypos);
+	m_posChangeNotifier.Notify(MOUSE_POSITION_CHANGED,xpos, ypos);
 }
 
 void OBJ_Viewer::Window::glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -59,6 +59,7 @@ void OBJ_Viewer::Window::glfwMouseButtonCallback(GLFWwindow* window, int button,
 
 void OBJ_Viewer::Window::glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	m_scrollChangeNotifier.Notify(MOUSE_SCROLL_CHANGED,xoffset, yoffset);
 }
 
 void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -67,4 +68,5 @@ void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scanco
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
+	m_windowSizeChanged.Notify(WINDOW_SIZE_CHANGED, width, height);
 }

@@ -5,6 +5,7 @@
 #include"ModelLoader.h"
 #include"MeshGeneratingMethods.h"
 #include"DialogWrapper.h"
+#include"imgui_internal.h"
 
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
@@ -54,6 +55,46 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler)/*:
 	m_windowHandler->GetScrollChangeNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetWindowSizeChangeNotifier().Attach(m_Camera.get());
 	m_currentlyLoadedModel.reset(GenerateCubeModel());
+
+
+	bool open = true;
+
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &open, window_flags);
+	ImGui::PopStyleVar();
+
+	ImGui::PopStyleVar(2);
+
+	if (ImGui::DockBuilderGetNode(ImGui::GetID("MyDockspace")) == NULL)
+	{
+		ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
+		ImGui::DockBuilderAddNode(dockspace_id, viewport->Size); // Add empty node
+
+		ImGuiID dock_main_id = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
+		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
+		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, NULL, &dock_main_id);
+		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
+
+		ImGui::DockBuilderDockWindow("James_1", dock_id_left);
+		ImGui::DockBuilderDockWindow("James_2", dock_main_id);
+		ImGui::DockBuilderDockWindow("James_3", dock_id_right);
+		ImGui::DockBuilderDockWindow("James_4", dock_id_bottom);
+		ImGui::DockBuilderFinish(dockspace_id);
+	}
+
+
 }
 
 void OBJ_Viewer::RenderingCoordinator::RenderImGui()
@@ -65,6 +106,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 	glm::vec3 rotation = { 0,0,0 };
 
 	uint32_t vertexCount = 4050, triangleCount = 2323, faceCount = 23232;
+
 
 	//Right panel for model and rendering settings.
 	ImGui::Begin("Test");

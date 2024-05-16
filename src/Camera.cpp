@@ -20,7 +20,7 @@ void OBJ_Viewer::Camera::CalculatePositionVector()
 	m_position = glm::normalize(m_position);
 }
 
-glm::mat4 OBJ_Viewer::Camera::GetViewProjMatrix()
+glm::mat4 OBJ_Viewer::Camera::GetViewProjMatrix()const
 {
 	return m_projectionMatrix * glm::lookAt(m_position *m_zoom,glm::vec3(0.0f), glm::vec3(0, 1, 0));
 }

@@ -47,8 +47,6 @@ namespace OBJ_Viewer
 		void RenderLoop();
 		void RenderScene();
 		void RenderImGui();
-		//TODO:Move this into a differend class;
-		nfdchar_t* OpenDialog();
 	private:
 		RendererSettings m_rendererSettings;
 		std::shared_ptr<Model> m_currentlyLoadedModel;

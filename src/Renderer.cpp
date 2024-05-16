@@ -4,21 +4,10 @@
 #include"Application.h"
 #include"ModelLoader.h"
 #include"MeshGeneratingMethods.h"
-constexpr float scaleVal = 1 / 1;
-//Test objs;
-static std::vector<float> vertices = { -0.5f * scaleVal, -0.5f * scaleVal, // bottom left corner
-										-0.5f * scaleVal,  0.5f * scaleVal, // top left corner
-										 0.5f * scaleVal,  0.5f * scaleVal, // top right corner
-										 0.5f * scaleVal, -0.5f * scaleVal, }; // bottom right corner
-
-static std::vector <unsigned int> indices = { 0,1,2, // first triangle (bottom left - top left - top right)
-					 0,2,3 }; // second triangle (bottom left - top right - bottom right)
-
+#include"DialogWrapper.h"
 
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
-	VertexAttributeObject vertexAttribObj = { vertices,indices };
-
 	GLFWwindow* window = this->m_windowHandler->GetGLFW_Window();
 
 	//Mesh square(vertices, indices,glm::mat4(0));
@@ -125,14 +114,10 @@ void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 	ImGui::Begin("Loading panel");
 	if (ImGui::Button("Open obj file"))
 	{
-		//Loading of object starts.
-		char* path = OpenDialog();
-		//Use path to load obj data;
-		//this->m_currentlyLoadedModel = ModelLoader::LoadModel(path);
-		free(path);
+		DialogWrapper dialog;
+		if (dialog.GetDialogPath() != NULL)
+			this->m_currentlyLoadedModel.reset(ModelLoader::LoadModel(dialog.GetDialogPath()));
 	}
-
-	
 
 	ImGui::Text("Loading stuff here.");
 	ImGui::End();
@@ -142,19 +127,6 @@ void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-nfdchar_t* OBJ_Viewer::RenderingCoordinator::OpenDialog()
-{
-	nfdchar_t* outPath = NULL;
-	nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPath);
-	if (result == NFD_OKAY) {
-		return outPath;
-	}
-	else {
-		printf("Error: %s\n", NFD_GetError());
-		
-	}
-	return nullptr;
-}
 
 void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera)
 {

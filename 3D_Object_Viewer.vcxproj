@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClInclude Include="Shaders\ShaderPath.h" />
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\DialogWrapper.h" />
     <ClInclude Include="src\IObserver.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshGeneratingMethods.h" />

@@ -9,11 +9,6 @@
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
 	GLFWwindow* window = this->m_windowHandler->GetGLFW_Window();
-
-	//Mesh square(vertices, indices,glm::mat4(0));
-	//std::vector<Mesh> meshVec = { square };
-	//Model defaultModel(meshVec);
-
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
@@ -24,16 +19,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-
-		m_rendererShaders.colorShader.UseShader();
-		m_rendererShaders.colorShader.UniformSet4x4FloatMatrix("ViewProjMatrix", m_Camera->GetViewProjMatrix());
-		for (const auto& mesh : m_currentlyLoadedModel->GetModelMeshes())
-		{
-			mesh.GetMeshVAO().BindBuffer();
-			glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
-			mesh.GetMeshVAO().UnBind();
-		}
-		
+	
 		RenderScene();
 		RenderImGui();
 
@@ -57,6 +43,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 		m_mainRenderer.DisableWireFrame();
 	//Submit to render;
 	//m_mainRenderer.RenderObject(/*Shader to use*/, *m_currentlyLoadedModel);
+	m_mainRenderer.RenderObject(m_rendererShaders.colorShader, *m_currentlyLoadedModel, *m_Camera);
 }
 
 OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler)/*:m_Camera(})*/
@@ -130,5 +117,12 @@ void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 
 void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera)
 {
-	//TODO:Implement
+	shaderToUse.UseShader();
+	shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
+	for (const auto& mesh : modelToRender.GetModelMeshes())
+	{
+		mesh.GetMeshVAO().BindBuffer();
+		glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
+		mesh.GetMeshVAO().UnBind();
+	}
 }

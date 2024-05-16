@@ -1,6 +1,7 @@
 #include "WindowHandler.h"
 #include"WindowInputFuncs.h"
 #include<functional>
+#include"imgui.h"
 
 OBJ_Viewer::Window::Window(WindowMetrics windowMetrics, const char* winTitle)
 {
@@ -68,5 +69,7 @@ void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scanco
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
+	this->m_windowMetrics = { width,height };
+	//glViewport(0, 0, width, height);
 	m_windowSizeChanged.Notify(WINDOW_SIZE_CHANGED, width, height);
 }

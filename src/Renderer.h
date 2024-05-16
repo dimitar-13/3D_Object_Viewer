@@ -47,12 +47,14 @@ namespace OBJ_Viewer
 		void RenderLoop();
 		void RenderScene();
 		void RenderImGui();
+		void CreateFrameBuffer();
 	private:
 		RendererSettings m_rendererSettings;
 		std::shared_ptr<Model> m_currentlyLoadedModel;
 		std::unique_ptr<Camera> m_Camera;
 		Window* m_windowHandler = nullptr;
 		RendererShaders m_rendererShaders;
+		GLuint m_framebuffer,m_readBuffer,m_framebufferTextureID;
 		Renderer m_mainRenderer;
 	};
 }

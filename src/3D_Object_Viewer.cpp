@@ -4,7 +4,7 @@
 int main()
 {
 	OBJ_Viewer::Application app;
-	OBJ_Viewer::RendererCoordinator renderer(&app.GetAppWindow());
+	OBJ_Viewer::RenderingCoordinator renderer(&app.GetAppWindow());
 	renderer.RenderLoop();
 	return 1;
 

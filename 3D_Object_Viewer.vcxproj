@@ -175,6 +175,7 @@
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\IObserver.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\MeshGeneratingMethods.h" />
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\ShaderClass.h" />

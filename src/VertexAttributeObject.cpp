@@ -38,7 +38,7 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<float> vert
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_indexBufferObjHandle);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexData.size(), indexData.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT,GL_FALSE, sizeof(float)*2, (void*)0);
+	glVertexAttribPointer(0,3, GL_FLOAT,GL_FALSE, sizeof(float)*3, (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);

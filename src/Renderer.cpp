@@ -3,6 +3,7 @@
 #include"ShaderClass.h"
 #include"Application.h"
 #include"ModelLoader.h"
+#include"MeshGeneratingMethods.h"
 constexpr float scaleVal = 1 / 1;
 //Test objs;
 static std::vector<float> vertices = { -0.5f * scaleVal, -0.5f * scaleVal, // bottom left corner
@@ -14,20 +15,21 @@ static std::vector <unsigned int> indices = { 0,1,2, // first triangle (bottom l
 					 0,2,3 }; // second triangle (bottom left - top right - bottom right)
 
 
-void OBJ_Viewer::RendererCoordinator::RenderLoop()
+void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
 	VertexAttributeObject vertexAttribObj = { vertices,indices };
 
 	GLFWwindow* window = this->m_windowHandler->GetGLFW_Window();
 
-	Mesh square(vertices, indices,glm::mat4(0));
-	std::vector<Mesh> meshVec = { square };
-	Model defaultModel(meshVec);
+	//Mesh square(vertices, indices,glm::mat4(0));
+	//std::vector<Mesh> meshVec = { square };
+	//Model defaultModel(meshVec);
 
+	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0, 0, 0, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
 		
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -36,7 +38,7 @@ void OBJ_Viewer::RendererCoordinator::RenderLoop()
 
 		m_rendererShaders.colorShader.UseShader();
 		m_rendererShaders.colorShader.UniformSet4x4FloatMatrix("ViewProjMatrix", m_Camera->GetViewProjMatrix());
-		for (const auto& mesh : defaultModel.GetModelMeshes())
+		for (const auto& mesh : m_currentlyLoadedModel->GetModelMeshes())
 		{
 			mesh.GetMeshVAO().BindBuffer();
 			glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
@@ -52,25 +54,33 @@ void OBJ_Viewer::RendererCoordinator::RenderLoop()
 
 }
 
-void OBJ_Viewer::RendererCoordinator::RenderScene()
+void OBJ_Viewer::RenderingCoordinator::RenderScene()
 {
+	//Set up the renderer based on the settings;
+
 	/*if (this->m_rendererSettings.m_isSkyboxOn)
 		this->m_mainRenderer.RenderObject(this->m_rendererShaders.skyboxShader);
 	if(this->m_rendererSettings.m_isWireGridOn)
 		this->m_mainRenderer.RenderObject();*/
-
+	if (m_rendererSettings.m_isWireFrameRenderingOn)
+		m_mainRenderer.EnableWireFrame();
+	if (!m_rendererSettings.m_isWireFrameRenderingOn)
+		m_mainRenderer.DisableWireFrame();
+	//Submit to render;
+	//m_mainRenderer.RenderObject(/*Shader to use*/, *m_currentlyLoadedModel);
 }
 
-OBJ_Viewer::RendererCoordinator::RendererCoordinator(Window* windowHandler)/*:m_Camera(})*/
+OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler)/*:m_Camera(})*/
 {
 	m_windowHandler = windowHandler;
 	m_Camera =std::make_unique<Camera>(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight);
 	m_windowHandler->GetMousePosNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetScrollChangeNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetWindowSizeChangeNotifier().Attach(m_Camera.get());
+	m_currentlyLoadedModel.reset(GenerateCubeModel());
 }
 
-void OBJ_Viewer::RendererCoordinator::RenderImGui()
+void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 {
 	//Testing values
 	float xPos = 1.0f;
@@ -118,9 +128,12 @@ void OBJ_Viewer::RendererCoordinator::RenderImGui()
 		//Loading of object starts.
 		char* path = OpenDialog();
 		//Use path to load obj data;
-		this->currentlyLoadedModel = ModelLoader::LoadModel(path);
+		//this->m_currentlyLoadedModel = ModelLoader::LoadModel(path);
 		free(path);
 	}
+
+	
+
 	ImGui::Text("Loading stuff here.");
 	ImGui::End();
 
@@ -129,7 +142,7 @@ void OBJ_Viewer::RendererCoordinator::RenderImGui()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-nfdchar_t* OBJ_Viewer::RendererCoordinator::OpenDialog()
+nfdchar_t* OBJ_Viewer::RenderingCoordinator::OpenDialog()
 {
 	nfdchar_t* outPath = NULL;
 	nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPath);

@@ -19,18 +19,21 @@ namespace OBJ_Viewer
 	{
 	public:
 		void RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera);
+		void EnableWireFrame() { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+		void DisableWireFrame(){ glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+		//void DrawSkybox();
 	};
 
 	struct RendererSettings
 	{
-		static inline bool m_isWireFrameRenderingOn;
-		static inline bool m_isRenderAlbedoTextureOn;
-		static inline bool m_isRenderSpecularTextureOn;
-		static inline bool m_isRenderNormalTextureOn;
-		static inline bool m_isSkyboxOn;
-		static inline bool m_isWireGridOn;
-		static inline bool m_isRenderAmbientOcclusionTextureOn;
-		static inline bool m_isRenderingLightOn;
+		bool m_isWireFrameRenderingOn;
+		bool m_isRenderAlbedoTextureOn;
+		bool m_isRenderSpecularTextureOn;
+		bool m_isRenderNormalTextureOn;
+		bool m_isSkyboxOn;
+		bool m_isWireGridOn;
+		bool m_isRenderAmbientOcclusionTextureOn;
+		bool m_isRenderingLightOn;
 	};
 	struct RendererShaders {
 		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
@@ -38,16 +41,17 @@ namespace OBJ_Viewer
 		//ShaderClass lightShader;
 		//ShaderClass skyboxShader;
 	};
-	class RendererCoordinator {
+	class RenderingCoordinator {
 	public:
-		RendererCoordinator(Window* m_windowHandler);
+		RenderingCoordinator(Window* m_windowHandler);
 		void RenderLoop();
 		void RenderScene();
 		void RenderImGui();
+		//TODO:Move this into a differend class;
 		nfdchar_t* OpenDialog();
 	private:
 		RendererSettings m_rendererSettings;
-		Model* currentlyLoadedModel = nullptr;
+		std::shared_ptr<Model> m_currentlyLoadedModel;
 		std::unique_ptr<Camera> m_Camera;
 		Window* m_windowHandler = nullptr;
 		RendererShaders m_rendererShaders;

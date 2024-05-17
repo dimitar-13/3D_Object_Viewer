@@ -141,6 +141,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
@@ -171,6 +172,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="Shaders\ShaderPath.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\DialogWrapper.h" />

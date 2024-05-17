@@ -23,7 +23,6 @@ namespace OBJ_Viewer
 		void DisableWireFrame(){ glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
 		//void DrawSkybox();
 	};
-
 	struct RendererSettings
 	{
 		bool m_isWireFrameRenderingOn;
@@ -35,27 +34,41 @@ namespace OBJ_Viewer
 		bool m_isRenderAmbientOcclusionTextureOn;
 		bool m_isRenderingLightOn;
 	};
+	class UIRenderer {
+	public:
+		UIRenderer(ImGuiWindowFlags imguiWindowFlags, ImGuiDockNodeFlags imGuiDockSpaceFlags, RendererSettings* pRendererSettings, Model* pCurrentlyLoadedModel);
+		void RenderUI(GLuint frameBuffer);
+		ImVec2 GetSceneViewImgSize()const{return m_sceneViewImgSize; }
+	private:
+		ImGuiWindowFlags m_imGuiWindowFlags;
+		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
+		ImVec2 m_sceneViewImgSize;
+		RendererSettings* m_pRendererSettings;
+		Model* m_pCurrentlyLoadedModel;
+	};	
 	struct RendererShaders {
 		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
 		ShaderClass colorShader;
 		//ShaderClass lightShader;
 		//ShaderClass skyboxShader;
 	};
-	class RenderingCoordinator {
+	class RenderingCoordinator{
 	public:
 		RenderingCoordinator(Window* m_windowHandler);
+		~RenderingCoordinator();
 		void RenderLoop();
 		void RenderScene();
 		void RenderImGui();
 		void CreateFrameBuffer();
+		void resize_buffer(ImVec2 newSize);
 	private:
 		RendererSettings m_rendererSettings;
 		std::shared_ptr<Model> m_currentlyLoadedModel;
 		std::unique_ptr<Camera> m_Camera;
 		Window* m_windowHandler = nullptr;
 		RendererShaders m_rendererShaders;
-		GLuint m_framebuffer,m_readBuffer,m_framebufferTextureID;
 		Renderer m_mainRenderer;
+		UIRenderer m_imGuiUIRenderer;
 	};
 }
 

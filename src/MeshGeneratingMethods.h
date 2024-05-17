@@ -25,14 +25,14 @@ namespace OBJ_Viewer {
             4, 5, 7
         };
         std::vector<GLfloat> vertices{
-            -1, -1,  0.5, //0
-             1, -1,  0.5, //1
-            -1,  1,  0.5, //2
-             1,  1,  0.5, //3
-            -1, -1, -0.5, //4
-             1, -1, -0.5, //5
-            -1,  1, -0.5, //6
-             1,  1, -0.5  //7
+            -0.5, -0.5,  0.5, //0
+             0.5, -0.5,  0.5, //1
+            -0.5,  0.5,  0.5, //2
+             0.5,  0.5,  0.5, //3
+            -0.5, -0.5, -0.5, //4
+             0.5, -0.5, -0.5, //5
+            -0.5,  0.5, -0.5, //6
+             0.5,  0.5, -0.5  //7
         };
         Mesh cubeMesh(vertices, indices, glm::mat4(1));
         //Expects vector of meshes using {} as a constructor instead of wrapping it in std::vector<Mesh> meshes;

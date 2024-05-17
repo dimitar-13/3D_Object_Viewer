@@ -20,7 +20,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 		{
 			winSize = m_imGuiUIRenderer.GetSceneViewImgSize();
 			glViewport(0, 0, winSize.x, winSize.y);
-			resize_buffer(winSize);
+			this->m_sceneFramebuffer.ResizeFramebuffer(winSize.x, winSize.y);
 		}
 		RenderScene();
 		glfwSwapBuffers(window);
@@ -43,76 +43,29 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 		m_mainRenderer.DisableWireFrame();
 	//Submit to render;
 	//m_mainRenderer.RenderObject(/*Shader to use*/, *m_currentlyLoadedModel);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer);
+	this->m_sceneFramebuffer.BindFramebuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 0, 0, 1);
 	m_mainRenderer.RenderObject(m_rendererShaders.colorShader, *m_currentlyLoadedModel, *m_Camera);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	this->m_sceneFramebuffer.UnbindFramebuffer();
 
 }
 
 OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler):m_currentlyLoadedModel(GenerateCubeModel()),
 	m_imGuiUIRenderer(ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None,
-		&this->m_rendererSettings, m_currentlyLoadedModel.get())
+		&this->m_rendererSettings, m_currentlyLoadedModel.get()), m_sceneFramebuffer(1000,1000,FRAMEBUFFER_COLOR_ATTACHMENT)
 {
 	m_windowHandler = windowHandler;
 	m_Camera =std::make_unique<Camera>(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight);
 	m_windowHandler->GetMousePosNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetScrollChangeNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetWindowSizeChangeNotifier().Attach(m_Camera.get());
-	CreateFrameBuffer();
-}
-
-OBJ_Viewer::RenderingCoordinator::~RenderingCoordinator()
-{
-	glDeleteTextures(1, &this->m_framebufferTextureID);
-	glDeleteFramebuffers(1, &this->m_framebuffer);
-	glDeleteRenderbuffers(1, &this->m_readBuffer);
 }
 
 void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 {
-	m_imGuiUIRenderer.RenderUI(this->m_framebuffer);	
+	m_imGuiUIRenderer.RenderUI(this->m_sceneFramebuffer.GetFramebufferTextureHandle());
 }
-void OBJ_Viewer::RenderingCoordinator::resize_buffer(ImVec2 newSize)
-{
-	glBindTexture(GL_TEXTURE_2D, this->m_framebufferTextureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newSize.x, newSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->m_framebufferTextureID, 0);
-
-	glBindRenderbuffer(GL_RENDERBUFFER, this->m_readBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newSize.x, newSize.y);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->m_readBuffer);
-
-}
-void OBJ_Viewer::RenderingCoordinator::CreateFrameBuffer()
-{
-	glGenFramebuffers(1, &this->m_framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer);
-
-	glGenTextures(1, &this->m_framebufferTextureID);
-	glBindTexture(GL_TEXTURE_2D, this->m_framebufferTextureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->m_windowHandler->GetWindowSize().m_winWidth, this->m_windowHandler->GetWindowSize().m_winHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->m_framebufferTextureID, 0);
-	glGenRenderbuffers(1, &this->m_readBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, this->m_readBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, this->m_windowHandler->GetWindowSize().m_winWidth, this->m_windowHandler->GetWindowSize().m_winHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->m_readBuffer);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cout << "[ERROR]:Failed to create valid framebuffer." << '\n';
-		return;
-	}
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
 
 void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera)
 {
@@ -132,25 +85,16 @@ OBJ_Viewer::UIRenderer::UIRenderer(ImGuiWindowFlags imGuiWindowFlags,
 	this->m_pCurrentlyLoadedModel = pCurrentlyLoadedModel;
 	this->m_pRendererSettings = pRendererSettings;
 
-	bool opt_fullScreen = true;
-	bool opt_padding = false;
-	bool p_open = true;
 	this->m_imgGuiDockSpaceFlags = imGuiDockSpaceFlags;
 	this->m_imGuiWindowFlags = imGuiWindowFlags;
 
-	if (opt_fullScreen)
-	{
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(viewport->WorkPos);
-		ImGui::SetNextWindowSize(viewport->WorkSize);
-		ImGui::SetNextWindowViewport(viewport->ID);
-		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-	}
-	else
-	{
-		this->m_imgGuiDockSpaceFlags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-	}
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
 	if (this->m_imgGuiDockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBackground;
 
@@ -168,7 +112,6 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	glm::vec3 position = { 0,0,0 };
 	glm::vec3 scale = { 1,1,1 };
 	glm::vec3 rotation = { 0,0,0 };
-	bool open = true;
 	uint32_t vertexCount = 4050, triangleCount = 2323, faceCount = 23232;
 
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -177,7 +120,7 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 
-	ImGui::Begin("DockSpace Demo", &open, m_imGuiWindowFlags);
+	ImGui::Begin("DockSpace Demo", (bool*)true, m_imGuiWindowFlags);
 	ImGuiIO& io = ImGui::GetIO();
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{

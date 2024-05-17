@@ -13,6 +13,7 @@
 #include <nfd.h>
 #include"ShaderPath.h"
 #include<memory>
+#include"Framebuffer.h"
 namespace OBJ_Viewer
 {
 	class Renderer
@@ -55,12 +56,9 @@ namespace OBJ_Viewer
 	class RenderingCoordinator{
 	public:
 		RenderingCoordinator(Window* m_windowHandler);
-		~RenderingCoordinator();
 		void RenderLoop();
 		void RenderScene();
 		void RenderImGui();
-		void CreateFrameBuffer();
-		void resize_buffer(ImVec2 newSize);
 	private:
 		RendererSettings m_rendererSettings;
 		std::shared_ptr<Model> m_currentlyLoadedModel;
@@ -69,6 +67,7 @@ namespace OBJ_Viewer
 		RendererShaders m_rendererShaders;
 		Renderer m_mainRenderer;
 		UIRenderer m_imGuiUIRenderer;
+		Framebuffer m_sceneFramebuffer;
 	};
 }
 

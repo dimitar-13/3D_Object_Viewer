@@ -1,5 +1,5 @@
 #include "Application.h"
-
+#include"imgui_internal.h"
 OBJ_Viewer::Application::Application()
 {
 	if (glfwInit() == GLFW_FALSE)
@@ -7,7 +7,7 @@ OBJ_Viewer::Application::Application()
 		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
 	}
 	
-	WindowMetrics metrics = { 1000,1000 };
+	WindowMetrics metrics = { 700,700 };
 	const char* winTitle = "3D_viewer";
 	this->m_window = new Window(metrics, winTitle);
 	if (this->m_window->GetGLFW_Window() == NULL)
@@ -39,6 +39,9 @@ void OBJ_Viewer::Application::InitImGui()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
+
 	ImGui_ImplGlfw_InitForOpenGL(this->m_window->GetGLFW_Window(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }

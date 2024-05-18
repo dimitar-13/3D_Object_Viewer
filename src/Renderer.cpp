@@ -154,7 +154,25 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	ImGui::Text("Scene settings.");
 	ImGui::Checkbox("UseWorldGrid?", &m_pRendererSettings->m_isWireGridOn);
 	ImGui::Checkbox("Enable lights?", &m_pRendererSettings->m_isRenderingLightOn);
+	if (m_pRendererSettings->m_isRenderingLightOn)
+	{
+		static float color;
+		static int lightCount;
+		ImGui::InputInt("Light count", &lightCount);
+		ImGui::ColorPicker4("Light color", &color);
+	}
 	ImGui::Checkbox("Enable skybox?", &m_pRendererSettings->m_isSkyboxOn);
+	if (m_pRendererSettings->m_isSkyboxOn)
+	{
+		ImGui::Separator();
+		ImGui::Button("Load front texture.");
+		ImGui::Button("Load back texture.");
+		ImGui::Button("Load top texture.");
+		ImGui::Button("Load bottom texture.");
+		ImGui::Button("Load left texture.");
+		ImGui::Button("Load right texture.");
+		ImGui::Separator();
+	}
 	ImGui::End();
 	ImGui::Begin("Loading panel");
 	ImGui::Text("Loading stuff here.");

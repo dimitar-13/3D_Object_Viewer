@@ -141,6 +141,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\InputHandler.cpp" />
     <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
@@ -172,6 +173,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\InputHandler.h" />
     <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="Shaders\ShaderPath.h" />
     <ClInclude Include="src\Application.h" />

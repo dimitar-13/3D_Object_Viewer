@@ -55,7 +55,7 @@ namespace OBJ_Viewer
 	};
 	class RenderingCoordinator{
 	public:
-		RenderingCoordinator(Window* m_windowHandler);
+		RenderingCoordinator(Window* m_windowHandler, InputHandler* pInputHandler);
 		void RenderLoop();
 		void RenderScene();
 		void RenderImGui();
@@ -68,8 +68,10 @@ namespace OBJ_Viewer
 		Renderer m_mainRenderer;
 		UIRenderer m_imGuiUIRenderer;
 		Framebuffer m_sceneFramebuffer;
+		InputHandler* m_pInputHandler = nullptr;
 	};
 }
+
 
 	
 

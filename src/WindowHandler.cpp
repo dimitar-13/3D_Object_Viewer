@@ -2,7 +2,7 @@
 #include"WindowInputFuncs.h"
 #include<functional>
 #include"imgui.h"
-
+#include<iostream>
 OBJ_Viewer::Window::Window(WindowMetrics windowMetrics, const char* winTitle)
 {
 	this->m_winTitle = winTitle;
@@ -47,6 +47,13 @@ void OBJ_Viewer::Window::SetWindowCallback()
 			static_cast<Window*>(glfwGetWindowUserPointer(window))->glfwScrollCallback(window, xoffset, yoffset);
 		};
 	glfwSetScrollCallback(m_glfwWindow, ScrollCallback);
+
+	auto buttonCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			static_cast<Window*>(glfwGetWindowUserPointer(window))->glfwKeyCallback(window, key, scancode, action, mods);
+		};
+	glfwSetKeyCallback(m_glfwWindow, buttonCallback);
+
 }
 void OBJ_Viewer::Window::glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -56,6 +63,7 @@ void OBJ_Viewer::Window::glfwCursorPositionCallback(GLFWwindow* window, double x
 
 void OBJ_Viewer::Window::glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
+	m_mouseButtonNotifier.Notify(WINDOW_SIZE_CHANGED, button, action, mods);
 }
 
 void OBJ_Viewer::Window::glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -65,6 +73,7 @@ void OBJ_Viewer::Window::glfwScrollCallback(GLFWwindow* window, double xoffset, 
 
 void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	m_windowKeyNotifier.Notify(WINDOW_SIZE_CHANGED,key,scancode,action,mods);
 }
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)

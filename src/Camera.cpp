@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height)
+OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height,InputHandler* pInputHandler)
 {
 	this->m_zoom = CameraZoom;
 	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)width / (float)height, 0.1f, 100.0f);
@@ -10,13 +10,14 @@ OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height)
 	//Use to set the x_previous and y_previous of the 'm_EulerAngleHelper' so we can avoid conditions;
 	m_EulerAngleHelper.calculateEulerAngles(this->m_EulerAngles.m_yawAngle,this->m_EulerAngles.m_pitchAngle);
 	CalculatePositionVector();
+	this->m_pInputHandler = pInputHandler;
 }
 
 void OBJ_Viewer::Camera::CalculatePositionVector()
 {
 	m_position.y = std::sin(glm::radians(this->m_EulerAngles.m_pitchAngle));
-	m_position.z = std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) * std::sin(glm::radians(this->m_EulerAngles.m_yawAngle));
-	m_position.x = std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) * std::cos(glm::radians(this->m_EulerAngles.m_yawAngle));
+	m_position.z = std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) * std::sin(glm::radians(-this->m_EulerAngles.m_yawAngle));
+	m_position.x = std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) * std::cos(glm::radians(-this->m_EulerAngles.m_yawAngle));
 	m_position = glm::normalize(m_position);
 }
 
@@ -30,8 +31,17 @@ void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 	//Yay mouse position has updated :)
 	if (type == MessageType::MOUSE_POSITION_CHANGED)
 	{
-	m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
-	CalculatePositionVector();
+		if(m_pInputHandler->isMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
+		{
+			//We update the previous x and y position.
+			m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
+		}
+		else if (m_pInputHandler->isMouseButtonHeld(GLFW_MOUSE_BUTTON_1))
+		{
+			constexpr float sensitivity = 0.000005;
+			m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
+			CalculatePositionVector();
+		}
 	}
 	else if(type == MessageType::MOUSE_SCROLL_CHANGED)
 	{
@@ -46,17 +56,6 @@ void OBJ_Viewer::Camera::Update(MessageType type, int newWidth, int newHeight)
 {
 	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)newWidth / (float)newHeight, 0.1f, 100.0f);
 }
-
-//void OBJ_Viewer::Camera::Update()
-//{
-//	//TODO:When the user presses button(button for reset) it will reset the camera to look at the starting position.
-//	//TODO:When the user presses button(button for reset) it will reset the scroll to be at the starting value.
-//
-//	//(NOTE)In case of 2 updates one for the mouse and other for the button press how will this be made ? 2 different functions maybe.
-//	 
-//	//Get the new position from the window class.
-//	//recalculatePosition();
-//}
 
 OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::calculateEulerAngles(double xpos, double ypos)
 {

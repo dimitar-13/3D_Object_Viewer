@@ -2,6 +2,7 @@
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include"IObserver.h"
+#include"InputHandler.h"
 namespace OBJ_Viewer
 {
 	struct EulerAngles {
@@ -11,6 +12,11 @@ namespace OBJ_Viewer
 			this->m_yawAngle += other.m_yawAngle;
 			this->m_pitchAngle += other.m_pitchAngle;
 		}
+		EulerAngles operator-(EulerAngles other)
+		{
+			return{this->m_yawAngle -= other.m_yawAngle,
+				   this->m_pitchAngle -= other.m_pitchAngle};
+		}
 	};
 	class EulerAngleHelper {
 	public:
@@ -19,13 +25,14 @@ namespace OBJ_Viewer
 		double m_previousXPos;
 		double m_previousYPos;
 	};
-
+	//TODO:When the user presses button(button for reset) it will reset the camera to look at the starting position.
+	//TODO:When the user presses button(button for reset) it will reset the scroll to be at the starting value.
 	class Camera:
 		public IObserver<double,double>,
 		public IObserver<int,int>
 	{
 	public:
-		Camera(float CameraZoom, int width, int height);
+		Camera(float CameraZoom, int width, int height, InputHandler* pInputHandler);
 		void CalculatePositionVector();
 		glm::mat4 GetViewProjMatrix()const;
 	private:
@@ -34,6 +41,7 @@ namespace OBJ_Viewer
 		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
+		InputHandler* m_pInputHandler = nullptr;
 		// Inherited via IObserver
 		void Update(MessageType type,double xpos, double ypos) override;
 		void Update(MessageType type, int newWidht, int newHeight) override;

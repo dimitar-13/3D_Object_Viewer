@@ -51,15 +51,16 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 }
 
-OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler):m_currentlyLoadedModel(GenerateCubeModel()),
+OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler, InputHandler* pInputHandler):m_currentlyLoadedModel(GenerateCubeModel()),
 	m_imGuiUIRenderer(ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None,
 		&this->m_rendererSettings, m_currentlyLoadedModel.get()), m_sceneFramebuffer(1000,1000,FRAMEBUFFER_COLOR_ATTACHMENT)
 {
 	m_windowHandler = windowHandler;
-	m_Camera =std::make_unique<Camera>(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight);
+	m_Camera =std::make_unique<Camera>(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight, pInputHandler);
 	m_windowHandler->GetMousePosNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetScrollChangeNotifier().Attach(m_Camera.get());
 	m_windowHandler->GetWindowSizeChangeNotifier().Attach(m_Camera.get());
+	m_pInputHandler = pInputHandler;
 }
 
 void OBJ_Viewer::RenderingCoordinator::RenderImGui()

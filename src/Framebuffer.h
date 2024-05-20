@@ -1,5 +1,6 @@
 #pragma once
 #include<GL/glew.h>
+#include"Texture.h"
 namespace OBJ_Viewer {
 
 	enum FramebufferAttachmentsFlags
@@ -16,7 +17,7 @@ namespace OBJ_Viewer {
 		//FramebufferAttachmentsFlags currently not used
 		Framebuffer(int width, int height, FramebufferAttachmentsFlags attachmentFlags);
 		GLuint GetFramebufferHandle()const { return this->m_framebuffer; }
-		GLuint GetFramebufferTextureHandle()const { return this->m_framebufferTextureID; }
+		std::shared_ptr<Texture> GetFramebufferTexture()const { return this->m_texture; }
 		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer); }
 		void UnbindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 		bool isFramebufferValid()const;
@@ -25,7 +26,7 @@ namespace OBJ_Viewer {
 	private:
 		GLuint m_framebuffer;
 		GLuint m_readBuffer;
-		GLuint m_framebufferTextureID;
+		std::shared_ptr<Texture> m_texture;
 	};
 }
 

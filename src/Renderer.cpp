@@ -48,7 +48,6 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	glClearColor(0, 0, 0, 1);
 	m_mainRenderer.RenderObject(m_rendererShaders.colorShader, *m_currentlyLoadedModel, *m_Camera);
 	this->m_sceneFramebuffer.UnbindFramebuffer();
-
 }
 
 OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler, InputHandler* pInputHandler):m_currentlyLoadedModel(GenerateCubeModel()),
@@ -65,7 +64,7 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler, In
 
 void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 {
-	m_imGuiUIRenderer.RenderUI(this->m_sceneFramebuffer.GetFramebufferTextureHandle());
+	m_imGuiUIRenderer.RenderUI(this->m_sceneFramebuffer.GetFramebufferTexture()->GetTextureHandle());
 }
 
 void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Model& modelToRender, const Camera& mainCamera)

@@ -7,8 +7,8 @@ namespace OBJ_Viewer
 	struct Vertex
 	{
 		glm::vec3 position;
+		glm::vec2 uvCoords;
 	};
-
 	class VertexAttributeObject
 	{
 	public:

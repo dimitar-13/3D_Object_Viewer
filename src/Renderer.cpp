@@ -52,7 +52,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler, InputHandler* pInputHandler):m_currentlyLoadedModel(GenerateCubeModel()),
 	m_imGuiUIRenderer(ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None,
-		&this->m_rendererSettings, m_currentlyLoadedModel.get()), m_sceneFramebuffer(1000,1000,FRAMEBUFFER_COLOR_ATTACHMENT)
+		&this->m_rendererSettings, &m_currentlyLoadedModel), m_sceneFramebuffer(1000,1000,FRAMEBUFFER_COLOR_ATTACHMENT)
 {
 	m_windowHandler = windowHandler;
 	m_Camera =std::make_unique<Camera>(5.0f,m_windowHandler->GetWindowSize().m_winWidth,m_windowHandler->GetWindowSize().m_winHeight, pInputHandler);
@@ -73,14 +73,14 @@ void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Mo
 	shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
 	for (const auto& mesh : modelToRender.GetModelMeshes())
 	{
-		mesh.GetMeshVAO().BindBuffer();
-		glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
-		mesh.GetMeshVAO().UnBind();
+		mesh->GetMeshVAO().BindBuffer();
+		glDrawElements(GL_TRIANGLES, mesh->GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
+		mesh->GetMeshVAO().UnBind();
 	}
 }
 
 OBJ_Viewer::UIRenderer::UIRenderer(ImGuiWindowFlags imGuiWindowFlags, 
-	ImGuiDockNodeFlags imGuiDockSpaceFlags, RendererSettings* pRendererSettings, Model* pCurrentlyLoadedModel)
+	ImGuiDockNodeFlags imGuiDockSpaceFlags, RendererSettings* pRendererSettings, std::shared_ptr<Model>* pCurrentlyLoadedModel)
 {
 	this->m_pCurrentlyLoadedModel = pCurrentlyLoadedModel;
 	this->m_pRendererSettings = pRendererSettings;
@@ -142,11 +142,11 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	ImGui::Checkbox("Normals?", &m_pRendererSettings->m_isRenderNormalTextureOn);
 	ImGui::Checkbox("Ambient occlusion?", &m_pRendererSettings->m_isRenderAmbientOcclusionTextureOn);
 	ImGui::End();
-
+	ModelData modelData = (*m_pCurrentlyLoadedModel)->GetModelData();
 	ImGui::Begin("Model data.");
-	ImGui::Text("Object triangle count:%d", triangleCount);
-	ImGui::Text("Object vertex count:%d", vertexCount);
-	ImGui::Text("Object face count:%d", faceCount);
+	ImGui::Text("Object triangle count:%d", modelData.m_triangleCount);
+	ImGui::Text("Object vertex count:%d", modelData.m_vertexCount);
+	ImGui::Text("Object face count:%d", modelData.m_faceCount);
 	ImGui::Text("Texture count:%d", 6);
 	ImGui::Text("File path %s", "Dummy path");
 
@@ -182,8 +182,11 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	if (ImGui::Button("Open obj file"))
 	{
 		DialogWrapper dialog;
-		/*if (dialog.GetDialogPath() != NULL)
-			model->reset(ModelLoader::LoadModel(dialog.GetDialogPath()));*/
+		if (dialog.GetDialogPath() != NULL)
+		{
+			ModelLoader loader;
+			m_pCurrentlyLoadedModel->reset(loader.LoadModel(dialog.GetDialogPath()));
+		}
 	}
 
 	ImGui::Text("Loading stuff here.");

@@ -37,15 +37,15 @@ namespace OBJ_Viewer
 	};
 	class UIRenderer {
 	public:
-		UIRenderer(ImGuiWindowFlags imguiWindowFlags, ImGuiDockNodeFlags imGuiDockSpaceFlags, RendererSettings* pRendererSettings, Model* pCurrentlyLoadedModel);
+		UIRenderer(ImGuiWindowFlags imguiWindowFlags, ImGuiDockNodeFlags imGuiDockSpaceFlags, RendererSettings* pRendererSettings, std::shared_ptr<Model>* pCurrentlyLoadedModel);
 		void RenderUI(GLuint frameBuffer);
 		ImVec2 GetSceneViewImgSize()const{return m_sceneViewImgSize; }
 	private:
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
 		ImVec2 m_sceneViewImgSize;
+		std::shared_ptr<Model>* m_pCurrentlyLoadedModel;
 		RendererSettings* m_pRendererSettings;
-		Model* m_pCurrentlyLoadedModel;
 	};	
 	struct RendererShaders {
 		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}

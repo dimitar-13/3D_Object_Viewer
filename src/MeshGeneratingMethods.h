@@ -24,18 +24,22 @@ namespace OBJ_Viewer {
             4, 6, 7,
             4, 5, 7
         };
-        std::vector<GLfloat> vertices{
-            -0.5, -0.5,  0.5, //0
-             0.5, -0.5,  0.5, //1
-            -0.5,  0.5,  0.5, //2
-             0.5,  0.5,  0.5, //3
-            -0.5, -0.5, -0.5, //4
-             0.5, -0.5, -0.5, //5
-            -0.5,  0.5, -0.5, //6
-             0.5,  0.5, -0.5  //7
+        std::vector<Vertex> vertices = {
+           {glm::vec3(-0.5, -0.5,  0.5)}, //0
+           {glm::vec3( 0.5, -0.5,  0.5)}, //1
+           {glm::vec3(-0.5,  0.5,  0.5)}, //2
+           {glm::vec3( 0.5,  0.5,  0.5)}, //3
+           {glm::vec3(-0.5, -0.5, -0.5)}, //4
+           {glm::vec3( 0.5, -0.5, -0.5)}, //5
+           {glm::vec3(-0.5,  0.5, -0.5)}, //6
+           {glm::vec3( 0.5,  0.5, -0.5)}  //7
         };
-        Mesh cubeMesh(vertices, indices, glm::mat4(1));
+        ModelData data;
+        data.m_vertexCount = vertices.size();
+        data.m_faceCount = 6;
+        data.m_triangleCount = 6*2;
+        std::shared_ptr<Mesh> cubeMesh =std::make_shared<Mesh>(vertices, indices, glm::mat4(1));
         //Expects vector of meshes using {} as a constructor instead of wrapping it in std::vector<Mesh> meshes;
-        return new Model({cubeMesh });
+        return new Model({cubeMesh}, data);
 	}
 }

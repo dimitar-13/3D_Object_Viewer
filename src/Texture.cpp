@@ -19,7 +19,7 @@ OBJ_Viewer::Texture::~Texture()
 
 void OBJ_Viewer::Texture::BindTexture() const
 {
-	glBindTexture(1, this->m_textureHandle);
+	glBindTexture(GL_TEXTURE_2D, this->m_textureHandle);
 }
 
 void OBJ_Viewer::Texture::ResizeTexture(TextureSize newSize)

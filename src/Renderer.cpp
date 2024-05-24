@@ -45,7 +45,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	//m_mainRenderer.RenderObject(/*Shader to use*/, *m_currentlyLoadedModel);
 	this->m_sceneFramebuffer.BindFramebuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0, 0, 0, 1);
+	glClearColor(0, 1, 0, 1);
 	m_mainRenderer.RenderObject(m_rendererShaders.colorShader, *m_currentlyLoadedModel, *m_Camera);
 	this->m_sceneFramebuffer.UnbindFramebuffer();
 }
@@ -71,11 +71,14 @@ void OBJ_Viewer::Renderer::RenderObject(const ShaderClass& shaderToUse, const Mo
 {
 	shaderToUse.UseShader();
 	shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
+
 	for (const auto& mesh : modelToRender.GetModelMeshes())
 	{
+		mesh->BindMeshTexture();
 		mesh->GetMeshVAO().BindBuffer();
 		glDrawElements(GL_TRIANGLES, mesh->GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
 		mesh->GetMeshVAO().UnBind();
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
 

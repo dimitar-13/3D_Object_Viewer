@@ -15,10 +15,10 @@ void main()
 out vec4 FragColor;
 in vec2 FragCoords;
 
-uniform sampler2D fragText;
+uniform sampler2D albedoTexture;
 void main()
 {
-	FragColor = vec4(texture(fragText,FragCoords).xyz,1);
+	FragColor = vec4(texture(albedoTexture,FragCoords).xyz,1);
 }
 
 

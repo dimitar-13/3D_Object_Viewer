@@ -11,10 +11,10 @@ namespace OBJ_Viewer {
 	private:
 		nfdchar_t* outPath =nullptr;
 	};
-	void DialogWrapper::OpenDialog()
+	inline void DialogWrapper::OpenDialog()
 	{
 		nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPath);
-		if (result != NFD_OKAY) {
+		if (result != NFD_OKAY && result != NFD_CANCEL) {
 			std::cout << "[ERROR]:NFD:" << NFD_GetError() << '\n';
 		}
 	}

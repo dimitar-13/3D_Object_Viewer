@@ -105,6 +105,8 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 	{*/
 		aiString relativeTexturePath;
 		mat->GetTexture(type, 0, &relativeTexturePath);
+		//TODO:Check if path is empty if it is than there is no texture and it should continure or return all together;
+
 		std::string fullPath(m_modelPath);
 		fullPath.append(relativeTexturePath.C_Str());
 		TextureSize textureSize;
@@ -130,34 +132,4 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 			SetTextureFormat(TEXTURE_FORMAT_RGB).buildTexture();
 
 	//}
-}
-OBJ_Viewer::Mesh::Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Material> material)
-	:m_ModelMatrix(transform),m_vao(vertexData, indexData)
-{
-	if (material.get() != nullptr)
-	{
-		m_Material = material;
-	}
-}
-
-void OBJ_Viewer::Mesh::BindMeshTexture() const
-{
-	 if (m_Material.get() != nullptr && m_Material->albedoTexture.get() != nullptr)
-		 m_Material->albedoTexture->BindTexture();
-}
-
-OBJ_Viewer::Model::Model(std::vector<std::shared_ptr<Mesh>> meshes, ModelData data):m_data(data)
-{
-	m_meshes = meshes;
-}
-
-OBJ_Viewer::Material::Material(std::shared_ptr<Texture> albedoTexture, 
-	std::shared_ptr<Texture> roughnessTexture, 
-	std::shared_ptr<Texture> normalTexture, 
-	std::shared_ptr<Texture> ambientOcclusion)
-{
-	this->albedoTexture = albedoTexture;
-	this->roughnessTexture = roughnessTexture;
-	this->normalTexture = normalTexture;
-	this->ambientOcclusion = ambientOcclusion;
 }

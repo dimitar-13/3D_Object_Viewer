@@ -7,7 +7,7 @@ OBJ_Viewer::Application::Application()
 		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
 	}
 	
-	WindowMetrics metrics = { 700,700 };
+	WindowMetrics metrics = { 1200,1500 };
 	const char* winTitle = "3D_viewer";
 	this->m_window = new Window(metrics, winTitle);
 	if (this->m_window->GetGLFW_Window() == NULL)

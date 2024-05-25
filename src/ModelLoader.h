@@ -17,15 +17,27 @@ namespace OBJ_Viewer
 		uint32_t textureCount;
 		//const char* m_modelPath;
 	};
+	struct Material
+	{
+		Material(std::shared_ptr<Texture> albedoTexture,
+			std::shared_ptr<Texture> roughnessTexture,
+			std::shared_ptr<Texture> normalTexture,
+			std::shared_ptr<Texture> ambientOcclusion);
+
+		std::shared_ptr<Texture> albedoTexture;
+		std::shared_ptr<Texture> roughnessTexture;
+		std::shared_ptr<Texture> normalTexture;
+		std::shared_ptr<Texture> ambientOcclusion;
+	};
 	class Mesh {
 	public:
-		Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Texture> texture = {});
+		Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Material> material = {});
 		const VertexAttributeObject& GetMeshVAO()const { return this->m_vao; }
 		void BindMeshTexture()const;
 		const glm::mat4& GetModelMatrix()const { return this->m_ModelMatrix; }
 	private:
 		glm::mat4 m_ModelMatrix;
-		std::shared_ptr<Texture> m_texture;
+		std::shared_ptr<Material> m_Material;
 		VertexAttributeObject m_vao;
 	};
 	struct Model
@@ -47,11 +59,11 @@ namespace OBJ_Viewer
 		void ReadNode(aiNode* node,const aiScene* scene);
 		std::vector<std::shared_ptr<Mesh>> CreateMeshArray();
 		std::shared_ptr<Mesh> ReadMesh(aiMesh* assimpMesh);
-		std::vector<std::shared_ptr<OBJ_Viewer::Texture>> GetSceneMaterials(const aiScene* scene);
+		std::vector<std::shared_ptr<OBJ_Viewer::Material>> GetSceneMaterials(const aiScene* scene);
 		std::shared_ptr<OBJ_Viewer::Texture> ReadTexture(aiMaterial* mat, aiTextureType type);
 	private:
 		std::vector<aiMesh*> m_meshes;
-		std::vector<std::shared_ptr<Texture>> m_ModelTextures;
+		std::vector<std::shared_ptr<Material>> m_SceneMaterials;
 		ModelData m_MeshData;
 		std::string m_modelPath;
 		bool m_AssimpScene;

@@ -15,22 +15,19 @@ OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path)
 	}
 	m_modelPath.append(path);
 	m_modelPath = m_modelPath.substr(0, m_modelPath.find_last_of('\\'));
+	std::replace(m_modelPath.begin(), m_modelPath.end(), '\\', '/');
 	m_modelPath += '/';
+
 	this->ReadNode(scene->mRootNode, scene);
-	m_ModelTextures = GetSceneMaterials(scene);
-	//Its good if the caller is not in charge of freeing this memory.
+	m_SceneMaterials = GetSceneMaterials(scene);
 	auto meshArray = CreateMeshArray();
 	Model* result = new Model(meshArray,m_MeshData);
 	
-	//TODO:Implement
 	return result;
 }
-//TODO:Interpret the aiMesh data into Mesh format or more specifically method that extracts the vertex data from the aiMesh
-//TODO:After we read and construct the meshes create a new Model and make it reference the meshes and return it to the scene.
-//TODO:Implement a material system so that every mesh can have a pointer to an existing material to minimize space usage.
+
 void OBJ_Viewer::ModelLoader::ReadNode(aiNode *node, const aiScene *scene)
 {
-
 	for (rsize_t i =0; i < node->mNumMeshes;i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -83,15 +80,19 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 			indexData.push_back(face.mIndices[j]);
 	}
 
-	return  std::make_shared<Mesh>(vertexData, indexData,glm::mat4(1),m_ModelTextures[assimpMesh->mMaterialIndex]);
+	return  std::make_shared<Mesh>(vertexData, indexData,glm::mat4(1),m_SceneMaterials[assimpMesh->mMaterialIndex]);
 }
-std::vector<std::shared_ptr<OBJ_Viewer::Texture>> OBJ_Viewer::ModelLoader::GetSceneMaterials(const aiScene* scene)
+std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetSceneMaterials(const aiScene* scene)
 {
-	std::vector<std::shared_ptr<Texture>> result(scene->mNumMaterials);
+	std::vector<std::shared_ptr<Material>> result(scene->mNumMaterials);
 
 	for (size_t i =1; i < result.size();i++)
 	{
-		result[i] = ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE);
+		result[i] = std::make_shared<Material>
+			(   ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE),
+				ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE_ROUGHNESS),
+				ReadTexture(scene->mMaterials[i], aiTextureType_NORMALS),
+				ReadTexture(scene->mMaterials[i], aiTextureType_AMBIENT_OCCLUSION));
 	}
 
 	return result;
@@ -103,40 +104,60 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 	/*for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 	{*/
 		aiString relativeTexturePath;
-		std::string fullPath(m_modelPath);
 		mat->GetTexture(type, 0, &relativeTexturePath);
+		std::string fullPath(m_modelPath);
 		fullPath.append(relativeTexturePath.C_Str());
-		std::replace(fullPath.begin(), fullPath.end(), '/', '\\');
 		TextureSize textureSize;
 		//A way to convert this into a enum of textureFormat.
 		int presentChannelCount;
 		TexturePixelDataWrapper textureReader(fullPath.c_str(), &textureSize, &presentChannelCount);
-
+		TextureInternalFormat format = TEXTURE_INTERNAL_FORMAT_RGB;
+		switch (presentChannelCount)
+		{
+		case 1:
+			format = TEXTURE_INTERNAL_FORMAT_R;
+			break;
+		case 2:
+			format = TEXTURE_INTERNAL_FORMAT_RG;
+			break;
+		case 3:
+			format = TEXTURE_INTERNAL_FORMAT_RGB;
+			break;
+		}
 		return builder.SetTextureSize(textureSize).
 			SetTexturePixelData(textureReader.GetTexturePixelData()).
-			SetTextureInternalFormat(TEXTURE_INTERNAL_FORMAT_RGB).
+			SetTextureInternalFormat(format).
 			SetTextureFormat(TEXTURE_FORMAT_RGB).buildTexture();
 
 	//}
 }
-OBJ_Viewer::Mesh::Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Texture> texture)
+OBJ_Viewer::Mesh::Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Material> material)
 	:m_ModelMatrix(transform),m_vao(vertexData, indexData)
 {
-	if (texture.get() != nullptr)
+	if (material.get() != nullptr)
 	{
-		m_texture = texture;
+		m_Material = material;
 	}
 }
 
 void OBJ_Viewer::Mesh::BindMeshTexture() const
 {
-	 if (m_texture.get() != nullptr)
-		 m_texture->BindTexture(); 
+	 if (m_Material.get() != nullptr && m_Material->albedoTexture.get() != nullptr)
+		 m_Material->albedoTexture->BindTexture();
 }
 
 OBJ_Viewer::Model::Model(std::vector<std::shared_ptr<Mesh>> meshes, ModelData data):m_data(data)
 {
 	m_meshes = meshes;
-	
 }
 
+OBJ_Viewer::Material::Material(std::shared_ptr<Texture> albedoTexture, 
+	std::shared_ptr<Texture> roughnessTexture, 
+	std::shared_ptr<Texture> normalTexture, 
+	std::shared_ptr<Texture> ambientOcclusion)
+{
+	this->albedoTexture = albedoTexture;
+	this->roughnessTexture = roughnessTexture;
+	this->normalTexture = normalTexture;
+	this->ambientOcclusion = ambientOcclusion;
+}

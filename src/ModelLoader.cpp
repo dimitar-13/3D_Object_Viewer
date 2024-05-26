@@ -88,11 +88,14 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetS
 
 	for (size_t i =1; i < result.size();i++)
 	{
-		result[i] = std::make_shared<Material>
-			(   ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE),
-				ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE_ROUGHNESS),
-				ReadTexture(scene->mMaterials[i], aiTextureType_NORMALS),
-				ReadTexture(scene->mMaterials[i], aiTextureType_AMBIENT_OCCLUSION));
+		Material data = {};
+		data.m_albedoTexture = ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE);
+		data.m_ambientOcclusion = ReadTexture(scene->mMaterials[i], aiTextureType_AMBIENT_OCCLUSION);
+		data.m_normalTexture = ReadTexture(scene->mMaterials[i], aiTextureType_NORMALS);
+		data.m_roughnessTexture = ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE_ROUGHNESS);
+
+
+		result[i] = std::make_shared<Material>(data);
 	}
 
 	return result;

@@ -108,7 +108,12 @@ GLuint OBJ_Viewer::ShaderClass::compileShader(const GLenum shaderType, const std
 GLint OBJ_Viewer::ShaderClass::findUniform(const char* name)const
 {
     if (this->m_uniformHash.find(name) != this->m_uniformHash.end())
-        return this->m_uniformHash.at(name);    
-    this->m_uniformHash[name]  = glGetUniformLocation(this->m_shaderHandle, name);
-    return this->m_uniformHash[name];
+        return this->m_uniformHash.at(name);  
+    int UniformID = glGetUniformLocation(this->m_shaderHandle, name); 
+    if (UniformID != -1)
+    {
+       this->m_uniformHash[name]  = UniformID;
+       return this->m_uniformHash[name];
+    }
+    std::cout << "[WARNING]:Failed to find uniform with name: " << name << '\n';
 }

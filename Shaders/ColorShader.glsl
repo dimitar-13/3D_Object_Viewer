@@ -12,13 +12,23 @@ void main()
 }
 #Shader:fragment
 #version 330 core
+struct Material
+{
+	vec3 color;
+	float roughness;
+	sampler2D albedoTexture;
+	sampler2D roughnessTexture;
+	sampler2D normalTexture;
+	sampler2D ambientOcclusion;
+};
 out vec4 FragColor;
 in vec2 FragCoords;
 
-uniform sampler2D albedoTexture;
+uniform Material material;
 void main()
 {
-	FragColor = vec4(texture(albedoTexture,FragCoords).xyz,1);
+	vec3 Color = length(texture(material.albedoTexture,FragCoords).xyz) != 0 ? texture(material.albedoTexture,FragCoords).xyz : material.color;
+	FragColor = vec4(Color,1);
 }
 
 

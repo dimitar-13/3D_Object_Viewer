@@ -37,15 +37,18 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	if(this->m_rendererSettings.m_isWireGridOn)
 		this->m_mainRenderer.RenderObject();*/
 	Renderer::IsWireFrameOn(m_rendererSettings.m_isWireFrameRenderingOn);
-	//Submit to render;
-	//m_mainRenderer.RenderObject(/*Shader to use*/, *m_currentlyLoadedModel);
+
 	this->m_sceneFramebuffer.BindFramebuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 1, 0, 1);
 	for (const auto& mesh : m_currentlyLoadedModel->GetModelMeshes())
 	{
-		if(m_rendererSettings.m_isRenderAlbedoTextureOn && mesh->GetMaterial().get() != nullptr)
-			Renderer::BindMaterialTexture(m_rendererShaders.colorShader, mesh->GetMaterial()->GetAlbedoTexture(), GL_TEXTURE1, "albedoTexture");
+		m_rendererShaders.colorShader.UseShader();
+		if(m_rendererSettings.m_isRenderAlbedoTextureOn && mesh->GetMaterial()->m_albedoTexture.get() != nullptr)
+			Renderer::BindMaterialTexture(m_rendererShaders.colorShader, mesh->GetMaterial()->m_albedoTexture, GL_TEXTURE1, "material.albedoTexture");
+
+		m_rendererShaders.colorShader.UniformSet3FloatVector("material.color", mesh->GetMaterial()->color);
+		
 		Renderer::RenderMesh(m_rendererShaders.colorShader, *mesh, *m_Camera);
 	}
 	this->m_sceneFramebuffer.UnbindFramebuffer();

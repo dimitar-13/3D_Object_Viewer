@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height,InputHandler* pInputHandler)
+OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height, InputHandler* pInputHandler)
 {
 	this->m_zoom = CameraZoom;
 	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)width / (float)height, 0.1f, 100.0f);
@@ -23,7 +23,9 @@ void OBJ_Viewer::Camera::CalculatePositionVector()
 
 glm::mat4 OBJ_Viewer::Camera::GetViewProjMatrix()const
 {
-	return m_projectionMatrix * glm::lookAt(m_position *m_zoom,glm::vec3(0.0f), glm::vec3(0, 1, 0));
+	glm::vec3 upVec(0, 1, 0);
+	upVec.y *= std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) < 0 ? -1 : 1;
+	return m_projectionMatrix * glm::lookAt(m_position *m_zoom,glm::vec3(0.0f), upVec);
 }
 
 void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
@@ -38,8 +40,8 @@ void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 		}
 		else if (m_pInputHandler->isMouseButtonHeld(GLFW_MOUSE_BUTTON_1))
 		{
-			constexpr float sensitivity = 0.000005;
 			m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
+			m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 			CalculatePositionVector();
 		}
 	}
@@ -48,7 +50,8 @@ void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 		//Calculate the new zoom lvl;
 		//TODO:Add restrains so that user scroll to inifity;
 		constexpr float sensitivity = 0.01f;
-		this->m_zoom += -ypos ;
+		constexpr float maxZoom = 0.002;
+		this->m_zoom += this->m_zoom - ypos <= maxZoom ? 0 : -ypos;
 	}
 }
 
@@ -63,5 +66,14 @@ OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::calculateEulerAngles(doubl
 	EulerAngles result = {static_cast<float>(xpos - m_previousXPos), static_cast<float>(m_previousYPos - ypos)};
 	m_previousXPos = xpos;
 	m_previousYPos = ypos;
+	ConstrainAngles(result);
 	return result;
+}
+
+void OBJ_Viewer::EulerAngleHelper::ConstrainAngles(EulerAngles& angle)
+{
+	char sing = angle.m_pitchAngle > 0 ? -1 : 1;
+	angle.m_pitchAngle += !(angle.m_pitchAngle >= -360.0f && angle.m_pitchAngle <= 360.0f) ? sing * 360.0f : 0;
+	sing = angle.m_yawAngle > 0 ? -1 : 1;
+	angle.m_yawAngle += !(angle.m_yawAngle >= -360.0f && angle.m_yawAngle <= 360.0f) ? sing * 360.0f : 0;
 }

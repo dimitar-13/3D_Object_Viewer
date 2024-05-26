@@ -9,5 +9,4 @@ int main()
 	OBJ_Viewer::RenderingCoordinator renderer(&app.GetAppWindow(), &inputHandler);
 	renderer.RenderLoop();
 	return 1;
-
 }

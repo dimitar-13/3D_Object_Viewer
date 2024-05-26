@@ -3,6 +3,7 @@
 #include<glm/gtc/matrix_transform.hpp>
 #include"IObserver.h"
 #include"InputHandler.h"
+#include<memory>
 namespace OBJ_Viewer
 {
 	struct EulerAngles {
@@ -21,6 +22,7 @@ namespace OBJ_Viewer
 	class EulerAngleHelper {
 	public:
 		EulerAngles calculateEulerAngles(double xpos, double ypos);
+		void ConstrainAngles(EulerAngles& angle);
 	private:
 		double m_previousXPos;
 		double m_previousYPos;
@@ -41,7 +43,7 @@ namespace OBJ_Viewer
 		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
-		InputHandler* m_pInputHandler = nullptr;
+		InputHandler* m_pInputHandler;
 		// Inherited via IObserver
 		void Update(MessageType type,double xpos, double ypos) override;
 		void Update(MessageType type, int newWidht, int newHeight) override;

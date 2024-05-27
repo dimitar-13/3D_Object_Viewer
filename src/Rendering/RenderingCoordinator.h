@@ -12,6 +12,7 @@
 #include<memory>
 #include"Framebuffer.h"
 #include"UIRenderer.h"
+#include"Scene/Skybox.h"
 namespace OBJ_Viewer
 {
 	struct RendererSettings
@@ -29,10 +30,11 @@ namespace OBJ_Viewer
 	
 
 	struct RendererShaders {
-		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
+		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str()),
+			skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
 		ShaderClass colorShader;
 		//ShaderClass lightShader;
-		//ShaderClass skyboxShader;
+		ShaderClass skyboxShader;
 	};
 	class RenderingCoordinator{
 	public:
@@ -45,6 +47,7 @@ namespace OBJ_Viewer
 	private:
 		std::shared_ptr<Model> m_currentlyLoadedModel;
 		std::unique_ptr<Camera> m_Camera;
+		std::unique_ptr<Skybox> m_Skybox;
 		Window* m_windowHandler = nullptr;
 		RendererSettings m_rendererSettings;
 		RendererShaders m_rendererShaders;

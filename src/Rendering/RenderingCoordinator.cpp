@@ -32,15 +32,14 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 {
 	//Set up the renderer based on the settings;
 
-	/*if (this->m_rendererSettings.m_isSkyboxOn)
-		this->m_mainRenderer.RenderObject(this->m_rendererShaders.skyboxShader);
-	if(this->m_rendererSettings.m_isWireGridOn)
+	/*if(this->m_rendererSettings.m_isWireGridOn)
 		this->m_mainRenderer.RenderObject();*/
 	Renderer::IsWireFrameOn(m_rendererSettings.m_isWireFrameRenderingOn);
 
 	this->m_sceneFramebuffer.BindFramebuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0, 1, 0, 1);
+	glClearColor(0, 0, 0, 1);
+
 	for (const auto& mesh : m_currentlyLoadedModel->GetModelMeshes())
 	{
 		m_rendererShaders.colorShader.UseShader();
@@ -51,6 +50,8 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 		
 		Renderer::RenderMesh(m_rendererShaders.colorShader, *mesh, *m_Camera);
 	}
+	if (m_Skybox.get() != nullptr && m_rendererSettings.m_isSkyboxOn)
+		Renderer::RenderSkybox(m_rendererShaders.skyboxShader, *m_Skybox, *m_Camera);
 	this->m_sceneFramebuffer.UnbindFramebuffer();
 }
 
@@ -66,6 +67,15 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler, In
 	m_pInputHandler = pInputHandler;
 	m_imGuiUIRenderer.SetOnModelLoadDialogCallback([this]() {
 		this->LoadModel(); });
+	std::array<const char*,6> skyboxFacePaths = {
+		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/right.png",
+		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/left.png",
+		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/bottom.png",
+		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/top.png",
+		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/front.png",
+		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/back.png"
+	};
+	this->m_Skybox = std::make_unique<Skybox>(skyboxFacePaths);
 }
 
 void OBJ_Viewer::RenderingCoordinator::RenderImGui()

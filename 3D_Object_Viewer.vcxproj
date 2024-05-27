@@ -141,6 +141,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Rendering\Renderer.cpp" />
     <ClCompile Include="src\Scene\Material.cpp" />
@@ -178,6 +179,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Scene\Model.h" />
     <ClInclude Include="src\Rendering\Renderer.h" />
     <ClInclude Include="src\Scene\Material.h" />
@@ -209,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
+    <None Include="Shaders\SkyboxShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

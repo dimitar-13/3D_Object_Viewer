@@ -2,7 +2,7 @@
 #include"ModelLoader.h"
 namespace OBJ_Viewer {
 
-	Model* GenerateCubeModel()
+	inline Model* GenerateCubeModel()
 	{
         std::vector<GLuint> indices{
             //Top

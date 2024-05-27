@@ -87,6 +87,9 @@
     <ClCompile Include="src\Scene\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h">
@@ -173,8 +176,12 @@
     <ClInclude Include="src\Scene\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
+    <None Include="Shaders\SkyboxShader.glsl" />
   </ItemGroup>
 </Project>

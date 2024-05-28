@@ -141,6 +141,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Rendering\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Rendering\Renderer.cpp" />
@@ -179,6 +180,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Scene\Model.h" />
     <ClInclude Include="src\Rendering\Renderer.h" />

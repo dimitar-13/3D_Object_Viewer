@@ -22,8 +22,10 @@ OBJ_Viewer::UIRenderer::UIRenderer(ImGuiWindowFlags imGuiWindowFlags,
 }
 
 //Yes this is pointless.It will be changed in the future but for now i dont think there is a huge point in designing a imGui abstraction.
-void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
+void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer, Skybox* skybox)
 {
+	static std::vector<const char*> items ={ "Right face" ,"Left face","Top face","Bottom face","Front face","Back face" };
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -86,12 +88,49 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	if (m_pRendererSettings->m_isSkyboxOn)
 	{
 		ImGui::Separator();
-		ImGui::Button("Load front texture.");
-		ImGui::Button("Load back texture.");
-		ImGui::Button("Load top texture.");
-		ImGui::Button("Load bottom texture.");
-		ImGui::Button("Load left texture.");
-		ImGui::Button("Load right texture.");
+		if (ImGui::Button("Load skybox textures."))
+		{
+			onSkyboxLoadDialogCallback();
+		}
+		ImTextureID test = (ImTextureID)frameBuffer;
+		if(skybox != nullptr)
+			test = (ImTextureID)skybox->m_faceTextures[0]->GetTextureHandle();
+		ImGui::Image((ImTextureID)test, {50,50}, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		DrawComboBox("Top face", items);
+
+		if (skybox != nullptr)
+			test = (ImTextureID)skybox->m_faceTextures[1]->GetTextureHandle();
+		ImGui::Image((ImTextureID)test, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		DrawComboBox("Bottom face", items);
+
+		if (skybox != nullptr)
+			test = (ImTextureID)skybox->m_faceTextures[2]->GetTextureHandle();
+
+		ImGui::Image((ImTextureID)test, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		DrawComboBox("Right face", items);
+
+		if (skybox != nullptr)
+			test = (ImTextureID)skybox->m_faceTextures[3]->GetTextureHandle();
+		ImGui::Image((ImTextureID)test, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		DrawComboBox("Left face", items);
+
+		if (skybox != nullptr)
+			test = (ImTextureID)skybox->m_faceTextures[4]->GetTextureHandle();
+		ImGui::Image((ImTextureID)test, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		DrawComboBox("Front face", items);
+
+		if (skybox != nullptr)
+			test = (ImTextureID)skybox->m_faceTextures[5]->GetTextureHandle();
+		ImGui::Image((ImTextureID)test, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		DrawComboBox("Back face", items);
+
+		//TODO:Add texture preview;
 		ImGui::Separator();
 	}
 	ImGui::End();
@@ -121,4 +160,24 @@ void OBJ_Viewer::UIRenderer::RenderUI(GLuint frameBuffer)
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void OBJ_Viewer::UIRenderer::DrawComboBox(const char* initialValue,const std::vector<const char*>& items)
+{
+	const char* current_item = NULL;
+
+	if (ImGui::BeginCombo(" ", initialValue)) // The second parameter is the label previewed before opening the combo.
+	{
+		for (int n = 0; n < items.size(); n++)
+		{
+			bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
+			if (ImGui::Selectable(items[n], is_selected))
+			{
+				current_item = items[n];
+			/*	if (skybox != nullptr)
+					skybox->SwapSkyboxFaceTextures(SKYBOX_FACE_LEFT, static_cast<SkyboxFace>(n));*/
+			}
+		}
+		ImGui::EndCombo();
+	}
 }

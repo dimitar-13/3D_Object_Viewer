@@ -90,6 +90,9 @@
     <ClCompile Include="src\Scene\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGLBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h">
@@ -177,6 +180,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGLBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

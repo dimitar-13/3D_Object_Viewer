@@ -17,11 +17,6 @@ OBJ_Viewer::Texture::~Texture()
 	glDeleteTextures(1, &this->m_textureHandle);
 }
 
-void OBJ_Viewer::Texture::BindTexture() const
-{
-	glBindTexture(GL_TEXTURE_2D, this->m_textureHandle);
-}
-
 void OBJ_Viewer::Texture::ResizeTexture(TextureSize newSize)
 {
 	this->m_textureSize = newSize;

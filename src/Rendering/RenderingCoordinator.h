@@ -44,6 +44,7 @@ namespace OBJ_Viewer
 		void RenderScene();
 		void RenderImGui();
 		void LoadModel();
+		void LoadSkyboxTextures();
 	private:
 		std::shared_ptr<Model> m_currentlyLoadedModel;
 		std::unique_ptr<Camera> m_Camera;

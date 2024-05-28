@@ -67,29 +67,37 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Window* windowHandler, In
 	m_pInputHandler = pInputHandler;
 	m_imGuiUIRenderer.SetOnModelLoadDialogCallback([this]() {
 		this->LoadModel(); });
-	std::array<const char*,6> skyboxFacePaths = {
-		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/right.png",
-		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/left.png",
-		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/bottom.png",
-		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/top.png",
-		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/front.png",
-		"C:/Users/MSI Katana 15/Desktop/skybox/skybox/back.png"
-	};
-	this->m_Skybox = std::make_unique<Skybox>(skyboxFacePaths);
+	m_imGuiUIRenderer.SetOnSkyboxLoadDialogCallback([this]() {
+		this->LoadSkyboxTextures(); });
+
+	
 }
 
 void OBJ_Viewer::RenderingCoordinator::RenderImGui()
 {
-	m_imGuiUIRenderer.RenderUI(this->m_sceneFramebuffer.GetFramebufferTexture()->GetTextureHandle());
+	m_imGuiUIRenderer.RenderUI(this->m_sceneFramebuffer.GetFramebufferTexture()->GetTextureHandle(), this->m_Skybox.get());
 }
 
 void OBJ_Viewer::RenderingCoordinator::LoadModel()
 {
 	DialogWrapper dialog;
-	if (dialog.GetDialogPath() != NULL)
+	dialog.OpenDialog();
+	auto VecPaths = dialog.GetDialogResult();
+	if (!VecPaths.empty())
 	{
 		ModelLoader loader;
-		m_currentlyLoadedModel.reset(loader.LoadModel(dialog.GetDialogPath()));
+		m_currentlyLoadedModel.reset(loader.LoadModel(VecPaths[0]));
+	}
+}
+
+void OBJ_Viewer::RenderingCoordinator::LoadSkyboxTextures()
+{
+	DialogWrapper dialog;
+	dialog.OpenDialogMultiple();
+	auto VecPaths = dialog.GetDialogResult();
+	if (!VecPaths.empty())
+	{
+		this->m_Skybox = std::make_unique<Skybox>(VecPaths);
 	}
 }
 

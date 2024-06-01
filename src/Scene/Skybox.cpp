@@ -1,5 +1,6 @@
 #include "Skybox.h"
 #include"MeshGeneratingMethods.h"
+#include<algorithm>
 OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_CubeMesh(GenerateCubeModel()->GetModelMeshes().at(0).get())
 {
 	TextureSize pTextureSize;
@@ -14,6 +15,7 @@ OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_CubeMesh(GenerateCub
 	
 	m_faceTextures.resize(6);
 	m_PixelBuffers.resize(6);
+	TextureFormat format;
 	for (size_t i = 0; i < 6; i++)
 	{
 		TexturePixelDataWrapper reader(textPaths[i], &pTextureSize, &pPresentChannelsCount);
@@ -23,21 +25,22 @@ OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_CubeMesh(GenerateCub
 		pixelBufferData.usageType = OPENGL_STREAM_DRAW_BUFFER_USAGE;
 		pixelBufferData.bufferSize = pTextureSize.height * pTextureSize.width * pPresentChannelsCount;
 		m_PixelBuffers[i] = new OpenGLBuffer(pixelBufferData);
-
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, pTextureSize.width, pTextureSize.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		format = GetFormatByChannelCount(pPresentChannelsCount);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, pTextureSize.width, pTextureSize.height, 0, format, GL_UNSIGNED_BYTE, NULL);
 
 		TextureBuilder builder;
-		m_faceTextures[i] = builder.SetTextureFormat(TEXTURE_FORMAT_RGBA).
-			SetTextureInternalFormat(TEXTURE_INTERNAL_FORMAT_RGBA).SetTextureSize(pTextureSize).buildTexture();
+		m_faceTextures[i] = builder.SetTextureFormat(format).
+			SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(pTextureSize).buildTexture();
 	}
+	m_format = format;
 	m_CubeMapTextSize = pTextureSize;
 	for (size_t i = 0; i < 6; i++)
 	{
 		m_PixelBuffers[i]->BindBuffer();
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle);
-		glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, pTextureSize.height, pTextureSize.width, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, pTextureSize.height, pTextureSize.width, m_format, GL_UNSIGNED_BYTE, 0);
 		m_faceTextures[i]->BindTexture();
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, pTextureSize.height, pTextureSize.width, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, pTextureSize.height, pTextureSize.width, m_format, GL_UNSIGNED_BYTE, 0);
 	}
 
 	m_faceTextures[0]->UnbindTexture();
@@ -56,14 +59,21 @@ OBJ_Viewer::Skybox::~Skybox()
 
 void OBJ_Viewer::Skybox::SwapSkyboxFaceTextures(SkyboxFace toBeSwapped, SkyboxFace swappedWith)
 {
+	if (toBeSwapped == swappedWith)
+		return;
+
 	m_PixelBuffers[swappedWith]->BindBuffer();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle);
-	glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + toBeSwapped, 0, 0, 0, m_CubeMapTextSize.height, m_CubeMapTextSize.width, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + toBeSwapped, 0, 0, 0, m_CubeMapTextSize.height, m_CubeMapTextSize.width, m_format, GL_UNSIGNED_BYTE, 0);
 
 	m_PixelBuffers[toBeSwapped]->BindBuffer();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle);
-	glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + swappedWith, 0, 0, 0, m_CubeMapTextSize.height, m_CubeMapTextSize.width, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + swappedWith, 0, 0, 0, m_CubeMapTextSize.height, m_CubeMapTextSize.width, m_format, GL_UNSIGNED_BYTE, 0);
 
 	m_PixelBuffers[0]->UnbindBuffer();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	std::iter_swap(m_faceTextures.begin() + static_cast<int>(toBeSwapped), m_faceTextures.begin() + static_cast<int>(swappedWith));
+	std::iter_swap(m_PixelBuffers.begin() + static_cast<int>(toBeSwapped), m_PixelBuffers.begin() + static_cast<int>(swappedWith));
+
 }

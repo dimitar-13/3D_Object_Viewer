@@ -54,6 +54,12 @@ namespace OBJ_Viewer {
 	};
 #pragma endregion
 
+	inline TextureFormat GetFormatByChannelCount(int channelCount)
+	{
+		return channelCount > 2 ? static_cast<TextureFormat>((channelCount - 3) + TEXTURE_FORMAT_RGB)
+			: channelCount % 2 == 0.0f ? TEXTURE_FORMAT_R: TEXTURE_FORMAT_RG;
+	}
+
 	struct TexturePixelDataWrapper
 	{
 	public:

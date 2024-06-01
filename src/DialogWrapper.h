@@ -6,7 +6,7 @@ namespace OBJ_Viewer {
 	public:
 		DialogWrapper() = default;
 		void OpenDialog();
-		void OpenDialogMultiple();
+		void OpenDialogMultiple(std::string filterList);
 		~DialogWrapper();
 		const std::vector<nfdchar_t*> GetDialogResult() const { return outPaths; }
 	private:
@@ -16,16 +16,17 @@ namespace OBJ_Viewer {
 	{
 		outPaths.push_back(nullptr);
 		nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPaths[0]);
-		if (result != NFD_OKAY && result != NFD_CANCEL) {
+		if (result != NFD_OKAY) {
 			std::cout << "[ERROR]:NFD:" << NFD_GetError() << '\n';
 		}
 	}
-	inline void DialogWrapper::OpenDialogMultiple()
+	inline void DialogWrapper::OpenDialogMultiple(std::string filterList)
 	{
 		nfdpathset_t paths;
-		nfdresult_t result = NFD_OpenDialogMultiple("png", NULL, &paths);
-		if (result != NFD_OKAY && result != NFD_CANCEL) {
+		nfdresult_t result = NFD_OpenDialogMultiple(filterList.c_str(), NULL, &paths);
+		if (result != NFD_OKAY) {
 			std::cout << "[ERROR]:NFD:" << NFD_GetError() << '\n';
+			return;
 		}
 		outPaths.resize(paths.count);
 		nfdchar_t* pathPtr = paths.buf;
@@ -35,6 +36,6 @@ namespace OBJ_Viewer {
 	}
 	inline DialogWrapper::~DialogWrapper()
 	{
-		free(outPaths[0]);
+		if(!outPaths.empty())free(outPaths[0]);
 	}
 }

@@ -28,6 +28,7 @@ namespace OBJ_Viewer
 		GLuint m_cubeMapHandle = 0;
 		Mesh* m_CubeMesh;
 		TextureSize m_CubeMapTextSize;
+		TextureFormat m_format;
 	};
 
 }

@@ -141,6 +141,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AppState.cpp" />
     <ClCompile Include="src\Rendering\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
@@ -166,7 +167,7 @@
     <ClCompile Include="src\WindowInputFuncs.cpp" />
     <ClCompile Include="src\WindowHandler.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\Rendering\UIRenderer.cpp" />
+    <ClCompile Include="src\UI\UILayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Dependencies\glew\glew-2.2.0\build\vc15\glew_static.vcxproj">
@@ -180,6 +181,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AppState.h" />
     <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Scene\Model.h" />
@@ -209,7 +211,7 @@
     <ClInclude Include="src\WindowInputFuncs.h" />
     <ClInclude Include="src\WindowHandler.h" />
     <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\Rendering\UIRenderer.h" />
+    <ClInclude Include="src\UI\UILayer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />

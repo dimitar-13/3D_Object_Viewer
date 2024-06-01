@@ -54,6 +54,12 @@ namespace OBJ_Viewer {
 	};
 #pragma endregion
 
+	inline TextureFormat GetFormatByChannelCount(int channelCount)
+	{
+		return channelCount > 2 ? static_cast<TextureFormat>((channelCount - 3) + TEXTURE_FORMAT_RGB)
+			: channelCount % 2 == 0.0f ? TEXTURE_FORMAT_R: TEXTURE_FORMAT_RG;
+	}
+
 	struct TexturePixelDataWrapper
 	{
 	public:
@@ -70,7 +76,8 @@ namespace OBJ_Viewer {
 		Texture(const unsigned char* data, TextureInternalFormat textureInternalFormat, TextureFormat textureFormat,
 			TextureSize textureSize, TexturePixelDataType dataType, TextureWrap textureWrapS, TextureWrap textureWrapT);
 		~Texture();
-		void BindTexture()const;
+		void BindTexture()const {glBindTexture(GL_TEXTURE_2D, this->m_textureHandle);}
+		void UnbindTexture()const {glBindTexture(GL_TEXTURE_2D, 0);}
 		GLuint GetTextureHandle()const { return m_textureHandle; }
 		void ResizeTexture(TextureSize newSize);
 		//Not tested;

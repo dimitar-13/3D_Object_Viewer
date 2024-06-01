@@ -28,6 +28,13 @@ glm::mat4 OBJ_Viewer::Camera::GetViewProjMatrix()const
 	return m_projectionMatrix * glm::lookAt(m_position *m_zoom,glm::vec3(0.0f), upVec);
 }
 
+glm::mat4 OBJ_Viewer::Camera::GetViewProjNoTranslation() const
+{
+	glm::vec3 upVec(0, 1, 0);
+	upVec.y *= std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) < 0 ? -1 : 1;
+	return m_projectionMatrix * glm::mat4(glm::mat3(glm::lookAt(m_position * m_zoom, glm::vec3(0.0f), upVec)));
+}
+
 void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 {
 	//Yay mouse position has updated :)

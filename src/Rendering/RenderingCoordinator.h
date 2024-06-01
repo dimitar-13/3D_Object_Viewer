@@ -11,46 +11,28 @@
 #include"ShaderPath.h"
 #include<memory>
 #include"Framebuffer.h"
-#include"UIRenderer.h"
+#include"UI/UILayer.h"
+#include "AppState.h"
 namespace OBJ_Viewer
 {
-	struct RendererSettings
-	{
-		bool m_isWireFrameRenderingOn;
-		bool m_isSkyboxOn;
-		bool m_isWireGridOn;
-		bool m_isRenderingLightOn;
-
-		bool m_isRenderAlbedoTextureOn;
-		bool m_isRenderSpecularTextureOn;
-		bool m_isRenderNormalTextureOn;
-		bool m_isRenderAmbientOcclusionTextureOn;
-	};
-	
-
 	struct RendererShaders {
-		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
+		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str()),
+			skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
 		ShaderClass colorShader;
 		//ShaderClass lightShader;
-		//ShaderClass skyboxShader;
+		ShaderClass skyboxShader;
 	};
 	class RenderingCoordinator{
 	public:
-		RenderingCoordinator(Window* m_windowHandler, InputHandler* pInputHandler);
+		RenderingCoordinator(AppState* appState);
 		void RenderLoop();
 	private:
 		void RenderScene();
-		void RenderImGui();
-		void LoadModel();
 	private:
-		std::shared_ptr<Model> m_currentlyLoadedModel;
 		std::unique_ptr<Camera> m_Camera;
-		Window* m_windowHandler = nullptr;
-		RendererSettings m_rendererSettings;
+		AppState* m_appState;
+		UILayer m_UILayer;
 		RendererShaders m_rendererShaders;
-		UIRenderer m_imGuiUIRenderer;
-		Framebuffer m_sceneFramebuffer;
-		InputHandler* m_pInputHandler = nullptr;
 	};
 }
 

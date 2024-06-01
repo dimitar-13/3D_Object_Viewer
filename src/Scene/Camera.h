@@ -37,6 +37,7 @@ namespace OBJ_Viewer
 		Camera(float CameraZoom, int width, int height, InputHandler* pInputHandler);
 		void CalculatePositionVector();
 		glm::mat4 GetViewProjMatrix()const;
+		glm::mat4 GetViewProjNoTranslation()const;
 	private:
 		float m_zoom;
 		glm::mat4 m_projectionMatrix;

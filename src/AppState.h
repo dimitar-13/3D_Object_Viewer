@@ -13,6 +13,12 @@
 #include"Rendering/Framebuffer.h"
 #include"Scene/Skybox.h"
 namespace OBJ_Viewer {
+	struct GridData
+	{
+		float gridScale = 1.;
+		glm::vec3 gridLineColor = glm::vec3(.5);
+		bool isAxisShaded = true;
+	};
 	struct RenderStateSettings
 	{
 		bool m_isWireFrameRenderingOn =false;
@@ -24,6 +30,7 @@ namespace OBJ_Viewer {
 		bool m_isRenderSpecularTextureOn = true;
 		bool m_isRenderNormalTextureOn = true;
 		bool m_isRenderAmbientOcclusionTextureOn = true;
+		GridData m_gridData;
 	};
 	enum BaseMeshType
 	{

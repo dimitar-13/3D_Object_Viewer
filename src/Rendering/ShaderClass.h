@@ -20,6 +20,8 @@ namespace OBJ_Viewer
 		void UniformSet3FloatVector(const char* name, const glm::vec3 value)const { glProgramUniform3fv(this->m_shaderHandle, findUniform(name), 1, &value[0]); }
 		void UniformSet4x4FloatMatrix(const char* name, const glm::mat4 value)const { glProgramUniformMatrix4fv(this->m_shaderHandle, findUniform(name), 1,GL_FALSE, &value[0][0]); }
 		void UniformSet1Int(const char* name, const int value)const { glProgramUniform1i(this->m_shaderHandle, findUniform(name),value); }
+		void UniformSet1Float(const char* name, const float value)const { glProgramUniform1f(this->m_shaderHandle, findUniform(name), value); }
+
 		void UseShader()const { glUseProgram(this->m_shaderHandle); }
 	private:
 		std::vector<std::string>readShaderSource(const char* path);

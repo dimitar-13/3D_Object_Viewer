@@ -17,10 +17,13 @@ namespace OBJ_Viewer
 {
 	struct RendererShaders {
 		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str()),
-			skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str())/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
+			skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str()), 
+			gridShader(GetConcatShaderPath("GridShader.glsl").c_str())
+			/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
 		ShaderClass colorShader;
 		//ShaderClass lightShader;
 		ShaderClass skyboxShader;
+		ShaderClass gridShader;
 	};
 	class RenderingCoordinator{
 	public:
@@ -33,6 +36,7 @@ namespace OBJ_Viewer
 		AppState* m_appState;
 		UILayer m_UILayer;
 		RendererShaders m_rendererShaders;
+		Mesh m_SceneGrid;
 	};
 }
 

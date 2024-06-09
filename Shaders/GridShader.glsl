@@ -21,6 +21,7 @@ vec3 unprojectPoint(vec4 point,mat4 viewMatrix,mat4 ProjectionMatrix)
 
 void main()
 {
+	//About how this work see the ReadMe.
 	frag_viewMatrix = ViewMatrix;
 	frag_projMatrix = ProjectionMatrix;
 
@@ -63,19 +64,19 @@ vec4 GetGridCol(vec2 p,GridInfo grid_Info)
 	vec3 gridColor = vec3(grid_Info.gridLineColor);
 
     vec2 dCoords = fwidth(coords);
-	// Dynamically adjust smoothstep based on derivatives
+
 	float dX = smoothstep(0.0, dCoords.x * 2.0, subregions.x);
 	float dY = smoothstep(0.0, dCoords.y * 2.0, subregions.y);
 
 	float d = 1.0 - (dX * dY);
 	
-	if(step(.01,coords.x) - step(.1,coords.x) >0. && grid_Info.isAxisShaded)
+	if(step(.0,coords.x) - step(.1,coords.x) >0. && grid_Info.isAxisShaded)
 	{
 		gridColor = vec3(0,0,.5);
 		d = 1.;
 	}
 		
-	if(step(.01,coords.y) - step(.1,coords.y) > 0. && grid_Info.isAxisShaded)
+	if(step(.0,abs(coords.y)) - step(.1,abs(coords.y)) > 0. && grid_Info.isAxisShaded)
 	{
 		gridColor = vec3(.5,.0,0);
 		d = 1.;
@@ -86,14 +87,14 @@ vec4 GetGridCol(vec2 p,GridInfo grid_Info)
 void main()
 {
 	float t = -nearPoint.y / (farPoint.y - nearPoint.y);
-   
-	vec3 fragPos3D = nearPoint + t * (farPoint - nearPoint);
-	gl_FragDepth = GetFragDepth(fragPos3D);
 
+	vec3 fragPos3D = nearPoint + t * (farPoint - nearPoint);
+	
 	vec4 col = GetGridCol(fragPos3D.xz,gridInfo);
 	
-	col.a *= 1- smoothstep(length(cameraPosition.xz ),length(cameraPosition.xz )+3., length(fragPos3D.xz));
+	col.a *= 1- smoothstep(length(cameraPosition.xz),length(cameraPosition.xz)*10., length(fragPos3D.xz));
 	col.a *= t < 0 ? 0. :1.;
+	gl_FragDepth = GetFragDepth(fragPos3D)*col.a;
 	FragColor = vec4(col);	
 }
 

@@ -22,9 +22,8 @@ std::vector<GLuint> planeIndexData =
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
 	GLFWwindow* window = this->m_appState->GetGlobalAppWindow().GetGLFW_Window();
-	glEnable(GL_DEPTH_TEST |  GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -45,26 +44,14 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	const Skybox* skybox = m_appState->GetSceneSkybox();
 	//Set up the renderer based on the settings;
 
-	/*if(this->m_rendererSettings.m_isWireGridOn)
-		this->m_mainRenderer.RenderObject();*/
-
 	framebuffer.BindFramebuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 0, 0, 1);
-	if (appSettings.m_isWireGridOn)
-	{
-		Renderer::IsWireFrameOn(false);
-		m_rendererShaders.gridShader.UseShader();
-		m_rendererShaders.gridShader.UniformSet3FloatVector("cameraPosition", m_Camera->GetCameraPos());
-		Renderer::RenderGrid(m_rendererShaders.gridShader, m_SceneGrid, *m_Camera,appSettings.m_gridData);
-	}
-	if (skybox != nullptr && appSettings.m_isSkyboxOn)
-	{
-		Renderer::IsWireFrameOn(false);
-		Renderer::RenderSkybox(m_rendererShaders.skyboxShader, *skybox, *m_Camera);
-	}
+	
 	for (const auto& mesh : Model.GetModelMeshes())
 	{
+		glEnable(GL_BLEND);
+
 		Renderer::IsWireFrameOn(appSettings.m_isWireFrameRenderingOn);
 
 		m_rendererShaders.colorShader.UseShader();
@@ -75,6 +62,20 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 		
 		Renderer::RenderMesh(m_rendererShaders.colorShader, *mesh, *m_Camera);
 	}
+
+	if (skybox != nullptr && appSettings.m_isSkyboxOn)
+	{
+		Renderer::IsWireFrameOn(false);
+		Renderer::RenderSkybox(m_rendererShaders.skyboxShader, *skybox, *m_Camera);
+	}
+	if (appSettings.m_isWireGridOn)
+	{
+		Renderer::IsWireFrameOn(false);
+		m_rendererShaders.gridShader.UseShader();
+		m_rendererShaders.gridShader.UniformSet3FloatVector("cameraPosition", m_Camera->GetCameraPos());
+    	Renderer::RenderGrid(m_rendererShaders.gridShader, m_SceneGrid, *m_Camera, appSettings.m_gridData);
+	}
+	glDisable(GL_BLEND);
 
 	framebuffer.UnbindFramebuffer();
 }

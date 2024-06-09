@@ -21,6 +21,14 @@ void OBJ_Viewer::Camera::CalculatePositionVector()
 	m_position = glm::normalize(m_position);
 }
 
+void OBJ_Viewer::Camera::GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj)const
+{
+	glm::vec3 upVec(0, 1, 0);
+	upVec.y *= std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) < 0 ? -1 : 1;
+	*pView = glm::lookAt(m_position * m_zoom, glm::vec3(0.0f), upVec);
+	*pProj = m_projectionMatrix;
+}
+
 glm::mat4 OBJ_Viewer::Camera::GetViewProjMatrix()const
 {
 	glm::vec3 upVec(0, 1, 0);

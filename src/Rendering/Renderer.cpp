@@ -8,6 +8,23 @@ void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const Mesh
 	mesh.GetMeshVAO().UnBind();	
 }
 
+void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const Mesh& mesh, const Camera& mainCamera, const GridData gridInfo)
+{
+	shaderToUse.UseShader();
+	glm::mat4 view, proj;
+	mainCamera.GetViewAndProjectionSeparate(&view, &proj);
+	shaderToUse.UniformSet4x4FloatMatrix("ProjectionMatrix", proj);
+	shaderToUse.UniformSet4x4FloatMatrix("ViewMatrix", view);
+	shaderToUse.UniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
+	shaderToUse.UniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
+	shaderToUse.UniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);
+
+
+	mesh.GetMeshVAO().BindBuffer();
+	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
+	mesh.GetMeshVAO().UnBind();
+}
+
 void OBJ_Viewer::Renderer::RenderSkybox(const ShaderClass& skyboxShader, const Skybox& skybox, const Camera& mainCamera)
 {
 	/*Using early depth testing : Instead of rendering the skybox first we try to renderer it last.For this however we need a way to say that the skybox depth is less

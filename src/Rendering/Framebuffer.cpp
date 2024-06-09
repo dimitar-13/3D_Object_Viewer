@@ -10,8 +10,8 @@ OBJ_Viewer::Framebuffer::Framebuffer(int width, int height, FramebufferAttachmen
 
 	TextureBuilder builder;
 	this->m_texture = 
-		builder.SetTextureFormat(TEXTURE_FORMAT_RGB).
-		SetTextureInternalFormat(TEXTURE_INTERNAL_FORMAT_RGB).
+		builder.SetTextureFormat(TEXTURE_FORMAT_RGBA).
+		SetTextureInternalFormat(TEXTURE_INTERNAL_FORMAT_RGBA).
 		SetTextureSize({ width,height }).buildTexture();
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,this->m_texture->GetTextureHandle(), 0);

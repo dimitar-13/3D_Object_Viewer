@@ -92,6 +92,13 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::Separator();
 		ImGui::Text("Scene settings.");
 		ImGui::Checkbox("UseWorldGrid?", &pSettings->m_isWireGridOn);
+		if (pSettings->m_isWireGridOn)
+		{
+			ImGui::SliderFloat("Grid scale", &pSettings->m_gridData.gridScale, 1.f, 10.f);
+			ImGui::ColorPicker4("Light color", &pSettings->m_gridData.gridLineColor[0]);
+			ImGui::Checkbox("Shade axis.", &pSettings->m_gridData.isAxisShaded);
+
+		}
 		ImGui::Checkbox("Enable lights?", &pSettings->m_isRenderingLightOn);
 
 		if (pSettings->m_isRenderingLightOn)

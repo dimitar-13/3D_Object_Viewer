@@ -3,10 +3,12 @@
 OBJ_Viewer::AppState::AppState(Window* pAppWindow, InputHandler* pInputHandler, BaseMeshType typeOfDefaultMeshToLoad)
 	:m_sceneFramebuffer(pAppWindow->GetWindowSize().m_winWidth, pAppWindow->GetWindowSize().m_winHeight, FRAMEBUFFER_COLOR_ATTACHMENT)
 {
+	std::shared_ptr<Mesh> mesh;
+	ModelData data;
 	switch (typeOfDefaultMeshToLoad)
 	{
-	case OBJ_Viewer::MESH_TYPE_CUBE:
-		m_currentlyLoadedModel = std::shared_ptr<Model>(GenerateCubeModel());
+	case OBJ_Viewer::MESH_TYPE_CUBE:	
+		m_currentlyLoadedModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ std::move(GenerateCubeMesh())}, data);
 		break;
 	case OBJ_Viewer::MESH_TYPE_SPHERE:
 		//

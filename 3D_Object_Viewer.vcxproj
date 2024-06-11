@@ -216,6 +216,7 @@
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
     <None Include="Shaders\GridShader.glsl" />
+    <None Include="Shaders\LightShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

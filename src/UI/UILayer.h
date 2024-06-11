@@ -15,6 +15,11 @@
 #include"AppState.h"
 namespace OBJ_Viewer {
 
+constexpr auto UI_LAYER_SCENE_WINDOW_NAME = "Scene";
+constexpr auto UI_LAYER_OBJECT_LOADING_WINDOW_NAME = "Loading panel";
+constexpr auto UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME = "ModelAndRenderingSettings";
+constexpr auto UI_LAYER_SCENE_SETTINGS_WINDOW_NAME = "Scene setting";
+constexpr auto UI_WINDOW_UNKNOWN = "unknownWindow";
 	class UILayer
 	{
 	public:
@@ -26,6 +31,7 @@ namespace OBJ_Viewer {
 		void LoadSkybox();
 		void RenderComboBox(std::string comboLabel, int index);
 		void RenderSkyboxSettings(const Skybox* skybox);
+		void RenderLightSettingsPanel(uint32_t lightIndex, glm::vec3* pColor, glm::vec3* pPosition);
 	private:
 	
 		AppState* m_appState;

@@ -196,5 +196,6 @@
     <None Include="Shaders\ColorShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
     <None Include="Shaders\GridShader.glsl" />
+    <None Include="Shaders\LightShader.glsl" />
   </ItemGroup>
 </Project>

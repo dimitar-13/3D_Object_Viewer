@@ -19,9 +19,10 @@ namespace OBJ_Viewer
 		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str()),
 			skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str()), 
 			gridShader(GetConcatShaderPath("GridShader.glsl").c_str())
-			/*, lightShader("LightSHaderPath"), skyboxShader("SkyboxPath")*/ {}
+			, lightShader(GetConcatShaderPath("LightShader.glsl").c_str()){}
+
 		ShaderClass colorShader;
-		//ShaderClass lightShader;
+		ShaderClass lightShader;
 		ShaderClass skyboxShader;
 		ShaderClass gridShader;
 	};
@@ -36,7 +37,7 @@ namespace OBJ_Viewer
 		AppState* m_appState;
 		UILayer m_UILayer;
 		RendererShaders m_rendererShaders;
-		Mesh m_SceneGrid;
+		VertexAttributeObject m_SceneGridVAO;
 	};
 }
 

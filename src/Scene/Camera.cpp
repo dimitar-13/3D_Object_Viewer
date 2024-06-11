@@ -1,3 +1,4 @@
+#include "UI/UILayer.h"
 #include "Camera.h"
 
 OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height, InputHandler* pInputHandler)
@@ -48,12 +49,12 @@ void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 	//Yay mouse position has updated :)
 	if (type == MessageType::MOUSE_POSITION_CHANGED)
 	{
-		if(m_pInputHandler->isMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
+		if(m_pInputHandler->isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && m_pInputHandler->GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 		{
 			//We update the previous x and y position.
 			m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
 		}
-		else if (m_pInputHandler->isMouseButtonHeld(GLFW_MOUSE_BUTTON_1))
+		else if (m_pInputHandler->isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && m_pInputHandler->GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 		{
 			m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
 			m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);

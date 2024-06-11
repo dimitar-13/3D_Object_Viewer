@@ -70,13 +70,13 @@ vec4 GetGridCol(vec2 p,GridInfo grid_Info)
 
 	float d = 1.0 - (dX * dY);
 	
-	if(step(.0,coords.x) - step(.1,coords.x) >0. && grid_Info.isAxisShaded)
+	if( 1. - smoothstep(.01,dCoords.x*2.,abs(coords.x)) > 0 && grid_Info.isAxisShaded)
 	{
 		gridColor = vec3(0,0,.5);
 		d = 1.;
 	}
 		
-	if(step(.0,abs(coords.y)) - step(.1,abs(coords.y)) > 0. && grid_Info.isAxisShaded)
+	if( 1. - smoothstep(.01,dCoords.y * 2.0,abs(coords.y))  > 0.  && grid_Info.isAxisShaded)
 	{
 		gridColor = vec3(.5,.0,0);
 		d = 1.;
@@ -92,9 +92,9 @@ void main()
 	
 	vec4 col = GetGridCol(fragPos3D.xz,gridInfo);
 	
-	col.a *= 1- smoothstep(length(cameraPosition.xz),length(cameraPosition.xz)*10., length(fragPos3D.xz));
+	col.a *= 1- smoothstep(0.,10., length(cameraPosition -fragPos3D ));
 	col.a *= t < 0 ? 0. :1.;
-	gl_FragDepth = GetFragDepth(fragPos3D)*col.a;
+	gl_FragDepth = GetFragDepth(fragPos3D);
 	FragColor = vec4(col);	
 }
 

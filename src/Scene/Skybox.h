@@ -26,7 +26,7 @@ namespace OBJ_Viewer
 	private:
 		std::vector<OpenGLBuffer*> m_PixelBuffers;
 		GLuint m_cubeMapHandle = 0;
-		Mesh* m_CubeMesh;
+		std::unique_ptr<Mesh> m_CubeMesh;
 		TextureSize m_CubeMapTextSize;
 		TextureFormat m_format;
 	};

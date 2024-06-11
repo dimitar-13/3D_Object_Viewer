@@ -38,7 +38,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 	Model SceneModel = m_appState->GetSceneModel();
 	const Framebuffer& sceneFrameBuffer = m_appState->GetSceneFrameBuffer();
 	const Skybox* sceneSkybox = m_appState->GetSceneSkybox();
-
+	const char* currentlyActiveWindow = UI_WINDOW_UNKNOWN;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -62,10 +62,12 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), m_imgGuiDockSpaceFlags);
 	}
-
 	//Right panel for model and rendering settings.
-	if (ImGui::Begin("Test"))
+	if (ImGui::Begin(UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
 	{
+		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)? 
+			UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+
 		ImGui::Text("Model view settings");
 		ImGui::InputFloat3("Position", &position[0]);
 		ImGui::InputFloat3("Rotation", &rotation[0]);
@@ -81,8 +83,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 	}ImGui::End();
 
 	//ModelData modelData = (*m_pCurrentlyLoadedModel)->GetModelData();
-	if (ImGui::Begin("Model data."))
+	if (ImGui::Begin(UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
 	{
+		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
+			UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+
 		ImGui::Text("Object triangle count:%d", 1);
 		ImGui::Text("Object vertex count:%d", 2);
 		ImGui::Text("Object face count:%d", 3);
@@ -95,7 +100,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 		if (pSettings->m_isWireGridOn)
 		{
 			ImGui::SliderFloat("Grid scale", &pSettings->m_gridData.gridScale, 1.f, 10.f);
-			ImGui::ColorPicker4("Light color", &pSettings->m_gridData.gridLineColor[0]);
+			ImGui::ColorPicker4("Grid color", &pSettings->m_gridData.gridLineColor[0]);
 			ImGui::Checkbox("Shade axis.", &pSettings->m_gridData.isAxisShaded);
 
 		}
@@ -103,10 +108,26 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 		if (pSettings->m_isRenderingLightOn)
 		{
-			static float color;
-			static int lightCount;
-			ImGui::InputInt("Light count", &lightCount);
-			ImGui::ColorPicker4("Light color", &color);
+			
+			ImGui::InputInt("Light count", &pSettings->lightInfo.lightCount);
+			//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
+			/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
+			will return negative value, a value that we can use to get the closest valid number in cases of 7 we get 7 += 4 - 7 <=> 7+=-3
+			and we use the min function in cases that we are within our range.We do it this way to avoid branching.
+			UPDATE: Added this for values below 0 as well by checking the value of 'lightCount' if its below zero we gonna add the positive version of it.
+			*/
+
+			pSettings->lightInfo.lightCount = 
+				pSettings->lightInfo.lightCount < 0 ? (pSettings->lightInfo.lightCount - pSettings->lightInfo.lightCount):
+				pSettings->lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount);
+
+			for (uint32_t i = 0; i < pSettings->lightInfo.lightCount; i++)
+			{
+				RenderLightSettingsPanel(i, 
+					&pSettings->lightInfo.lights[i].color,
+					&pSettings->lightInfo.lights[i].direction);
+				ImGui::Separator();
+			}
 		}
 		ImGui::Checkbox("Enable skybox?", &pSettings->m_isSkyboxOn);
 		if (pSettings->m_isSkyboxOn)
@@ -116,12 +137,18 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	}ImGui::End();
 
-	ImGui::Begin("Loading panel");
-	ImGui::Text("Loading stuff here.");
-	ImGui::End();
-
-	if (ImGui::Begin("Loading panel"))
+	if(ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
+		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
+			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+	ImGui::Text("Loading stuff here.");
+	}ImGui::End();
+	
+	if (ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
+	{
+		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
+			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+
 		if (ImGui::Button("Open obj file"))
 		{
 			LoadModel();
@@ -130,8 +157,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	}ImGui::End();
 
-	ImGui::Begin("Scene");
+	if(ImGui::Begin(UI_LAYER_SCENE_WINDOW_NAME))
 	{
+		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
+			UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
+
 		ImVec2 winSize = ImGui::GetWindowSize();
 		m_appState->ResizeBuffer(winSize.x, winSize.y);
 		ImGui::BeginChild("GameRender");
@@ -143,6 +173,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	m_appState->GetGlobalInputHandler()->SetCurrentlyFocusedWindow(currentlyActiveWindow);
 }
 
 void OBJ_Viewer::UILayer::RenderSkyboxSettings(const Skybox* skybox)
@@ -196,6 +227,16 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings(const Skybox* skybox)
 
 	//TODO:Add texture preview;
 	ImGui::Separator();
+}
+
+void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3 *pColor, glm::vec3* pPosition)
+{
+	ImGui::ColorPicker3(std::string("Light color:" + std::to_string(lightIndex)).c_str(),&(*pColor)[0]);
+	ImGui::NewLine();
+	ImGui::VSliderFloat(std::string("Light direction.x:" + std::to_string(lightIndex)).c_str(), { 50,50}, &(pPosition->x), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->y), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->z), -1.f, 1.f);
+
 }
 
 void OBJ_Viewer::UILayer::RenderComboBox(std::string comboLabel, int index)

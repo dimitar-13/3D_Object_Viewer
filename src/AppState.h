@@ -12,12 +12,25 @@
 #include<memory>
 #include"Rendering/Framebuffer.h"
 #include"Scene/Skybox.h"
+#include<array>
 namespace OBJ_Viewer {
+constexpr int MAX_LIGHT_COUNT = 4;
+
 	struct GridData
 	{
 		float gridScale = 1.;
 		glm::vec3 gridLineColor = glm::vec3(.5);
 		bool isAxisShaded = true;
+	};
+	struct DirectionalLight
+	{
+		glm::vec3 direction = glm::vec3(0,-1,0);
+		glm::vec3 color = glm::vec3(1);
+	};
+	struct SceneLightInfo
+	{
+		int lightCount = 1;
+		std::array<DirectionalLight, MAX_LIGHT_COUNT>lights;
 	};
 	struct RenderStateSettings
 	{
@@ -31,6 +44,7 @@ namespace OBJ_Viewer {
 		bool m_isRenderNormalTextureOn = true;
 		bool m_isRenderAmbientOcclusionTextureOn = true;
 		GridData m_gridData;
+		SceneLightInfo lightInfo;
 	};
 	enum BaseMeshType
 	{

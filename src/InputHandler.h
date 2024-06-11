@@ -165,11 +165,14 @@ namespace OBJ_Viewer
 		bool isKeyboardKeyHeld(int keycode) { return m_keyboardInputManager.GetKeyState(keycode) == KEY_HELD; }
 		bool isMouseButtonPressed(int mouseButton) { return m_mouseInputManager.GetButtonState(mouseButton) == KEY_PRESSED; }
 		bool isMouseButtonHeld(int mouseButton) { return m_mouseInputManager.GetButtonState(mouseButton) == KEY_HELD; }
+		const char* GetCurrentlyFocusedWindow()const { return m_crrentlyFocusedWindowName; }
+		void SetCurrentlyFocusedWindow(const char* windowName){ m_crrentlyFocusedWindowName = windowName; }
+
 		KeyState GetKeyState(int keycode);
 	private:
 		MouseInputStateManager m_mouseInputManager;
 		KeyboardInputStateManager m_keyboardInputManager;
-
+		const char* m_crrentlyFocusedWindowName = "SceneWindow";
 };
 }
 

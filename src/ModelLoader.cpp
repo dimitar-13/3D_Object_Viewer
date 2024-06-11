@@ -69,6 +69,12 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 		}
 		else
 			vertexData[i].uvCoords = glm::vec2(0.0f, 0.0f);
+		if (assimpMesh->mNormals != nullptr)
+		{
+			vertexData[i].normal.x = assimpMesh->mNormals[i].x;
+			vertexData[i].normal.y = assimpMesh->mNormals[i].y;
+			vertexData[i].normal.z = assimpMesh->mNormals[i].z;
+		}
 	}
 
 	m_MeshData.m_faceCount += assimpMesh->mNumFaces;

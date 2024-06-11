@@ -1,7 +1,7 @@
 #include "Skybox.h"
 #include"MeshGeneratingMethods.h"
 #include<algorithm>
-OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_CubeMesh(GenerateCubeModel()->GetModelMeshes().at(0).get())
+OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_CubeMesh(std::move(GenerateCubeMesh(true)))
 {
 	TextureSize pTextureSize;
 	int pPresentChannelsCount;

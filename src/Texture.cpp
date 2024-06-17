@@ -38,6 +38,7 @@ void OBJ_Viewer::Texture::SetTextureProperties(const unsigned char* data)
 
 	glTexImage2D(GL_TEXTURE_2D, 0, m_textureInternalFormat,
 		m_textureSize.width, m_textureSize.height, 0, m_textureFormat,m_texturePixelDataType,data);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 

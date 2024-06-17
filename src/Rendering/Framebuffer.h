@@ -18,7 +18,7 @@ namespace OBJ_Viewer {
 		//FramebufferAttachmentsFlags currently not used
 		Framebuffer(int width, int height, FramebufferAttachmentsFlags attachmentFlags);
 		GLuint GetFramebufferHandle()const { return this->m_framebuffer; }
-		std::shared_ptr<Texture> GetFramebufferTexture()const { return this->m_texture; }
+		Texture& GetFramebufferTexture()const { return *this->m_texture; }
 		std::pair<int,int>GetBufferSize() { return std::pair<int,int>(m_Width, m_Height); }
 		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer); }
 		void UnbindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
@@ -30,7 +30,7 @@ namespace OBJ_Viewer {
 		GLuint m_readBuffer;
 		int m_Width;
 		int m_Height;
-		std::shared_ptr<Texture> m_texture;
+		std::unique_ptr<Texture> m_texture;
 	};
 }
 

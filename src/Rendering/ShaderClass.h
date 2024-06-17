@@ -5,6 +5,7 @@
 #include<string>
 #include<GL/glew.h>
 #include<vector>
+#include"UniformBuffer.h"
 namespace OBJ_Viewer
 {
 	enum ShaderIndex
@@ -21,7 +22,8 @@ namespace OBJ_Viewer
 		void UniformSet4x4FloatMatrix(const char* name, const glm::mat4 value)const { glProgramUniformMatrix4fv(this->m_shaderHandle, findUniform(name), 1,GL_FALSE, &value[0][0]); }
 		void UniformSet1Int(const char* name, const int value)const { glProgramUniform1i(this->m_shaderHandle, findUniform(name),value); }
 		void UniformSet1Float(const char* name, const float value)const { glProgramUniform1f(this->m_shaderHandle, findUniform(name), value); }
-
+		void BindUBOToShader(const UniformBuffer& buffer)const;
+		std::vector<std::string> GetShaderUniformList()const;
 		void UseShader()const { glUseProgram(this->m_shaderHandle); }
 	private:
 		std::vector<std::string>readShaderSource(const char* path);

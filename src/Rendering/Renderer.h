@@ -1,8 +1,10 @@
 #pragma once
 #include"ShaderClass.h"
-#include"ModelLoader.h"
 #include"Scene/Camera.h"
-#include"RenderingCoordinator.h"
+#include"Scene/Skybox.h"
+#include"Scene/Model.h"
+#include"AppState.h"
+
 namespace OBJ_Viewer {
 	class Renderer
 	{

@@ -46,48 +46,49 @@ namespace OBJ_Viewer {
         { -1.0f, -1.0f, 1.0f},
         {  1.0f, -1.0f, 1.0f},
         {  1.0f, -1.0f, -1.0f}};
-
+    
    const std::vector<Vertex> CUBE_VERTEX_VECTOR = {
+       //TODO:Calc the tangent vector of the cube.
         // Front face
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[0], glm::vec2(0.0f, 0.0f), {0.0f,  0.0f,  1.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[1], glm::vec2(1.0f, 0.0f), { 0.0f,  0.0f,  1.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[2], glm::vec2(1.0f, 1.0f), { 0.0f,  0.0f,  1.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[3], glm::vec2(0.0f, 1.0f), { 0.0f,  0.0f,  1.0f}},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[0], glm::vec2(0.0f, 0.0f), { 0.0f,  0.0f,   1.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[1], glm::vec2(1.0f, 0.0f), { 0.0f,  0.0f,   1.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[2], glm::vec2(1.0f, 1.0f), { 0.0f,  0.0f,   1.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[3], glm::vec2(0.0f, 1.0f), { 0.0f,  0.0f,   1.0f},glm::vec3(0)},
 
         // Back face
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[4], glm::vec2(0.0f, 0.0f), { 0.0f,  0.0f, -1.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[5], glm::vec2(1.0f, 0.0f), { 0.0f,  0.0f, -1.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[6], glm::vec2(1.0f, 1.0f), { 0.0f,  0.0f, -1.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[7], glm::vec2(0.0f, 1.0f), { 0.0f,  0.0f, -1.0f}},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[4], glm::vec2(0.0f, 0.0f), { 0.0f,  0.0f, -1.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[5], glm::vec2(1.0f, 0.0f), { 0.0f,  0.0f, -1.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[6], glm::vec2(1.0f, 1.0f), { 0.0f,  0.0f, -1.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[7], glm::vec2(0.0f, 1.0f), { 0.0f,  0.0f, -1.0f},glm::vec3(0)},
 
         // Left face
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[8], glm::vec2(0.0f, 0.0f), {-1.0f,  0.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[9], glm::vec2(1.0f, 0.0f), {-1.0f,  0.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[10], glm::vec2(1.0f, 1.0f), {-1.0f,  0.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[11], glm::vec2(0.0f, 1.0f), {-1.0f,  0.0f,  0.0f}},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[8], glm::vec2(0.0f, 0.0f), {-1.0f,  0.0f,   0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[9], glm::vec2(1.0f, 0.0f), {-1.0f,  0.0f,   0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[10], glm::vec2(1.0f, 1.0f), {-1.0f,  0.0f,  0.0f}, glm::vec3(0)},
+        { ONE_BY_ONE_CUBE_POSITION_VECTOR[11], glm::vec2(0.0f, 1.0f), {-1.0f,  0.0f,  0.0f}, glm::vec3(0)},
 
         // Right face
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[12], glm::vec2(0.0f, 0.0f), { 1.0f,  0.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[13], glm::vec2(1.0f, 0.0f), { 1.0f,  0.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[14], glm::vec2(1.0f, 1.0f), { 1.0f,  0.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[15], glm::vec2(0.0f, 1.0f), { 1.0f,  0.0f,  0.0f}},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[12], glm::vec2(0.0f, 0.0f), { 1.0f,  0.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[13], glm::vec2(1.0f, 0.0f), { 1.0f,  0.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[14], glm::vec2(1.0f, 1.0f), { 1.0f,  0.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[15], glm::vec2(0.0f, 1.0f), { 1.0f,  0.0f,  0.0f},glm::vec3(0)},
 
         // Top face
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[16], glm::vec2(0.0f, 0.0f), { 0.0f,  1.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[17], glm::vec2(1.0f, 0.0f), { 0.0f,  1.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[18], glm::vec2(1.0f, 1.0f), { 0.0f,  1.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[19], glm::vec2(0.0f, 1.0f), { 0.0f,  1.0f,  0.0f}},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[16], glm::vec2(0.0f, 0.0f), { 0.0f,  1.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[17], glm::vec2(1.0f, 0.0f), { 0.0f,  1.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[18], glm::vec2(1.0f, 1.0f), { 0.0f,  1.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[19], glm::vec2(0.0f, 1.0f), { 0.0f,  1.0f,  0.0f},glm::vec3(0)},
 
         // Bottom face
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[20], glm::vec2(0.0f, 0.0f), { 0.0f, -1.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[21], glm::vec2(1.0f, 0.0f), { 0.0f, -1.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[22], glm::vec2(1.0f, 1.0f), { 0.0f, -1.0f,  0.0f}},
-        {ONE_BY_ONE_CUBE_POSITION_VECTOR[23], glm::vec2(0.0f, 1.0f), { 0.0f, -1.0f,  0.0f}},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[20], glm::vec2(0.0f, 0.0f), { 0.0f, -1.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[21], glm::vec2(1.0f, 0.0f), { 0.0f, -1.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[22], glm::vec2(1.0f, 1.0f), { 0.0f, -1.0f,  0.0f},glm::vec3(0)},
+        {ONE_BY_ONE_CUBE_POSITION_VECTOR[23], glm::vec2(0.0f, 1.0f), { 0.0f, -1.0f,  0.0f},glm::vec3(0)},
     };
  
     inline std::unique_ptr<Mesh> GenerateCubeMesh(bool isOnlyPosition = false)
     {   
-        return  isOnlyPosition ? std::make_unique<Mesh>(ONE_BY_ONE_CUBE_POSITION_VECTOR, ONE_BY_ONE_CUBE_INDICIES,glm::mat4(1)) :
-            std::make_unique<Mesh>(CUBE_VERTEX_VECTOR, ONE_BY_ONE_CUBE_INDICIES,glm::mat4(1));
+        return  isOnlyPosition ? std::make_unique<Mesh>(ONE_BY_ONE_CUBE_POSITION_VECTOR, ONE_BY_ONE_CUBE_INDICIES) :
+            std::make_unique<Mesh>(CUBE_VERTEX_VECTOR, ONE_BY_ONE_CUBE_INDICIES);
     }
 }

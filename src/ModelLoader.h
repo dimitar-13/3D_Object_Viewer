@@ -21,6 +21,8 @@ namespace OBJ_Viewer
 		std::shared_ptr<Mesh> ReadMesh(aiMesh* assimpMesh);
 		std::vector<std::shared_ptr<OBJ_Viewer::Material>> GetSceneMaterials(const aiScene* scene);
 		std::shared_ptr<OBJ_Viewer::Texture> ReadTexture(aiMaterial* mat, aiTextureType type);
+		std::string GetModelTexturePathAbsolute(aiString texturePath)const;
+		glm::mat4 AssimpToGlmMatrix4x4(const aiMatrix4x4& matrix);
 	private:
 		std::vector<aiMesh*> m_meshes;
 		std::vector<std::shared_ptr<Material>> m_SceneMaterials;

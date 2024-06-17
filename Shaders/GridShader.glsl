@@ -8,14 +8,20 @@ out vec3 nearPoint;
 out mat4 frag_viewMatrix;
 out mat4 frag_projMatrix;
 
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
+layout(std140) uniform Matrices
+{
+	mat4 ViewMatrix;
+	mat4 ProjectionMatrix;
+	mat4 ModelMatrix;
+};
 
 vec3 unprojectPoint(vec4 point,mat4 viewMatrix,mat4 ProjectionMatrix)
 {
 	mat4 inverseView = inverse(viewMatrix);
 	mat4 inversePorj = inverse(ProjectionMatrix);
 	point = inverseView *inversePorj *point;
+	//The idea here is to bring this point back into the representation where w =1. sicne currenlty we have World_homogenous point and we want just
+	//World point.
 	return point.xyz/point.w;
 }
 

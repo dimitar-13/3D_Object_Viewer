@@ -3,9 +3,6 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#include"ModelLoader.h"
-#include"ShaderClass.h"
-#include"Scene/Camera.h"
 #include"WindowHandler.h"
 #include <nfd.h>
 #include"ShaderPath.h"
@@ -13,19 +10,9 @@
 #include"Framebuffer.h"
 #include"UI/UILayer.h"
 #include "AppState.h"
+#include "SceneRenderer.h" 
 namespace OBJ_Viewer
 {
-	struct RendererShaders {
-		RendererShaders() :colorShader(GetConcatShaderPath("ColorShader.glsl").c_str()),
-			skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str()), 
-			gridShader(GetConcatShaderPath("GridShader.glsl").c_str())
-			, lightShader(GetConcatShaderPath("LightShader.glsl").c_str()){}
-
-		ShaderClass colorShader;
-		ShaderClass lightShader;
-		ShaderClass skyboxShader;
-		ShaderClass gridShader;
-	};
 	class RenderingCoordinator{
 	public:
 		RenderingCoordinator(AppState* appState);
@@ -33,11 +20,9 @@ namespace OBJ_Viewer
 	private:
 		void RenderScene();
 	private:
-		std::unique_ptr<Camera> m_Camera;
 		AppState* m_appState;
-		UILayer m_UILayer;
-		RendererShaders m_rendererShaders;
-		VertexAttributeObject m_SceneGridVAO;
+		std::unique_ptr<UILayer> m_UILayer;
+		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 	};
 }
 

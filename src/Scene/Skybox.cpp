@@ -29,8 +29,8 @@ OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_CubeMesh(std::move(G
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, pTextureSize.width, pTextureSize.height, 0, format, GL_UNSIGNED_BYTE, NULL);
 
 		TextureBuilder builder;
-		m_faceTextures[i] = builder.SetTextureFormat(format).
-			SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(pTextureSize).buildTexture();
+		m_faceTextures[i] = std::move(builder.SetTextureFormat(format).
+			SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(pTextureSize).buildTexture());
 	}
 	m_format = format;
 	m_CubeMapTextSize = pTextureSize;

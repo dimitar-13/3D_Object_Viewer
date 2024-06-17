@@ -2,7 +2,6 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#include"Rendering/Renderer.h"
 #include"WindowHandler.h"
 namespace OBJ_Viewer {
 

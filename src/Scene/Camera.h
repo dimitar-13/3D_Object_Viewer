@@ -34,7 +34,7 @@ namespace OBJ_Viewer
 		public IObserver<int,int>
 	{
 	public:
-		Camera(float CameraZoom, int width, int height, InputHandler* pInputHandler);
+		Camera(float CameraZoom, int width, int height, InputHandler& pInputHandler);
 		void CalculatePositionVector();
 		void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj)const;
 		glm::mat4 GetViewProjMatrix()const;
@@ -46,7 +46,7 @@ namespace OBJ_Viewer
 		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
-		InputHandler* m_pInputHandler;
+		InputHandler& m_pInputHandler;
 		// Inherited via IObserver
 		void Update(MessageType type,double xpos, double ypos) override;
 		void Update(MessageType type, int newWidht, int newHeight) override;

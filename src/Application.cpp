@@ -1,5 +1,8 @@
 #include "Application.h"
 #include"imgui_internal.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include<iostream>
 OBJ_Viewer::Application::Application()
 {
 	if (glfwInit() == GLFW_FALSE)

@@ -33,6 +33,31 @@ OBJ_Viewer::ShaderClass::ShaderClass(const char* filePath)
     //TODO:Think what to do after this leave it as is or destroy the object(i don't like this idea thought).
 }
 
+void OBJ_Viewer::ShaderClass::BindUBOToShader(const UniformBuffer& buffer)const
+{
+  const int bufferIndex = glGetUniformBlockIndex(m_shaderHandle, buffer.GetBufferName().c_str());
+  glUniformBlockBinding(m_shaderHandle, bufferIndex, buffer.GetBindingPoint());
+}
+
+std::vector<std::string> OBJ_Viewer::ShaderClass::GetShaderUniformList()const
+{
+    int count; 
+    glGetProgramiv(this->m_shaderHandle, GL_ACTIVE_UNIFORMS,&count);
+    constexpr uint8_t buffSize = 50;
+    if (!count)
+        return std::vector<std::string>();
+
+    std::vector<std::string> result(count);
+    int Name_Size;
+    GLenum uType;
+    for (int i = 0; i < count; i++)
+    {
+        glGetActiveUniform(this->m_shaderHandle, i, buffSize, NULL, &Name_Size, &uType, result[i].data());
+    }
+    return result;
+    
+}
+
 std::vector<std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* path)
 {
     std::fstream sourceFile;

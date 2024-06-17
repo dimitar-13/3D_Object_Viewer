@@ -1,7 +1,8 @@
 #include "UI/UILayer.h"
 #include "Camera.h"
 
-OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height, InputHandler* pInputHandler)
+OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height, InputHandler& pInputHandler):
+	m_pInputHandler(pInputHandler)
 {
 	this->m_zoom = CameraZoom;
 	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)width / (float)height, 0.1f, 100.0f);
@@ -11,7 +12,6 @@ OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height, InputHandler
 	//Use to set the x_previous and y_previous of the 'm_EulerAngleHelper' so we can avoid conditions;
 	m_EulerAngleHelper.calculateEulerAngles(this->m_EulerAngles.m_yawAngle,this->m_EulerAngles.m_pitchAngle);
 	CalculatePositionVector();
-	this->m_pInputHandler = pInputHandler;
 }
 
 void OBJ_Viewer::Camera::CalculatePositionVector()
@@ -49,12 +49,12 @@ void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 	//Yay mouse position has updated :)
 	if (type == MessageType::MOUSE_POSITION_CHANGED)
 	{
-		if(m_pInputHandler->isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && m_pInputHandler->GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+		if(m_pInputHandler.isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && m_pInputHandler.GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 		{
 			//We update the previous x and y position.
 			m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
 		}
-		else if (m_pInputHandler->isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && m_pInputHandler->GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+		else if (m_pInputHandler.isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && m_pInputHandler.GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 		{
 			m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(xpos, ypos);
 			m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);

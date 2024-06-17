@@ -6,14 +6,12 @@ namespace OBJ_Viewer
 {
 	class Mesh {
 	public:
-		Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Material> material = {});
-		Mesh(std::vector<glm::vec3> vertexData, std::vector<unsigned int>indexData, glm::mat4 transform, std::shared_ptr<Material> material = {});
+		Mesh(std::vector<OBJ_Viewer::Vertex> vertexData, std::vector<unsigned int>indexData, std::shared_ptr<Material> material = {});
+		Mesh(std::vector<glm::vec3> vertexData, std::vector<unsigned int>indexData, std::shared_ptr<Material> material = {});
 
 		const VertexAttributeObject& GetMeshVAO()const { return this->m_vao; }
-		std::shared_ptr<Material> GetMaterial() { return m_Material; }
-		const glm::mat4& GetModelMatrix()const { return this->m_ModelMatrix; }
+		std::weak_ptr<Material> GetMaterial() { return m_Material; }
 	private:
-		glm::mat4 m_ModelMatrix;
 		std::shared_ptr<Material> m_Material;
 		VertexAttributeObject m_vao;
 	};

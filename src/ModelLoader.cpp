@@ -1,8 +1,11 @@
 #include "ModelLoader.h"
 #include <iostream>
+#include<filesystem>
+#include<glm/gtc/matrix_transform.hpp>
 
 OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path)
 {
+
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path,
 		aiProcess_CalcTangentSpace |
@@ -20,14 +23,16 @@ OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path)
 
 	this->ReadNode(scene->mRootNode, scene);
 	m_SceneMaterials = GetSceneMaterials(scene);
+
 	auto meshArray = CreateMeshArray();
-	Model* result = new Model(meshArray,m_MeshData);
+	Model* result = new Model(meshArray, AssimpToGlmMatrix4x4(scene->mRootNode->mTransformation),m_MeshData);
 	
 	return result;
 }
 
 void OBJ_Viewer::ModelLoader::ReadNode(aiNode *node, const aiScene *scene)
 {
+	
 	for (rsize_t i =0; i < node->mNumMeshes;i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -73,7 +78,13 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 		{
 			vertexData[i].normal.x = assimpMesh->mNormals[i].x;
 			vertexData[i].normal.y = assimpMesh->mNormals[i].y;
-			vertexData[i].normal.z = assimpMesh->mNormals[i].z;
+			vertexData[i].normal.z = assimpMesh->mNormals[i].z;	
+		}
+		if (assimpMesh->mTangents != nullptr)
+		{
+			vertexData[i].tangent.x = assimpMesh->mTangents[i].x;
+			vertexData[i].tangent.y = assimpMesh->mTangents[i].y;
+			vertexData[i].tangent.z = assimpMesh->mTangents[i].z;
 		}
 	}
 
@@ -85,60 +96,80 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 		for (size_t j = 0; j < face.mNumIndices; j++)
 			indexData.push_back(face.mIndices[j]);
 	}
-
-	return  std::make_shared<Mesh>(vertexData, indexData,glm::mat4(1),m_SceneMaterials[assimpMesh->mMaterialIndex]);
+	return  std::make_shared<Mesh>(vertexData, indexData,m_SceneMaterials[assimpMesh->mMaterialIndex]);
 }
 std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetSceneMaterials(const aiScene* scene)
 {
 	std::vector<std::shared_ptr<Material>> result(scene->mNumMaterials);
 
-	for (size_t i =1; i < result.size();i++)
+	for (size_t i =0; i < result.size();i++)
 	{
-		Material data = {};
+		
+		MaterialData data;
 		data.m_albedoTexture = ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE);
 		data.m_ambientOcclusion = ReadTexture(scene->mMaterials[i], aiTextureType_AMBIENT_OCCLUSION);
-		data.m_normalTexture = ReadTexture(scene->mMaterials[i], aiTextureType_NORMALS);
-		data.m_roughnessTexture = ReadTexture(scene->mMaterials[i], aiTextureType_DIFFUSE_ROUGHNESS);
-
+		data.m_normalTexture = ReadTexture(scene->mMaterials[i], aiTextureType_HEIGHT);
+		data.m_roughnessTexture = ReadTexture(scene->mMaterials[i], aiTextureType_UNKNOWN);
 
 		result[i] = std::make_shared<Material>(data);
 	}
 
 	return result;
 }
+std::string OBJ_Viewer::ModelLoader::GetModelTexturePathAbsolute(aiString texturePath)const
+{
+	//If textures are not in the same disk location or don't share common path assimp will return absolute path.
+	//that's why we need to check for that and return either concatenated path or the absolute path from assimp.
+
+	std::filesystem::path fileSysPath(texturePath.C_Str());
+	if (fileSysPath.is_absolute())
+		return std::string(texturePath.C_Str());
+
+	return std::string(m_modelPath + texturePath.C_Str());
+}
+glm::mat4 OBJ_Viewer::ModelLoader::AssimpToGlmMatrix4x4(const aiMatrix4x4& matrix)
+{
+	if (matrix.IsIdentity())
+		return glm::mat4(1);
+
+	glm::mat4 result(1);
+	aiVector3D Position;
+	aiVector3D Rotation;
+	aiVector3D Scale;
+	ai_real RotationAngle;
+	matrix.Decompose(Scale,Rotation, RotationAngle,Position);
+	
+	result = glm::translate(result, glm::vec3(Position.x, Position.y, Position.z));
+	result = glm::rotate(result, RotationAngle, glm::vec3(Rotation.x, Rotation.y, Rotation.z));
+	result = glm::scale(result, glm::vec3(Scale.x, Scale.y, Scale.z));
+
+	return result;
+}
 std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMaterial* mat, aiTextureType type)
 {
+	uint32_t textureCount = mat->GetTextureCount(type);
+	if (textureCount == 0)
+		return nullptr;
+
 	TextureBuilder builder;
 	//TODO:Change to get all of the material textures. A single material can have more than 1 textures in it.
-	/*for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-	{*/
-		aiString relativeTexturePath;
-		mat->GetTexture(type, 0, &relativeTexturePath);
-		//TODO:Check if path is empty if it is than there is no texture and it should continure or return all together;
+	for (uint32_t i = 0; i < textureCount; i++)
+	{
+		aiString TexturePath;
+		mat->GetTexture(type, i, &TexturePath);
+		std::string fullPath = GetModelTexturePathAbsolute(TexturePath);
 
-		std::string fullPath(m_modelPath);
-		fullPath.append(relativeTexturePath.C_Str());
 		TextureSize textureSize;
-		//A way to convert this into a enum of textureFormat.
 		int presentChannelCount;
+
 		TexturePixelDataWrapper textureReader(fullPath.c_str(), &textureSize, &presentChannelCount);
-		TextureInternalFormat format = TEXTURE_INTERNAL_FORMAT_RGB;
-		switch (presentChannelCount)
-		{
-		case 1:
-			format = TEXTURE_INTERNAL_FORMAT_R;
-			break;
-		case 2:
-			format = TEXTURE_INTERNAL_FORMAT_RG;
-			break;
-		case 3:
-			format = TEXTURE_INTERNAL_FORMAT_RGB;
-			break;
-		}
+
+		TextureFormat format = GetFormatByChannelCount(presentChannelCount);
+
+		//TODO:return vector of textures.
 		return builder.SetTextureSize(textureSize).
 			SetTexturePixelData(textureReader.GetTexturePixelData()).
-			SetTextureInternalFormat(format).
-			SetTextureFormat(TEXTURE_FORMAT_RGB).buildTexture();
-
-	//}
+			SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).
+			SetTextureFormat(format).buildTexture();
+	}
 }

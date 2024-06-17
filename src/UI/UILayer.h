@@ -5,14 +5,11 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#include"ModelLoader.h"
-#include"Rendering/ShaderClass.h"
-#include"Scene/Camera.h"
-#include"WindowHandler.h"
 #include <nfd.h>
-#include"ShaderPath.h"
 #include<memory>
 #include"AppState.h"
+#include "Rendering/SceneRenderer.h"
+
 namespace OBJ_Viewer {
 
 constexpr auto UI_LAYER_SCENE_WINDOW_NAME = "Scene";
@@ -23,18 +20,19 @@ constexpr auto UI_WINDOW_UNKNOWN = "unknownWindow";
 	class UILayer
 	{
 	public:
-		UILayer(AppState* appState,ImGuiWindowFlags imGuiWindowFlags,
+		UILayer(AppState* appState, std::shared_ptr<SceneRenderer> sceneRenderer,ImGuiWindowFlags imGuiWindowFlags,
 			ImGuiDockNodeFlags imGuiDockSpaceFlags);
 		void RenderUI();
 	private:
 		void LoadModel();
 		void LoadSkybox();
 		void RenderComboBox(std::string comboLabel, int index);
-		void RenderSkyboxSettings(const Skybox* skybox);
+		void RenderSkyboxSettings();
 		void RenderLightSettingsPanel(uint32_t lightIndex, glm::vec3* pColor, glm::vec3* pPosition);
 	private:
 	
 		AppState* m_appState;
+		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
 	};

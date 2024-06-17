@@ -22,8 +22,10 @@ namespace OBJ_Viewer
 		void BindSkyboxTexture()const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle); }
 		void SwapSkyboxFaceTextures(SkyboxFace toBeSwapped, SkyboxFace swappedWith);
 		const VertexAttributeObject& GetSkyboxVAO()const { return m_CubeMesh->GetMeshVAO(); }
-		std::vector<std::shared_ptr<Texture>> m_faceTextures;
+		const std::vector<std::shared_ptr<Texture>>& const GetSkyboxFaceTextures() { return m_faceTextures; }
+		//TODO:Hide away the pointers make the unique and return the reference to them if needed
 	private:
+		std::vector<std::shared_ptr<Texture>> m_faceTextures;
 		std::vector<OpenGLBuffer*> m_PixelBuffers;
 		GLuint m_cubeMapHandle = 0;
 		std::unique_ptr<Mesh> m_CubeMesh;

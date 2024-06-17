@@ -26,7 +26,9 @@ namespace OBJ_Viewer {
 	enum TextureWrap
 	{
 		TEXTURE_WRAP_REPEAT = GL_REPEAT,
-		TEXTURE_WRAP_MIRRORED_REPEAT = GL_MIRRORED_REPEAT
+		TEXTURE_WRAP_MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
+		TEXTURE_WRAP_CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+
 		//TODO:Add more option
 	};
 	enum TexturePixelDataType
@@ -101,12 +103,12 @@ namespace OBJ_Viewer {
 	public:
 		TextureBuilder& SetTextureFormat(TextureFormat format) { this->textureFormat = format; return *this; }
 		TextureBuilder& SetTextureInternalFormat(TextureInternalFormat internalFormat) { this->textureInternalFormat = internalFormat; return *this; }
-		TextureBuilder& SetTextureWrapS(TextureWrap textureWrap) { this->textureWrapT = textureWrap; return *this; }
+		TextureBuilder& SetTextureWrapS(TextureWrap textureWrap) { this->textureWrapS = textureWrap; return *this; }
 		TextureBuilder& SetTextureWrapT(TextureWrap textureWrap) { this->textureWrapT = textureWrap; return *this; }
 		TextureBuilder& SetTextureSize(TextureSize size) { this->textureSize = size; return *this; }
 		TextureBuilder& SetTexturePixelData(const unsigned char* data) { this->data = data; return *this; }
 		TextureBuilder& SetTexturePixelDataType(TexturePixelDataType dataType) { this->texturePixelDataType = dataType; return *this; }
-		std::shared_ptr<Texture> buildTexture()const{ return std::make_shared<Texture>(data, textureInternalFormat, textureFormat, textureSize, texturePixelDataType, textureWrapS, textureWrapT); }
+		std::unique_ptr<Texture> buildTexture()const{ return std::make_unique<Texture>(data, textureInternalFormat, textureFormat, textureSize, texturePixelDataType, textureWrapS, textureWrapT); }
 	private:
 		TextureWrap textureWrapS = TextureWrap::TEXTURE_WRAP_REPEAT;
 		TextureWrap textureWrapT = TextureWrap::TEXTURE_WRAP_REPEAT;

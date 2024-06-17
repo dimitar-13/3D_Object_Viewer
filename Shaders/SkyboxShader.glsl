@@ -4,10 +4,15 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 uvCoords;
 
 out vec3 FragCoords;
-uniform mat4 ViewProjMatrix;
+layout(std140) uniform Matrices
+{
+	mat4 ViewMatrix;
+	mat4 ProjectionMatrix;
+	mat4 ModelMatrix;
+};
 void main()
 {
-	vec4 pos = ViewProjMatrix*vec4(position,1);
+	vec4 pos = ProjectionMatrix*ViewMatrix*vec4(position,1);
 	gl_Position = pos.xyww;
 	FragCoords = position;
 }

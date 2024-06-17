@@ -2,7 +2,8 @@
 void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const Mesh& mesh, const Camera& mainCamera)
 {
 	shaderToUse.UseShader();
-	shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
+	//shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
+
 	mesh.GetMeshVAO().BindBuffer();
 	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
 	mesh.GetMeshVAO().UnBind();	
@@ -11,7 +12,8 @@ void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const Mesh
 void OBJ_Viewer::Renderer::RenderMeshLight(const ShaderClass& shaderToUse, const Mesh& mesh, const Camera& mainCamera, const SceneLightInfo lightInfo)
 {
 	shaderToUse.UseShader();
-	shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
+	//shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
+
 	for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
 	{
 

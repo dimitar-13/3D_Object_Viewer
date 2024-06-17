@@ -96,6 +96,12 @@
     <ClCompile Include="src\AppState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\UniformBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\SceneRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h">
@@ -191,11 +197,26 @@
     <ClInclude Include="src\AppState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\UniformBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\SceneRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
     <None Include="Shaders\GridShader.glsl" />
     <None Include="Shaders\LightShader.glsl" />
+    <None Include="Shaders\MaterialShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\WhiteTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Normal_Map_dummy_texture.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -141,6 +141,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Rendering\SceneRenderer.cpp" />
     <ClCompile Include="src\AppState.cpp" />
     <ClCompile Include="src\Rendering\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="src\WindowHandler.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\UI\UILayer.cpp" />
+    <ClCompile Include="src\UniformBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Dependencies\glew\glew-2.2.0\build\vc15\glew_static.vcxproj">
@@ -181,6 +183,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Rendering\SceneRenderer.h" />
     <ClInclude Include="src\AppState.h" />
     <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
@@ -212,12 +215,18 @@
     <ClInclude Include="src\WindowHandler.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\UI\UILayer.h" />
+    <ClInclude Include="src\UniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
     <None Include="Shaders\GridShader.glsl" />
     <None Include="Shaders\LightShader.glsl" />
+    <None Include="Shaders\MaterialShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Normal_Map_dummy_texture.jpg" />
+    <Image Include="Resources\WhiteTexture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

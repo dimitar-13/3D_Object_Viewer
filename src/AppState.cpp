@@ -6,22 +6,7 @@ OBJ_Viewer::AppState::AppState(Window* pAppWindow, InputHandler& pInputHandler, 
 	, m_pInputHandler(pInputHandler)
 {
 
-	std::shared_ptr<Mesh> mesh;
-	ModelData data;
-	switch (typeOfDefaultMeshToLoad)
-	{
-	case OBJ_Viewer::MESH_TYPE_CUBE:	
-		m_currentlyLoadedModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ std::move(GenerateCubeMesh())},glm::mat4(1),data);
-		break;
-	case OBJ_Viewer::MESH_TYPE_SPHERE:
-		//
-		break;
-	case OBJ_Viewer::MESH_TYPE_TORUS:
-		//
-		break;
-	default:
-		break;
-	}
+
 	m_windowHandler = pAppWindow;
 }
 

@@ -1,6 +1,6 @@
+#pragma once
 #include<array>
 #include<memory>
-#include"Texture.h"
 #include<iostream>
 #include"Mesh.h"
 #include"Rendering/OpenGLBuffer.h"

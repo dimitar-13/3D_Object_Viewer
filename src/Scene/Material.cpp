@@ -17,7 +17,7 @@ OBJ_Viewer::Material::Material(MaterialData data)
 
 }
 
-void OBJ_Viewer::Material::BindMaterialWithShader(const ShaderClass& shader, MaterialFlags flags)const
+void OBJ_Viewer::Material::BindMaterialWithLightShader(const ShaderClass& shader, MaterialFlags flags)const
 {
 	shader.UseShader();
 		if(flags & IS_ALBEDO_ON)
@@ -43,6 +43,16 @@ void OBJ_Viewer::Material::BindMaterialWithShader(const ShaderClass& shader, Mat
 	shader.UniformSet3FloatVector("Mesh_material.color", m_materialInfo.color);
 	shader.UniformSet1Float("Mesh_material.specular", m_materialInfo.roughness);
 
+}
+
+void OBJ_Viewer::Material::BindMaterialWithShader(const ShaderClass& shader, MaterialFlags flags) const
+{
+	shader.UseShader();
+	if (flags & IS_ALBEDO_ON)
+		Renderer::BindMaterialTexture(shader, m_materialInfo.m_albedoTexture, GL_TEXTURE1, "Mesh_material.albedo");
+	else
+		Renderer::BindMaterialTexture(shader, defaultTextureStorage->Get1x1WhiteTexture(), GL_TEXTURE1, "Mesh_material.albedo");
+	shader.UniformSet3FloatVector("Mesh_material.color", m_materialInfo.color);
 }
 
 OBJ_Viewer::TextureStorage::TextureStorage()

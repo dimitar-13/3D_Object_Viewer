@@ -2,7 +2,6 @@
 #include<iostream>
 #include<glm/glm.hpp>
 #include<vector>
-#include"VertexAttributeObject.h"
 #include"Texture.h"
 #include"Scene/Material.h"
 #include"Scene/Model.h"

@@ -14,21 +14,21 @@ void OBJ_Viewer::Renderer::RenderMeshLight(const ShaderClass& shaderToUse, const
 	shaderToUse.UseShader();
 	//shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
 
-	for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
-	{
+	//for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
+	//{
 
-		shaderToUse.UniformSet3FloatVector(std::string("lights[" + std::to_string(i) + "].LightDirection").c_str(),lightInfo.lights[i].direction);
+	//	shaderToUse.UniformSet3FloatVector(std::string("lights[" + std::to_string(i) + "].LightDirection").c_str(),lightInfo.lights[i].direction);
 
-		//TL;DR - This is done because uniform store their values until we don't explicitly change them.
-		/* If in we have a predefined array, in our case is the lightArray[MAX_LIGHT_COUNT], in a shader and we send it some data.
-		* The array in that shader cant be dynamic so that's the reason is of a predefined size. However openGL or the graphical card manufacturers
-		* made it so that uniform will store pass values from different passes meaning the previous data is still there. And since we want to remove light
-		* sources and add them dynamically we have to set them to a color that will not make a contribution in the final color or with other words 0,0,0.
-		*/
-		shaderToUse.UniformSet3FloatVector(std::string("lights[" + std::to_string(i) + "].lightColor").c_str(), !(i >= lightInfo.lightCount) ?
-			lightInfo.lights[i].color : glm::vec3(0));
+	//	//TL;DR - This is done because uniform store their values until we don't explicitly change them.
+	//	/* If in we have a predefined array, in our case is the lightArray[MAX_LIGHT_COUNT], in a shader and we send it some data.
+	//	* The array in that shader cant be dynamic so that's the reason is of a predefined size. However openGL or the graphical card manufacturers
+	//	* made it so that uniform will store pass values from different passes meaning the previous data is still there. And since we want to remove light
+	//	* sources and add them dynamically we have to set them to a color that will not make a contribution in the final color or with other words 0,0,0.
+	//	*/
+	//	shaderToUse.UniformSet3FloatVector(std::string("lights[" + std::to_string(i) + "].lightColor").c_str(), !(i >= lightInfo.lightCount) ?
+	//		lightInfo.lights[i].color : glm::vec3(0));
 
-	}
+	//}
 	shaderToUse.UniformSet3FloatVector("cameraPosition", mainCamera.GetCameraPos());
 	mesh.GetMeshVAO().BindBuffer();
 	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
@@ -43,8 +43,8 @@ void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const Vert
 	shaderToUse.UseShader();
 	glm::mat4 view, proj;
 	mainCamera.GetViewAndProjectionSeparate(&view, &proj);
-	shaderToUse.UniformSet4x4FloatMatrix("ProjectionMatrix", proj);
-	shaderToUse.UniformSet4x4FloatMatrix("ViewMatrix", view);
+	//shaderToUse.UniformSet4x4FloatMatrix("ProjectionMatrix", proj);
+	//shaderToUse.UniformSet4x4FloatMatrix("ViewMatrix", view);
 	shaderToUse.UniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
 	shaderToUse.UniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
 	shaderToUse.UniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);
@@ -65,7 +65,6 @@ void OBJ_Viewer::Renderer::RenderSkybox(const ShaderClass& skyboxShader, const S
 	never be less because is 1.0f so we get nothing where there are objects and where pixels are not mapped we get the skybox colors.*/
 	glDepthFunc(GL_LEQUAL);
 	skyboxShader.UseShader();
-	skyboxShader.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjNoTranslation());
 	glActiveTexture(GL_TEXTURE0);
 	skybox.BindSkyboxTexture();
 	skyboxShader.UniformSet1Int("skyboxSampler", 0);

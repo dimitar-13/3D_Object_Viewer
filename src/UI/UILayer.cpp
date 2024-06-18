@@ -1,6 +1,9 @@
 #include "UILayer.h"
 #include"DialogWrapper.h"
 #include<algorithm>
+#include <iostream>
+#include<GL/glew.h>
+#include<GLFW/glfw3.h>
 
 inline std::vector<std::string> itemsLabel = { "Right face" ,"Left face","Top face","Bottom face","Front face","Back face" };
 inline std::vector<OBJ_Viewer::SkyboxFace> itemsFaces = {
@@ -83,7 +86,6 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::Checkbox("Specular?", &pSettings.m_isRenderSpecularTextureOn);
 		ImGui::Checkbox("Normals?", &pSettings.m_isRenderNormalTextureOn);
 		ImGui::Checkbox("Ambient occlusion?", &pSettings.m_isRenderAmbientOcclusionTextureOn);
-
 	}ImGui::End();
 
 	//ModelData modelData = (*m_pCurrentlyLoadedModel)->GetModelData();

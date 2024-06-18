@@ -2,9 +2,10 @@
 #include<GL/glew.h>
 #include"Scene/Camera.h"
 #include"Scene/Model.h"
-#include"Scene/Skybox.h"
 #include"AppState.h"
+#include"ShaderClass.h"
 #include<memory>
+#include"Scene/Skybox.h"
 namespace OBJ_Viewer {
 	class SceneRenderer
 	{

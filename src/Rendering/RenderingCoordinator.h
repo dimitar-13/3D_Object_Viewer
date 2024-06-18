@@ -1,16 +1,8 @@
 #pragma once
-#include <iostream>
-#include<GL/glew.h>
-#include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
-#include"WindowHandler.h"
-#include <nfd.h>
-#include"ShaderPath.h"
 #include<memory>
-#include"Framebuffer.h"
-#include"UI/UILayer.h"
-#include "AppState.h"
 #include "SceneRenderer.h" 
+#include"UI/UILayer.h"
+
 namespace OBJ_Viewer
 {
 	class RenderingCoordinator{

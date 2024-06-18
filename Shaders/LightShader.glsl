@@ -69,13 +69,13 @@ in FRAG_INFO{
 }fragment_in;
 
 
-layout(std140) LightInfo
+layout(std140) uniform LightInfo
 {
 	DirectionalLight lights[MAX_LIGHTS];
-	vec3 cameraPosition;
 };
 
 uniform Material Mesh_material;
+uniform vec3 cameraPosition;
 
 void main()
 {

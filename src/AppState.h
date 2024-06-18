@@ -3,14 +3,11 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#include"ModelLoader.h"
-#include"Rendering/ShaderClass.h"
-#include"Scene/Camera.h"
 #include"WindowHandler.h"
 #include <nfd.h>
-#include"ShaderPath.h"
 #include<memory>
 #include"Rendering/Framebuffer.h"
+#include"InputHandler.h"
 #include<array>
 namespace OBJ_Viewer {
 constexpr int MAX_LIGHT_COUNT = 4;
@@ -24,7 +21,7 @@ constexpr int MAX_LIGHT_COUNT = 4;
 	struct DirectionalLight
 	{
 		glm::vec3 direction = glm::vec3(0,-1,0);
-		glm::vec3 color = glm::vec3(1);
+		glm::vec3 color = glm::vec3(0);
 	};
 	struct SceneLightInfo
 	{
@@ -55,7 +52,6 @@ constexpr int MAX_LIGHT_COUNT = 4;
 	{
 	public:
 		AppState(Window* pAppWindow,InputHandler& pInputHandler,BaseMeshType typeOfDefaultMeshToLoad = MESH_TYPE_CUBE);
-		Model& GetSceneModel() { return *m_currentlyLoadedModel; }
 		RenderStateSettings& GetScene_RefSettings() { return m_rendererStateSettings; }
 		const Framebuffer& GetSceneFrameBuffer()const { return m_sceneFramebuffer; }
 		InputHandler& GetGlobalInputHandler() { return m_pInputHandler; }
@@ -63,7 +59,6 @@ constexpr int MAX_LIGHT_COUNT = 4;
 		void ResizeBuffer(int newWidht, int newHeight);
 	private:
 	private:
-		std::shared_ptr<Model> m_currentlyLoadedModel;
 		Window* m_windowHandler = nullptr;
 		RenderStateSettings m_rendererStateSettings;
 		Framebuffer m_sceneFramebuffer;

@@ -37,6 +37,7 @@ namespace OBJ_Viewer {
 	{
 	public:
 		Material(MaterialData data = {});
+		void BindMaterialWithLightShader(const ShaderClass& shader, MaterialFlags flags)const;
 		void BindMaterialWithShader(const ShaderClass& shader, MaterialFlags flags)const;
 	private:
 		MaterialData m_materialInfo;

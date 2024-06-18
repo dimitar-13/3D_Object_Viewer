@@ -2,8 +2,10 @@
 #include "Renderer.h"
 #include "Application.h"
 #include "ModelLoader.h"
-#include"Scene/Skybox.h"
-
+#include "Scene/Skybox.h"
+#include<memory>
+#include"ShaderPath.h"
+#include"MeshGeneratingMethods.h"
 OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppWindow)
 {
 	InitShaders();
@@ -29,6 +31,8 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppW
 		 2, 1, 3
 	};
 
+	ModelData data;
+	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ std::move(GenerateCubeMesh())}, glm::mat4(1), data);
 
 	m_gridVAO = std::make_unique<VertexAttributeObject>(planeVerts, planeIndexData);
 }
@@ -45,19 +49,21 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 		Renderer::IsWireFrameOn(renderSettings.m_isWireFrameRenderingOn);
 		std::shared_ptr<Material> mat = mesh->GetMaterial().lock();
 
-		MaterialFlags flags = static_cast<MaterialFlags>(
-			renderSettings.m_isRenderAlbedoTextureOn * IS_ALBEDO_ON |
-			renderSettings.m_isRenderNormalTextureOn * IS_CUSTOM_NORMALS_ON |
-			renderSettings.m_isRenderSpecularTextureOn * IS_CUSTOM_SPECULAR_ON |
-			renderSettings.m_isRenderAmbientOcclusionTextureOn * IS_AMBIENT_OCCLUSION_ON);
-
 		if (!renderSettings.m_isRenderingLightOn)
 		{
-			mat->BindMaterialWithShader(*m_materialShader, flags);
+			mat->BindMaterialWithShader(*m_materialShader, renderSettings.m_isWireFrameRenderingOn || renderSettings.m_isRenderAlbedoTextureOn
+				? static_cast<MaterialFlags>(0) : IS_ALBEDO_ON);
 		}
 		if (renderSettings.m_isRenderingLightOn)
 		{
-			mat->BindMaterialWithShader(*m_lightShader, flags);
+			MaterialFlags flags = static_cast<MaterialFlags>(
+				renderSettings.m_isRenderAlbedoTextureOn * IS_ALBEDO_ON |
+				renderSettings.m_isRenderNormalTextureOn * IS_CUSTOM_NORMALS_ON |
+				renderSettings.m_isRenderSpecularTextureOn * IS_CUSTOM_SPECULAR_ON |
+				renderSettings.m_isRenderAmbientOcclusionTextureOn * IS_AMBIENT_OCCLUSION_ON);
+
+			mat->BindMaterialWithLightShader(*m_lightShader, flags);
+			m_uniformLightBuffer->SendBufferSubData(0, renderSettings.lightInfo.lights.size() * sizeof(DirectionalLight), renderSettings.lightInfo.lights.data());
 
 			Renderer::RenderMeshLight(*m_lightShader, *mesh, *m_sceneCamera, renderSettings.lightInfo);
 			continue;
@@ -67,8 +73,12 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 
 	if (m_sceneSkybox != nullptr && renderSettings.m_isSkyboxOn)
 	{
+		glDisable(GL_CULL_FACE);
+
 		Renderer::IsWireFrameOn(false);
 		Renderer::RenderSkybox(*m_skyboxShader, *m_sceneSkybox, *m_sceneCamera);
+		glEnable(GL_CULL_FACE);
+
 	}
 
 	if (renderSettings.m_isWireGridOn)
@@ -77,6 +87,7 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 		m_gridShader->UseShader();
 		m_gridShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
 		Renderer::RenderGrid(*m_gridShader, *m_gridVAO, *m_sceneCamera, renderSettings.m_gridData);
+
 	}
 }
 
@@ -111,7 +122,9 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 
 	m_uniformMatrixBuffer = std::make_unique<UniformBuffer>("Matrices", 0, 3 * sizeof(glm::mat4), nullptr);
 	m_uniformMatrixBuffer->BindBufferRange(0, 3 * sizeof(glm::mat4));
-	//m_uniformLightBuffer = std::make_unique<UniformBuffer>("LightInfo", 0, 3 * sizeof(glm::mat4), nullptr);
+
+	m_uniformLightBuffer = std::make_unique<UniformBuffer>("LightInfo", 1, MAX_LIGHT_COUNT * 2* sizeof(glm::vec4), nullptr);
+	m_uniformLightBuffer->BindBufferRange(0, MAX_LIGHT_COUNT * 2 * sizeof(glm::vec4));
 
 	m_clearColorShader->BindUBOToShader(*m_uniformMatrixBuffer);
 	m_skyboxShader->BindUBOToShader(*m_uniformMatrixBuffer);
@@ -119,6 +132,7 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 	m_lightShader->BindUBOToShader(*m_uniformMatrixBuffer);
 	m_materialShader->BindUBOToShader(*m_uniformMatrixBuffer);
 
+	m_lightShader->BindUBOToShader(*m_uniformLightBuffer);
 
 }
 

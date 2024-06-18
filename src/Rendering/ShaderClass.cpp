@@ -104,7 +104,7 @@ bool OBJ_Viewer::ShaderClass::isShaderCompilerSuccessfully(const GLuint Shader)
     return true;
 }
 
-bool OBJ_Viewer::ShaderClass::isProgramLinkedSuccessfully()
+bool OBJ_Viewer::ShaderClass::isProgramLinkedSuccessfully()const
 {
     GLint result;
     glGetProgramiv(this->m_shaderHandle, GL_LINK_STATUS, &result);

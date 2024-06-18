@@ -28,7 +28,7 @@ namespace OBJ_Viewer
 	private:
 		std::vector<std::string>readShaderSource(const char* path);
 		bool isShaderCompilerSuccessfully(const GLuint Shader);
-		bool isProgramLinkedSuccessfully();
+		bool isProgramLinkedSuccessfully()const;
 		GLuint compileShader(const GLenum shaderType, const std::string* shaderSource);
 		GLint findUniform(const char* name)const;
 	private:

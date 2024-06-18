@@ -58,7 +58,6 @@ constexpr int MAX_LIGHT_COUNT = 4;
 		Window& GetGlobalAppWindow() { return *m_windowHandler; }
 		void ResizeBuffer(int newWidht, int newHeight);
 	private:
-	private:
 		Window* m_windowHandler = nullptr;
 		RenderStateSettings m_rendererStateSettings;
 		Framebuffer m_sceneFramebuffer;

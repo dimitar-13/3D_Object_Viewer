@@ -2,23 +2,35 @@
 #include<iostream>
 OBJ_Viewer::KeyState OBJ_Viewer::KeyboardInputStateManager::GetKeyState(int key)
 {
+	if (m_keyHashes.find(key) == m_keyHashes.end())
+		return KEY_STATE_UKNOWN;
+
 	KeyState result = static_cast<KeyState>(m_keyHashes.find(key) != m_keyHashes.end() ? m_keyHashes.at(key) : KEY_PRESSES);
 	return result;
 }
 void OBJ_Viewer::KeyboardInputStateManager::Update(MessageType type, int key, int scancode, int action, int mods)
 {
+	if (m_keyHashes.find(key) == m_keyHashes.end())
+		return;
+
 	KeyState state = static_cast<KeyState>(action);
 	m_keyHashes.at(key) = state;
 }
 void OBJ_Viewer::MouseInputStateManager::Update(MessageType type, int button, int action, int mods)
 {
+	if (m_mouseKeyHashes.find(button) == m_mouseKeyHashes.end())
+		return;
+
 	KeyState state = static_cast<KeyState>(action);
 	m_mouseKeyHashes.at(button) = state;
 }
 
 OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(int button)
 {
-	KeyState result = static_cast<KeyState>(m_mouseKeyHashes.find(button) != m_mouseKeyHashes.end() ? m_mouseKeyHashes.at(button) : KEY_PRESSES);
+	if (m_mouseKeyHashes.find(button) == m_mouseKeyHashes.end())
+		return KEY_STATE_UKNOWN;
+
+	KeyState result = static_cast<KeyState>(m_mouseKeyHashes.at(button));
 	//TODO:Add error checks;
 	/*Why don't just return the state? Well because GLFW doesn't really have state for the held mouse button it will only tell us if the mouse is pressed or released.
 	So that means in between these 2 stages that happens the mouse is being held.The user of this class is the one interested in the state so in a way we can make 

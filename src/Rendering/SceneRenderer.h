@@ -36,8 +36,6 @@ namespace OBJ_Viewer {
 
 		std::unique_ptr<UniformBuffer> m_uniformMatrixBuffer;
 		std::unique_ptr<UniformBuffer> m_uniformLightBuffer;
-
-
 	};
 }
 

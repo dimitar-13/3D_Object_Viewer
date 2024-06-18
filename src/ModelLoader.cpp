@@ -96,7 +96,10 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 		for (size_t j = 0; j < face.mNumIndices; j++)
 			indexData.push_back(face.mIndices[j]);
 	}
-	return  std::make_shared<Mesh>(vertexData, indexData,m_SceneMaterials[assimpMesh->mMaterialIndex]);
+	std::unique_ptr<VertexAttributeObject> meshVAO = 
+		std::make_unique<VertexAttributeObject>(vertexData, indexData);
+
+	return  std::make_shared<Mesh>(std::move(meshVAO), m_SceneMaterials[assimpMesh->mMaterialIndex]);
 }
 std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetSceneMaterials(const aiScene* scene)
 {

@@ -5,6 +5,7 @@
 namespace OBJ_Viewer
 {
 	enum KeyState {
+		KEY_STATE_UKNOWN = -1,
 		KEY_PRESSED = GLFW_PRESS,
 		KEY_HELD = GLFW_REPEAT,
 		KEY_RELEASED = GLFW_RELEASE,

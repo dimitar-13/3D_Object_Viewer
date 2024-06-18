@@ -32,7 +32,8 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppW
 	};
 
 	ModelData data;
-	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ std::move(GenerateCubeMesh())}, glm::mat4(1), data);
+	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(std::move(GenerateCubeVAO()));
+	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ mesh }, glm::mat4(1), data);
 
 	m_gridVAO = std::make_unique<VertexAttributeObject>(planeVerts, planeIndexData);
 }
@@ -46,12 +47,17 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())
 	{
-		Renderer::IsWireFrameOn(renderSettings.m_isWireFrameRenderingOn);
+		//Renderer::IsWireFrameOn();
+		if (renderSettings.m_isWireFrameRenderingOn)
+		{
+			Renderer::RenderObjectWithWireFrame(*m_clearColorShader, *mesh, *m_sceneCamera);
+			continue;
+		}
 		std::shared_ptr<Material> mat = mesh->GetMaterial().lock();
 
 		if (!renderSettings.m_isRenderingLightOn)
 		{
-			mat->BindMaterialWithShader(*m_materialShader, renderSettings.m_isWireFrameRenderingOn || renderSettings.m_isRenderAlbedoTextureOn
+			mat->BindMaterialWithShader(*m_materialShader, renderSettings.m_isWireFrameRenderingOn || !renderSettings.m_isRenderAlbedoTextureOn
 				? static_cast<MaterialFlags>(0) : IS_ALBEDO_ON);
 		}
 		if (renderSettings.m_isRenderingLightOn)
@@ -78,7 +84,6 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 		Renderer::IsWireFrameOn(false);
 		Renderer::RenderSkybox(*m_skyboxShader, *m_sceneSkybox, *m_sceneCamera);
 		glEnable(GL_CULL_FACE);
-
 	}
 
 	if (renderSettings.m_isWireGridOn)
@@ -87,7 +92,6 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 		m_gridShader->UseShader();
 		m_gridShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
 		Renderer::RenderGrid(*m_gridShader, *m_gridVAO, *m_sceneCamera, renderSettings.m_gridData);
-
 	}
 }
 

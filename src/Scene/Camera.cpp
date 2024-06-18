@@ -64,7 +64,6 @@ void OBJ_Viewer::Camera::Update(MessageType type, double xpos, double ypos)
 	else if(type == MessageType::MOUSE_SCROLL_CHANGED)
 	{
 		//Calculate the new zoom lvl;
-		//TODO:Add restrains so that user scroll to inifity;
 		constexpr float sensitivity = 0.01f;
 		constexpr float maxZoom = 0.002;
 		this->m_zoom += this->m_zoom - ypos <= maxZoom ? 0 : -ypos;

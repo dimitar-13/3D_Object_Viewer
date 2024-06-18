@@ -2,7 +2,8 @@
 #include<array>
 #include<memory>
 #include<iostream>
-#include"Mesh.h"
+#include"VertexAttributeObject.h"
+#include"Texture.h"
 #include"Rendering/OpenGLBuffer.h"
 namespace OBJ_Viewer
 {
@@ -21,14 +22,14 @@ namespace OBJ_Viewer
 		~Skybox();
 		void BindSkyboxTexture()const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle); }
 		void SwapSkyboxFaceTextures(SkyboxFace toBeSwapped, SkyboxFace swappedWith);
-		const VertexAttributeObject& GetSkyboxVAO()const { return m_CubeMesh->GetMeshVAO(); }
+		const VertexAttributeObject& GetSkyboxVAO()const { return *m_skyboxVAO; }
 		const std::vector<std::shared_ptr<Texture>>& const GetSkyboxFaceTextures() { return m_faceTextures; }
 		//TODO:Hide away the pointers make the unique and return the reference to them if needed
 	private:
 		std::vector<std::shared_ptr<Texture>> m_faceTextures;
 		std::vector<OpenGLBuffer*> m_PixelBuffers;
 		GLuint m_cubeMapHandle = 0;
-		std::unique_ptr<Mesh> m_CubeMesh;
+		std::unique_ptr<VertexAttributeObject> m_skyboxVAO;
 		TextureSize m_CubeMapTextSize;
 		TextureFormat m_format;
 	};

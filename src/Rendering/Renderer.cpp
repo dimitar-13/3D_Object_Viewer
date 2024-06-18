@@ -75,6 +75,24 @@ void OBJ_Viewer::Renderer::RenderSkybox(const ShaderClass& skyboxShader, const S
 
 }
 
+void OBJ_Viewer::Renderer::RenderObjectWithWireFrame(const ShaderClass& shaderToUse, const Mesh& mesh, const Camera& mainCamera)
+{
+	shaderToUse.UseShader();
+	shaderToUse.UniformSet3FloatVector("u_Color",glm::vec3(1));
+	mesh.GetMeshVAO().BindBuffer();
+	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
+	mesh.GetMeshVAO().UnBind();
+
+	shaderToUse.UniformSet3FloatVector("u_Color", glm::vec3(0,1,0));
+	glLineWidth(5.);
+	Renderer::IsWireFrameOn(true);
+
+	mesh.GetMeshVAO().BindBuffer();
+	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
+	mesh.GetMeshVAO().UnBind();	
+	Renderer::IsWireFrameOn(false);
+}
+
 void OBJ_Viewer::Renderer::BindMaterialTexture(const ShaderClass& shaderToUse, std::shared_ptr<Texture> textureToBind, GLenum textureUnit, const char* textureName)
 {
 	shaderToUse.UseShader();

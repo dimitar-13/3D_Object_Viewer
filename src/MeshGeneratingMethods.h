@@ -86,9 +86,9 @@ namespace OBJ_Viewer {
         {ONE_BY_ONE_CUBE_POSITION_VECTOR[23], glm::vec2(0.0f, 1.0f), { 0.0f, -1.0f,  0.0f},glm::vec3(0)},
     };
  
-    inline std::unique_ptr<Mesh> GenerateCubeMesh(bool isOnlyPosition = false)
+    inline std::unique_ptr<VertexAttributeObject> GenerateCubeVAO(bool isOnlyPosition = false)
     {   
-        return  isOnlyPosition ? std::make_unique<Mesh>(ONE_BY_ONE_CUBE_POSITION_VECTOR, ONE_BY_ONE_CUBE_INDICIES) :
-            std::make_unique<Mesh>(CUBE_VERTEX_VECTOR, ONE_BY_ONE_CUBE_INDICIES);
+        return  isOnlyPosition ? std::make_unique<VertexAttributeObject>(ONE_BY_ONE_CUBE_POSITION_VECTOR, ONE_BY_ONE_CUBE_INDICIES) :
+            std::make_unique<VertexAttributeObject>(CUBE_VERTEX_VECTOR, ONE_BY_ONE_CUBE_INDICIES);
     }
 }

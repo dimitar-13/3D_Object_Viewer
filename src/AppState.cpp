@@ -5,8 +5,6 @@ OBJ_Viewer::AppState::AppState(Window* pAppWindow, InputHandler& pInputHandler, 
 	:m_sceneFramebuffer(pAppWindow->GetWindowSize().m_winWidth, pAppWindow->GetWindowSize().m_winHeight, FRAMEBUFFER_COLOR_ATTACHMENT)
 	, m_pInputHandler(pInputHandler)
 {
-
-
 	m_windowHandler = pAppWindow;
 }
 

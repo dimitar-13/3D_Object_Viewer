@@ -28,8 +28,8 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> ver
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_indexCount = indexData.size();
-	m_vertexCount = vertexData.size();
+	m_vertexData.indexCount = indexData.size();
+	m_vertexData.vertexCount = vertexData.size();
 }
 
 OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<glm::vec3> vertexData, std::vector<unsigned int>indexData)
@@ -55,6 +55,6 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<glm::vec3> 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_indexCount = indexData.size();
-	m_vertexCount = vertexData.size();
+	m_vertexData.indexCount = indexData.size();
+	m_vertexData.vertexCount = vertexData.size();
 }

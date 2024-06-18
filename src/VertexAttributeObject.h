@@ -14,8 +14,8 @@ namespace OBJ_Viewer
 	};
 	struct VertexAttribData
 	{
-		size_t m_indexCount;
-		size_t m_vertexCount;
+		size_t indexCount;
+		size_t vertexCount;
 	};
 	//struct VertexSolidColor
 	//{
@@ -27,8 +27,8 @@ namespace OBJ_Viewer
 	public:
 		VertexAttributeObject(std::vector<Vertex> vertexData,std::vector<unsigned int>indexData);
 		VertexAttributeObject(std::vector<glm::vec3> vertexData,std::vector<unsigned int>indexData);
-		size_t GetIndexCount()const { return this->m_vertexData.m_indexCount; }
-		size_t GetVertexCount()const { return this->m_vertexData.m_vertexCount; }
+		size_t GetIndexCount()const { return this->m_vertexData.indexCount; }
+		size_t GetVertexCount()const { return this->m_vertexData.vertexCount; }
 		void BindBuffer()const{ glBindVertexArray(this->m_vertexAttributeObjHandle); }
 		void UnBind()const { glBindVertexArray(0); }
 	private:

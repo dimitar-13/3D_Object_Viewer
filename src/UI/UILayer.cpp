@@ -4,7 +4,6 @@
 #include <iostream>
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
-
 inline std::vector<std::string> itemsLabel = { "Right face" ,"Left face","Top face","Bottom face","Front face","Back face" };
 inline std::vector<OBJ_Viewer::SkyboxFace> itemsFaces = {
 		OBJ_Viewer::SKYBOX_FACE_RIGHT,
@@ -113,7 +112,6 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 		if (pSettings.m_isRenderingLightOn)
 		{
-			
 			ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
 			//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
 			/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
@@ -126,12 +124,19 @@ void OBJ_Viewer::UILayer::RenderUI()
 				pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount):
 				pSettings.lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
 
-			for (uint32_t i = 0; i < pSettings.lightInfo.lightCount; i++)
+			for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
 			{
-				RenderLightSettingsPanel(i, 
+				if (i < pSettings.lightInfo.lightCount)
+				{
+					RenderLightSettingsPanel(i, 
 					&pSettings.lightInfo.lights[i].color,
 					&pSettings.lightInfo.lights[i].direction);
-				ImGui::Separator();
+					ImGui::Separator();
+				}
+				else
+				{
+					pSettings.lightInfo.lights[i].color = glm::vec3(0);
+				}
 			}
 		}
 		ImGui::Checkbox("Enable skybox?", &pSettings.m_isSkyboxOn);

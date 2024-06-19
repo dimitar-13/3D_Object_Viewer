@@ -20,8 +20,11 @@ constexpr int MAX_LIGHT_COUNT = 4;
 	};
 	struct DirectionalLight
 	{
-		glm::vec3 direction = glm::vec3(0,-1,0);
+		glm::vec3 direction = glm::vec3(0,0,0);
+		float padding1;
 		glm::vec3 color = glm::vec3(0);
+		float padding2;
+
 	};
 	struct SceneLightInfo
 	{

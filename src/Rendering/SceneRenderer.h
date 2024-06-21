@@ -22,6 +22,7 @@ namespace OBJ_Viewer {
 	private:
 		void InitShaders();
 		void SetUniformMatrixBuffer()const;
+		glm::mat3 ConstructViewportMatrix()const;
 	private:
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
@@ -33,6 +34,8 @@ namespace OBJ_Viewer {
 		std::unique_ptr<ShaderClass> m_skyboxShader;
 		std::unique_ptr<ShaderClass> m_lightShader;
 		std::unique_ptr<ShaderClass> m_materialShader;
+		std::unique_ptr<ShaderClass> m_wireframeShader;
+		Window& m_appWindow;
 
 		std::unique_ptr<UniformBuffer> m_uniformMatrixBuffer;
 		std::unique_ptr<UniformBuffer> m_uniformLightBuffer;

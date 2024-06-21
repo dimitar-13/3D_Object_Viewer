@@ -81,6 +81,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::Separator();
 		ImGui::Text("Model rendering settings.");
 		ImGui::Checkbox("Wireframe?", &pSettings.m_isWireFrameRenderingOn);
+		if (pSettings.m_isWireFrameRenderingOn)
+		{
+			ImGui::InputFloat("Wire line Thickness",&pSettings.wireframeSettings.lineThickness);
+			ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
+		}
 		ImGui::Checkbox("Albedo?", &pSettings.m_isRenderAlbedoTextureOn);
 		ImGui::Checkbox("Specular?", &pSettings.m_isRenderSpecularTextureOn);
 		ImGui::Checkbox("Normals?", &pSettings.m_isRenderNormalTextureOn);

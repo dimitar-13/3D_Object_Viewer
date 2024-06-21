@@ -24,7 +24,11 @@ constexpr int MAX_LIGHT_COUNT = 4;
 		float padding1;
 		glm::vec3 color = glm::vec3(0);
 		float padding2;
-
+	};
+	struct WireFrameSettings
+	{
+		float lineThickness = 4.f;
+		glm::vec3 lineColor = glm::vec3(0, 1, 0);
 	};
 	struct SceneLightInfo
 	{
@@ -44,6 +48,7 @@ constexpr int MAX_LIGHT_COUNT = 4;
 		bool m_isRenderAmbientOcclusionTextureOn = true;
 		GridData m_gridData;
 		SceneLightInfo lightInfo;
+		WireFrameSettings wireframeSettings;
 	};
 	enum BaseMeshType
 	{

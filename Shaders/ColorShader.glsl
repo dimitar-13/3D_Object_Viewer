@@ -11,7 +11,6 @@ layout(std140) uniform Matrices
 	mat4 ProjectionMatrix;
 	mat4 ModelMatrix;
 };
-
 void main()
 {
 	gl_Position =  ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);

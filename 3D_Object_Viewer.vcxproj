@@ -141,6 +141,9 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="Shaders\WireframeShader.glsl">
+      <FileType>Document</FileType>
+    </Text>
     <ClCompile Include="src\Rendering\SceneRenderer.cpp" />
     <ClCompile Include="src\AppState.cpp" />
     <ClCompile Include="src\Rendering\OpenGLBuffer.cpp" />

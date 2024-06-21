@@ -36,6 +36,7 @@ void OBJ_Viewer::ModelLoader::ReadNode(aiNode *node, const aiScene *scene)
 	for (rsize_t i =0; i < node->mNumMeshes;i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		node->mTransformation;
 		m_meshes.push_back(mesh);
 	}
 	for (rsize_t i = 0; i < node->mNumChildren; i++)

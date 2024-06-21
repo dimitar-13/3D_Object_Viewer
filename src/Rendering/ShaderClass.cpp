@@ -18,6 +18,9 @@ OBJ_Viewer::ShaderClass::ShaderClass(const char* filePath)
         case FRAGMENT_SHADER:
             shaderHandles[i] = compileShader(GL_FRAGMENT_SHADER, &sources[FRAGMENT_SHADER]);
             break;
+        case GEOMETRY_SHADER:
+            shaderHandles[i] = compileShader(GL_GEOMETRY_SHADER, &sources[GEOMETRY_SHADER]);
+            break;
         default:
             break;
         } 
@@ -67,18 +70,26 @@ std::vector<std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* p
         std::cout << "Was not able to open file at path:" << path <<'\n';
     }
     std::string line;
-    std::vector<std::string>shaderSources(2);
+    std::vector<std::string>shaderSources;
     std::string* p_currentShaderSource = NULL;
     while (std::getline(sourceFile, line))
     {
         if (line.compare("#Shader:vertex") == 0)
         {
+            shaderSources.push_back(std::string());
             p_currentShaderSource = &shaderSources[VERTEX_SHADER];
             continue;
         }
         else if (line.compare("#Shader:fragment") == 0)
         {
+            shaderSources.push_back(std::string());
             p_currentShaderSource = &shaderSources[FRAGMENT_SHADER];
+            continue;
+        }
+        else if (line.compare("#Shader:geometry") == 0)
+        {
+            shaderSources.push_back(std::string());
+            p_currentShaderSource = &shaderSources[GEOMETRY_SHADER];
             continue;
         }
         *p_currentShaderSource += line +'\n';

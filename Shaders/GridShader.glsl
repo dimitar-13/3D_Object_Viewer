@@ -76,16 +76,16 @@ vec4 GetGridCol(vec2 p,GridInfo grid_Info)
 
 	float d = 1.0 - (dX * dY);
 	
-	if( 1. - smoothstep(.01,dCoords.x*2.,abs(coords.x)) > 0 && grid_Info.isAxisShaded)
+	if( 1. - smoothstep(.0,dCoords.x*2.,abs(coords.x)) > 0 && grid_Info.isAxisShaded)
 	{
 		gridColor = vec3(0,0,.5);
-		d = 1.;
+		//d = 1.;
 	}
 		
-	if( 1. - smoothstep(.01,dCoords.y * 2.0,abs(coords.y))  > 0.  && grid_Info.isAxisShaded)
+	if( 1. - smoothstep(.0,dCoords.y * 2.0,abs(coords.y))  > 0.  && grid_Info.isAxisShaded)
 	{
 		gridColor = vec3(.5,.0,0);
-		d = 1.;
+		//d = 1.;
 	}
 	return vec4(gridColor,d);
 }

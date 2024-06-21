@@ -6,7 +6,7 @@
 #include<memory>
 #include"ShaderPath.h"
 #include"MeshGeneratingMethods.h"
-OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppWindow)
+OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppWindow) : m_appWindow(AppWindow)
 {
 	InitShaders();
 
@@ -36,6 +36,10 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppW
 	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ mesh }, glm::mat4(1), data);
 
 	m_gridVAO = std::make_unique<VertexAttributeObject>(planeVerts, planeIndexData);
+
+	//TODO:Get this somewhere else
+	
+
 }
 OBJ_Viewer::SceneRenderer::~SceneRenderer()
 {
@@ -44,13 +48,21 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 {
 	SetUniformMatrixBuffer();
 
+	//glLineWidth(renderSettings.wireframeSettings.lineThickness);
+	
+
 
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())
 	{
-		//Renderer::IsWireFrameOn();
 		if (renderSettings.m_isWireFrameRenderingOn)
 		{
-			Renderer::RenderObjectWithWireFrame(*m_clearColorShader, *mesh, *m_sceneCamera);
+			const glm::mat3 viewportTransform = ConstructViewportMatrix();
+			m_wireframeShader->UseShader();
+			m_wireframeShader->UniformSet3FloatVector("u_frameColor", renderSettings.wireframeSettings.lineColor);
+			m_wireframeShader->UniformSet1Float("frameThickness", renderSettings.wireframeSettings.lineThickness);
+
+			m_wireframeShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
+			Renderer::RenderMesh(*m_wireframeShader, *mesh, *m_sceneCamera);
 			continue;
 		}
 		std::shared_ptr<Material> mat = mesh->GetMaterial().lock();
@@ -123,6 +135,8 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 	m_gridShader = std::make_unique<ShaderClass>(GetConcatShaderPath("GridShader.glsl").c_str());
 	m_lightShader = std::make_unique<ShaderClass>(GetConcatShaderPath("LightShader.glsl").c_str());
 	m_materialShader = std::make_unique<ShaderClass>(GetConcatShaderPath("MaterialShader.glsl").c_str());
+	m_wireframeShader = std::make_unique<ShaderClass>(GetConcatShaderPath("WireframeShader.glsl").c_str());
+
 
 	m_uniformMatrixBuffer = std::make_unique<UniformBuffer>("Matrices", 0, 3 * sizeof(glm::mat4), nullptr);
 	m_uniformMatrixBuffer->BindBufferRange(0, 3 * sizeof(glm::mat4));
@@ -135,6 +149,8 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 	m_gridShader->BindUBOToShader(*m_uniformMatrixBuffer);
 	m_lightShader->BindUBOToShader(*m_uniformMatrixBuffer);
 	m_materialShader->BindUBOToShader(*m_uniformMatrixBuffer);
+	m_wireframeShader->BindUBOToShader(*m_uniformMatrixBuffer);
+
 
 	m_lightShader->BindUBOToShader(*m_uniformLightBuffer);
 
@@ -146,4 +162,17 @@ void OBJ_Viewer::SceneRenderer::SetUniformMatrixBuffer()const
 	m_sceneCamera->GetViewAndProjectionSeparate(&matrices[0], &matrices[1]);
 	matrices[2] = m_sceneModel->GetModelMatrix();
 	m_uniformMatrixBuffer->SendBufferSubData(0, 3 * sizeof(glm::mat4), matrices);
+}
+
+glm::mat3 OBJ_Viewer::SceneRenderer::ConstructViewportMatrix() const
+{
+	glm::mat3 result(1);
+	auto winSize = m_appWindow.GetWindowSize();
+	result[0][0] = (float)winSize.m_winWidth / 2;
+	result[1][1] = (float)winSize.m_winHeight / 2;
+
+	result[2][0] = result[0][0];
+	result[2][1] = result[1][1];
+
+	return result;
 }

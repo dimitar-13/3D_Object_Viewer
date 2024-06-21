@@ -219,4 +219,9 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Shaders\WireframeShader.glsl">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

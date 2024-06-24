@@ -2,6 +2,7 @@
 #include<GL/glew.h>
 #include"Texture.h"
 #include<iostream>
+#include"CommonAppData.h"
 namespace OBJ_Viewer {
 
 	enum FramebufferAttachmentsFlags
@@ -12,6 +13,7 @@ namespace OBJ_Viewer {
 		FRAMEBUFFER_SPECULAR_ATTACHMENT = 8
 	};
 
+
 	class Framebuffer
 	{
 	public:
@@ -19,17 +21,16 @@ namespace OBJ_Viewer {
 		Framebuffer(int width, int height, FramebufferAttachmentsFlags attachmentFlags);
 		GLuint GetFramebufferHandle()const { return this->m_framebuffer; }
 		Texture& GetFramebufferTexture()const { return *this->m_texture; }
-		std::pair<int,int>GetBufferSize() { return std::pair<int,int>(m_Width, m_Height); }
 		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer); }
 		void UnbindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 		bool isFramebufferValid()const;
+		Size2D GetFramebufferSize()const { return { m_framebufferSize.width ,m_framebufferSize.height}; }
 		void ResizeFramebuffer(int newWidth, int newHeight);
 		~Framebuffer();
 	private:
 		GLuint m_framebuffer;
 		GLuint m_readBuffer;
-		int m_Width;
-		int m_Height;
+		Size2D m_framebufferSize;
 		std::unique_ptr<Texture> m_texture;
 	};
 }

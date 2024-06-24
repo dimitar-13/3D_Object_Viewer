@@ -8,11 +8,10 @@
 #include<glm/glm.hpp>
 #include"WindowHandler.h"
 #include"Framebuffer.h"
-#include "AppState.h"
 
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
-	GLFWwindow* window = this->m_appState->GetGlobalAppWindow().GetGLFW_Window();
+	GLFWwindow* window = this->m_application.GetGlobalAppWindow().GetGLFW_Window();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -20,10 +19,12 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_UILayer->RenderUI();
-		RenderScene();
-		glfwSwapBuffers(window);
+		if (m_currentWindowState != WINDOW_STATE_MINIMIZED){
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			m_UILayer->RenderUI();
+			RenderScene();
+			glfwSwapBuffers(window);
+		}
 		glfwPollEvents();
 	}
 
@@ -31,8 +32,8 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 
 void OBJ_Viewer::RenderingCoordinator::RenderScene()
 {
-	auto& appSettings = m_appState->GetScene_RefSettings();
-	auto& framebuffer = m_appState->GetSceneFrameBuffer();
+	auto& appSettings =	m_application.GetScene_RefSettings();
+	auto& framebuffer =	m_application.GetSceneFrameBuffer();
 
 	//Set up the renderer based on the settings;
 	framebuffer.BindFramebuffer();
@@ -45,11 +46,20 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	framebuffer.UnbindFramebuffer();
 }
 
-OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(AppState* appState)
+void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)
 {
-	m_appState = appState;
-	m_sceneRenderer = std::make_shared<SceneRenderer>(m_appState->GetGlobalInputHandler(), m_appState->GetGlobalAppWindow());
-	m_UILayer = std::make_unique<UILayer>(appState, m_sceneRenderer, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
+	if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_WINDOW_STATE_CHANGED)
+		m_currentWindowState = dynamic_cast<WindowStateChangedEvent&>(e).GetWindowState();
+}
+
+
+OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):m_application(application)
+{
+	std::shared_ptr<RenderingMediator> mediator = std::make_shared<RenderingMediator>();
+	m_sceneRenderer = std::make_shared<SceneRenderer>(application, mediator);
+	m_UILayer = std::make_unique<UILayer>(m_application, mediator, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
+	m_application.AddEventListener(this);
+
 }
 
 

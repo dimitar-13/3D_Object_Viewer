@@ -93,9 +93,6 @@
     <ClCompile Include="src\UI\UILayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AppState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\UniformBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -158,7 +155,7 @@
     <ClInclude Include="Shaders\ShaderPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IObserver.h">
+    <ClInclude Include="src\Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\MeshGeneratingMethods.h">
@@ -194,13 +191,19 @@
     <ClInclude Include="src\UI\UILayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\AppState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\UniformBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\SceneRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderingMediator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AppEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommonAppData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,18 +6,16 @@
 #include<memory>
 #include"ShaderPath.h"
 #include"MeshGeneratingMethods.h"
-OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppWindow) : m_appWindow(AppWindow)
+OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) : m_app(app)
 {
 	InitShaders();
-
-	auto windowSize = AppWindow.GetWindowSize();
-	m_sceneCamera = std::make_unique<Camera>(5.0f, windowSize.m_winWidth, windowSize.m_winHeight,
-		inputHandler);
 	
-	AppWindow.GetMousePosNotifier().Attach(m_sceneCamera.get());
-	AppWindow.GetScrollChangeNotifier().Attach(m_sceneCamera.get());
-	AppWindow.GetWindowSizeChangeNotifier().Attach(m_sceneCamera.get());
-
+	auto windowSize = m_app.GetGlobalAppWindow().GetWindowSize();
+	m_app.AddEventListener(this);
+	m_sceneCamera = std::make_unique<Camera>(5.0f, windowSize,
+		app);
+	app.AddEventListener(m_sceneCamera.get());
+	m_renderingMediator = mediator;
 
 	std::vector <glm::vec3> planeVerts = {
 	{ -1.0f,1.0f,0.0f},
@@ -37,6 +35,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppW
 
 	m_gridVAO = std::make_unique<VertexAttributeObject>(planeVerts, planeIndexData);
 
+	m_renderingMediator->SetSceneModel(m_sceneModel);
 	//TODO:Get this somewhere else
 	
 
@@ -44,7 +43,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(InputHandler& inputHandler,Window& AppW
 OBJ_Viewer::SceneRenderer::~SceneRenderer()
 {
 }
-void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
+void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings)
 {
 	SetUniformMatrixBuffer();
 
@@ -107,7 +106,7 @@ void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
 	}
 }
 
-void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<char*> paths)
+void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 {
 	if (!paths.empty())
 	{
@@ -119,13 +118,13 @@ void OBJ_Viewer::SceneRenderer::SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace wi
 {
 	this->m_sceneSkybox->SwapSkyboxFaceTextures(toSwap, with);
 }
-void OBJ_Viewer::SceneRenderer::LoadModel(char* path)
+void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 {
-	if (!path)
+	if (path.empty())
 		return;
 
 	ModelLoader loader;
-	m_sceneModel.reset(loader.LoadModel(path));
+	m_sceneModel.reset(loader.LoadModel(path.c_str()));
 }
 
 void OBJ_Viewer::SceneRenderer::InitShaders()
@@ -167,12 +166,33 @@ void OBJ_Viewer::SceneRenderer::SetUniformMatrixBuffer()const
 glm::mat3 OBJ_Viewer::SceneRenderer::ConstructViewportMatrix() const
 {
 	glm::mat3 result(1);
-	auto winSize = m_appWindow.GetWindowSize();
-	result[0][0] = (float)winSize.m_winWidth / 2;
-	result[1][1] = (float)winSize.m_winHeight / 2;
+	auto winSize = m_app.GetSceneViewport();
+	result[0][0] = (float)winSize.width / 2.f;
+	result[1][1] = (float)winSize.height / 2.f;
 
 	result[2][0] = result[0][0];
 	result[2][1] = result[1][1];
 
 	return result;
+}
+
+void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
+{
+	if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_ON_MODEL_LOAD)
+		OnModelLoadEvent(dynamic_cast<EventOnModelLoaded&>(e));
+	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_ON_SKYBOX_LOAD)
+		OnSkyboxLoadEvent(dynamic_cast<EventOnSkyboxLoaded&>(e));
+}
+
+void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
+{
+	LoadSkybox(e.GetSkyboxPaths());
+	m_renderingMediator->SetSkybox(m_sceneSkybox);
+
+}
+
+void OBJ_Viewer::SceneRenderer::OnModelLoadEvent(EventOnModelLoaded& e)
+{
+	LoadModel(e.GetModelPath());
+	m_renderingMediator->SetSceneModel(m_sceneModel);
 }

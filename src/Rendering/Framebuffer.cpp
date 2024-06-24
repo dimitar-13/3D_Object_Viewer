@@ -2,8 +2,8 @@
 #include<iostream>
 OBJ_Viewer::Framebuffer::Framebuffer(int width, int height, FramebufferAttachmentsFlags attachmentFlags)
 {
-	m_Width = width;
-	m_Height = height;
+	m_framebufferSize.width = width;
+	m_framebufferSize.height = height;
 
 	glGenFramebuffers(1, &this->m_framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer);
@@ -38,11 +38,11 @@ bool OBJ_Viewer::Framebuffer::isFramebufferValid() const
 
 void OBJ_Viewer::Framebuffer::ResizeFramebuffer(int newWidth, int newHeight)
 {
-	if (m_Width == newWidth && m_Height == newHeight)
+	if (m_framebufferSize.width == newWidth && m_framebufferSize.height == newHeight)
 		return;
 
-	m_Width = newWidth;
-	m_Height = newHeight;
+	m_framebufferSize.width = newWidth;
+	m_framebufferSize.height = newHeight;
 
 	BindFramebuffer();
 	this->m_texture->ResizeTexture({ newWidth,newHeight });

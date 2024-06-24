@@ -1,9 +1,10 @@
 #pragma once
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include"AppState.h"
+#include"Application.h"
 #include<glm/glm.hpp>
 #include"Rendering/SceneRenderer.h"
+#include"RenderingMediator.h"
 #include<memory>
 
 namespace OBJ_Viewer {
@@ -16,7 +17,7 @@ constexpr auto UI_WINDOW_UNKNOWN = "unknownWindow";
 	class UILayer
 	{
 	public:
-		UILayer(AppState* appState, std::shared_ptr<SceneRenderer> sceneRenderer,ImGuiWindowFlags imGuiWindowFlags,
+		UILayer(Application& appState, std::shared_ptr<RenderingMediator> renderingMediator,ImGuiWindowFlags imGuiWindowFlags,
 			ImGuiDockNodeFlags imGuiDockSpaceFlags);
 		void RenderUI();
 	private:
@@ -27,10 +28,11 @@ constexpr auto UI_WINDOW_UNKNOWN = "unknownWindow";
 		void RenderLightSettingsPanel(uint32_t lightIndex, glm::vec3* pColor, glm::vec3* pPosition);
 	private:
 	
-		AppState* m_appState;
-		std::shared_ptr<SceneRenderer> m_sceneRenderer;
+		Application& m_application;
+		std::shared_ptr<RenderingMediator> m_mediator;
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
+		std::function<void(Event&)> m_appEventCallback;
 	};
 }
 

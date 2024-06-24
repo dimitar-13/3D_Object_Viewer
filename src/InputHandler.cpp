@@ -5,24 +5,24 @@ OBJ_Viewer::KeyState OBJ_Viewer::KeyboardInputStateManager::GetKeyState(int key)
 	if (m_keyHashes.find(key) == m_keyHashes.end())
 		return KEY_STATE_UKNOWN;
 
-	KeyState result = static_cast<KeyState>(m_keyHashes.find(key) != m_keyHashes.end() ? m_keyHashes.at(key) : KEY_PRESSES);
+	KeyState result = static_cast<KeyState>(m_keyHashes.find(key) != m_keyHashes.end() ? m_keyHashes.at(key) : KEY_PRESSED);
 	return result;
 }
-void OBJ_Viewer::KeyboardInputStateManager::Update(MessageType type, int key, int scancode, int action, int mods)
+void OBJ_Viewer::KeyboardInputStateManager::onKeyStateChanged(KeyboardKeyEvent& e)
 {
-	if (m_keyHashes.find(key) == m_keyHashes.end())
+	if (m_keyHashes.find(e.GetKeyCode()) == m_keyHashes.end())
 		return;
 
-	KeyState state = static_cast<KeyState>(action);
-	m_keyHashes.at(key) = state;
+	KeyState state = static_cast<KeyState>(e.GetKeyAction());
+	m_keyHashes.at(e.GetKeyCode()) = state;
 }
-void OBJ_Viewer::MouseInputStateManager::Update(MessageType type, int button, int action, int mods)
+void OBJ_Viewer::MouseInputStateManager::onButtonStateChanged(MouseKeyEvent& e)
 {
-	if (m_mouseKeyHashes.find(button) == m_mouseKeyHashes.end())
+	if (m_mouseKeyHashes.find(e.GetKeyCode()) == m_mouseKeyHashes.end())
 		return;
 
-	KeyState state = static_cast<KeyState>(action);
-	m_mouseKeyHashes.at(button) = state;
+	KeyState state = static_cast<KeyState>(e.GetKeyAction());
+	m_mouseKeyHashes.at(e.GetKeyCode()) = state;
 }
 
 OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(int button)
@@ -42,8 +42,17 @@ OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(int butt
 	return result;
 }
 
-OBJ_Viewer::InputHandler::InputHandler(Notifier<int, int, int>* mouseButtonNotifier, Notifier<int, int, int, int>* keyboardKeyNotifier)
+void OBJ_Viewer::InputHandler::OnEvent(Event& e)
 {
-	mouseButtonNotifier->Attach(dynamic_cast<IObserver<int, int, int>*>(&this->m_mouseInputManager));
-	keyboardKeyNotifier->Attach(dynamic_cast<IObserver<int, int, int, int>*>(&this->m_keyboardInputManager));
+	switch (e.GetEventType())
+	{
+	case EVENT_KEY_PRESSES:
+		this->m_keyboardInputManager.onKeyStateChanged(dynamic_cast<KeyboardKeyEvent&>(e));
+		break;
+	case EVENT_MOUSE_BUTTON_PRESSED:
+		this->m_mouseInputManager.onButtonStateChanged(dynamic_cast<MouseKeyEvent&>(e));
+		break;
+	default:
+		break;
+	}
 }

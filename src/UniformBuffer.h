@@ -7,7 +7,7 @@ namespace OBJ_Viewer {
 	public:
 		UniformBuffer(std::string bufferName,GLuint bindPoint,const uint32_t buffSize,void * data);
 		~UniformBuffer();
-		void SendBufferSubData(const uint32_t dataBufferOffset,const uint32_t buffSize, void* data)const;
+		void SendBufferSubData(const uint32_t dataBufferOffset, const uint32_t buffSize, const void* data)const;
 		void UnbindBuffer()const { glBindBuffer(GL_UNIFORM_BUFFER, 0); }
 		void BindBuffer()const { glBindBuffer(GL_UNIFORM_BUFFER, m_bufferHandle); }
 		//void BindBufferToShader(const ShaderClass& shader, GLuint m_bindingPoint);

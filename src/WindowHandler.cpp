@@ -3,11 +3,12 @@
 #include<functional>
 #include"imgui.h"
 #include<iostream>
-OBJ_Viewer::Window::Window(WindowMetrics windowMetrics, const char* winTitle, std::function<void(Event&)> onEventFunc)
+#include"AppEvent.h"
+OBJ_Viewer::Window::Window(Size2D windowMetrics, const char* winTitle, std::function<void(Event&)> onEventFunc)
 {
 	this->m_winTitle = winTitle;
-	this->m_windowMetrics = windowMetrics;
-	GLFWwindow* glfwWindow = glfwCreateWindow(windowMetrics.m_winWidth, windowMetrics.m_winHeight, winTitle, NULL, NULL);
+	this->m_windowSize = windowMetrics;
+	GLFWwindow* glfwWindow = glfwCreateWindow(windowMetrics.width, windowMetrics.height, winTitle, NULL, NULL);
 	glfwMakeContextCurrent(glfwWindow);
 	this->m_glfwWindow = glfwWindow;
 	m_onEvent = onEventFunc;
@@ -17,9 +18,9 @@ OBJ_Viewer::Window::Window(WindowMetrics windowMetrics, const char* winTitle, st
 glm::mat4 OBJ_Viewer::Window::GetViewportMatrix()const
 {
 	glm::mat4 result(1);
-	auto winSize = m_windowMetrics;
-	result[0][0] = (float)winSize.m_winWidth / 2;
-	result[1][1] = (float)winSize.m_winHeight / 2;
+	Size2D winSize = m_windowSize;
+	result[0][0] = (float)winSize.width / 2;
+	result[1][1] = (float)winSize.height / 2;
 
 	result[2][0] = result[0][0];
 	result[2][1] = result[1][1];
@@ -95,7 +96,22 @@ void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scanco
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	this->m_windowMetrics = { width,height };
-	WindowResizeEvent winSizeChangedEvent(width, height);
-	m_onEvent(winSizeChangedEvent);
+	int isVisible = glfwGetWindowAttrib(window, GLFW_VISIBLE);
+	if (width == 0 || height == 0)
+	{
+		this->m_windowSize = Size2D{ width,height };
+		WindowStateChangedEvent e(Size2D{ width, height }, WINDOW_STATE_MINIMIZED);
+		m_onEvent(e);
+		return;
+	}
+	else if (m_windowSize.width == 0 || m_windowSize.height == 0 && (width != 0 || height != 0))
+	{
+		this->m_windowSize = Size2D{ width,height };
+		WindowStateChangedEvent e(Size2D{ width, height }, WINDOW_STATE_NORMAL);
+		m_onEvent(e);
+		return;
+	}
+	WindowResizeEvent e(Size2D{ width, height });
+	m_onEvent(e);
 }
+

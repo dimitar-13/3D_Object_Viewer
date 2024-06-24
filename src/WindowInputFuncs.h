@@ -1,7 +1,7 @@
 #pragma once
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
-#include"IObserver.h"
+#include"Events.h"
 namespace OBJ_Viewer
 {
 	class WindowInputFuncs {

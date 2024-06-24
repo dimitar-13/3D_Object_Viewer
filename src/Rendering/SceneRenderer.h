@@ -7,14 +7,14 @@
 #include"Scene/Skybox.h"
 #include"Application.h"
 #include"RenderingMediator.h"
-#include"IObserver.h"
+#include"Events.h"
 namespace OBJ_Viewer {
 	class SceneRenderer : public Listener
 	{
 	public:
 		SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator);
 		~SceneRenderer();
-		void RenderScene(RenderStateSettings renderSettings);	
+		void RenderScene(const RenderStateSettings& renderSettings);
 		void SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with);
 		std::weak_ptr<Model> GetSceneModel() { return m_sceneModel; }
 		std::weak_ptr<Skybox> GetSkyboxModel() { return m_sceneSkybox; }

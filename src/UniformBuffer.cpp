@@ -15,13 +15,13 @@ OBJ_Viewer::UniformBuffer::~UniformBuffer()
 	glDeleteBuffers(1, &this->m_bufferHandle);
 }
 
-void OBJ_Viewer::UniformBuffer::SendBufferSubData(const uint32_t dataBufferOffset, const uint32_t buffSize, void* data)const
+
+void OBJ_Viewer::UniformBuffer::SendBufferSubData(const uint32_t dataBufferOffset, const uint32_t buffSize, const void* data)const
 {
 	this->BindBuffer();
-		glBufferSubData(GL_UNIFORM_BUFFER, dataBufferOffset, buffSize, data);
+	glBufferSubData(GL_UNIFORM_BUFFER, dataBufferOffset, buffSize, data);
 	this->UnbindBuffer();
 }
-
 void OBJ_Viewer::UniformBuffer::BindBufferRange(const uint32_t dataBufferOffset, const uint32_t bufferRange) const
 {
 	this->BindBuffer();

@@ -1,12 +1,11 @@
 #include "UI/UILayer.h"
 #include "Camera.h"
 
-
-OBJ_Viewer::Camera::Camera(float CameraZoom, int width, int height, Application& app):
+OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app):
 	app(app)
 {
 	this->m_zoom = CameraZoom;
-	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)width / (float)height, 0.1f, 100.0f);
+	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)screenSize.width / (float)screenSize.height, 0.1f, 100.0f);
 	//CameraZoom units from the origin or vec3(0,0,1) * CameraZoom;
 	this->m_EulerAngles.m_pitchAngle =0.0f;
 	this->m_EulerAngles.m_yawAngle = 90.0f;
@@ -52,15 +51,15 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 	if (app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_2) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
-		m_lastMousePos = glm::vec2(mousePos.x, mousePos.y);
+		m_lastMousePos = mousePos;
 	}
 	else if (app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_2) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
-		constexpr float movementSpeed = .05;
+		constexpr float movementSpeed = .005;
 		glm::mat3 viewSpaceOrthogonalVectors = glm::mat3(m_viewMatrix);
 		glm::vec3 viewDirectionVector(0);
 		//We calculate the offset in camera/view space first.
-		glm::vec2 delta = glm::vec2(mousePos.x, mousePos.y) - m_lastMousePos;
+		Position2D delta = Position2D{ mousePos.x - m_lastMousePos.x,mousePos.y - m_lastMousePos.y};
 		viewDirectionVector.x = delta.x*movementSpeed;
 		viewDirectionVector.y = delta.y*movementSpeed;
 		//TL;DR: We use transpose as a cheap inverse since the "viewSpaceOrthogonalVectors" is a 3 orthogonal vector matrix
@@ -72,7 +71,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		* calculate the movement in view space and then inverse the view matrix to get what the vector will be in world space.
 		*/
 		viewDirectionVector = glm::transpose(viewSpaceOrthogonalVectors) * viewDirectionVector;
-		m_lastMousePos = glm::vec2(mousePos.x, mousePos.y);
+		m_lastMousePos = mousePos;
 		m_cameraCenter += viewDirectionVector;
 		RecalculateViewMatrix();
 	}
@@ -81,7 +80,8 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 
 void OBJ_Viewer::Camera::onWinSizeChanged(WindowResizeEvent& e)
 {
-	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)e.GetWindowWidth()/ (float)e.GetWindowHeight(), 0.1f, 100.0f);
+	const Size2D winSize = e.GetWindowSize();
+	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)winSize.width/ (float)winSize.height, 0.1f, 100.0f);
 }
 
 void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
@@ -119,29 +119,6 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 	default:
 		break;
 	}
-}
-
-glm::vec3 OBJ_Viewer::Camera::GetScreenToWorldSpacePos(glm::vec3 inPoint)
-{
-	auto sceneViewportSize = app.GetSceneViewport();
-	auto winViewportSize = app.GetGlobalAppWindow().GetWindowSize();
-		
-	glm::mat4 result(1);
-	result[0][0] = (float)sceneViewportSize.width /2;
-	result[1][1] = (float)sceneViewportSize.height /2;
-
-	result[2][0] = sceneViewportSize.x + result[0][0];
-	result[2][1] = sceneViewportSize.y + result[1][1];
-
-
-
-	glm::mat4 invViewport = glm::inverse(result);
-	glm::mat4 invViewProjection = glm::inverse(this->GetViewProjMatrix());
-	glm::vec4 point = glm::vec4(inPoint.x, inPoint.y,0.0, 1.0);
-	point =  invViewProjection * invViewport * point;
-	point /= point.w;
-
-	return glm::vec3(point);
 }
 
 

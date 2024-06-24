@@ -1,7 +1,7 @@
 #pragma once
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
-#include"IObserver.h"
+#include"Events.h"
 #include"InputHandler.h"
 #include"WindowHandler.h"
 #include<memory>
@@ -34,20 +34,20 @@ namespace OBJ_Viewer
 	class Camera : public Listener
 	{
 	public:
-		Camera(float CameraZoom, int width, int height, Application& app);
+		Camera(float CameraZoom,Size2D screenSize, Application& app);
 		void CalculatePositionVector();
 		//void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj) { pView = &m_viewMatrix; pProj = &m_projectionMatrix; }
 		void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj)const { *pView = m_viewMatrix; *pProj = m_projectionMatrix; }
 		glm::mat4 GetViewProjMatrix()const { return m_projectionMatrix * m_viewMatrix; }
 		glm::mat4 GetViewProjNoTranslation()const { return m_projectionMatrix* glm::mat4(glm::mat3(m_viewMatrix)); };
-		glm::vec3 GetCameraPos()const { return this->m_position; }
+		glm::vec3 GetCameraPos()const { return this->m_position; }	
+	private:
+		void RecalculateViewMatrix();
 
 		void onScrollChanged(ScrollPositionChanged& e);
 		void onMousePositionChanged(MousePositionEvent& e);
 		void onWinSizeChanged(WindowResizeEvent& e);
 		void onKeyPressedEvent(KeyboardKeyEvent& e);
-	private:
-		void RecalculateViewMatrix();
 	private:
 		float m_zoom;
 		glm::mat4 m_projectionMatrix;
@@ -58,11 +58,10 @@ namespace OBJ_Viewer
 		Application& app;
 
 		glm::vec3 m_cameraCenter = glm::vec3(0);
-		glm::vec2 m_lastMousePos = glm::vec2(0);
+		Position2D m_lastMousePos = Position2D{0,0};
 
 		// Inherited via Listener
 		void OnEvent(Event& e) override;
-		glm::vec3 GetScreenToWorldSpacePos(glm::vec3 inPoint);
 	};
 }
 

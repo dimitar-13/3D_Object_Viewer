@@ -1,7 +1,8 @@
 #pragma once
 #include<vector>
 #include<string>
-#include"../src/IObserver.h"
+#include"Events.h"
+#include"WindowHandler.h"
 namespace OBJ_Viewer {
 	class EventOnSkyboxLoaded : public Event
 	{
@@ -24,5 +25,19 @@ namespace OBJ_Viewer {
 		std::string GetModelPath()const { return m_modelPath; }
 	private:
 		std::string m_modelPath;
+	};
+	class WindowStateChangedEvent : public Event
+	{
+	public:
+		WindowStateChangedEvent(Size2D metrics,WindowState state) :m_metrics(metrics), m_state(state)
+		{}
+		EventType GetEventType()const override { return EVENT_WINDOW_STATE_CHANGED; }
+		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		WindowState GetWindowState()const { return m_state; }
+		Size2D GetWindowMetrics()const { return m_metrics; }
+
+	private:
+		Size2D m_metrics;
+		WindowState m_state;
 	};
 }

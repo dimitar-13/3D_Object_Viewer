@@ -2,26 +2,29 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#include"IObserver.h"
-
+#include"Events.h"
+#include"CommonAppData.h"
 namespace OBJ_Viewer {
-	struct WindowMetrics
-	{
-		int m_winWidth;
-		int m_winHeight;
-	};
 
+	enum WindowState
+	{
+		WINDOW_STATE_UKNOWN = 0,
+		WINDOW_STATE_MINIMIZED,
+		WINDOW_STATE_FULL_SCREEN,
+		WINDOW_STATE_NORMAL
+	};
 	class Window {
 	public:
-		Window(WindowMetrics windowMetrics, const char* winTitle,std::function<void(Event&)> onEventFunc);
-		WindowMetrics GetWindowSize()const { return this->m_windowMetrics; }
+		Window(Size2D windowMetrics, const char* winTitle,std::function<void(Event&)> onEventFunc);
+		Size2D GetWindowSize()const { return this->m_windowSize; }
 		GLFWwindow* GetGLFW_Window()const { return this->m_glfwWindow; }
 		glm::mat4 GetViewportMatrix()const;
 	private:
-		WindowMetrics m_windowMetrics;
+		Size2D m_windowSize;
 		GLFWwindow* m_glfwWindow;
 		const char* m_winTitle;
 		std::function<void(Event&)> m_onEvent;
+		WindowState windowState = WINDOW_STATE_NORMAL;
  	private:
 		void SetWindowCallback();
 		void glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos);

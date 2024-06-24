@@ -12,7 +12,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	
 	auto windowSize = m_app.GetGlobalAppWindow().GetWindowSize();
 	m_app.AddEventListener(this);
-	m_sceneCamera = std::make_unique<Camera>(5.0f, windowSize.m_winWidth, windowSize.m_winHeight,
+	m_sceneCamera = std::make_unique<Camera>(5.0f, windowSize,
 		app);
 	app.AddEventListener(m_sceneCamera.get());
 	m_renderingMediator = mediator;
@@ -43,7 +43,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 OBJ_Viewer::SceneRenderer::~SceneRenderer()
 {
 }
-void OBJ_Viewer::SceneRenderer::RenderScene(RenderStateSettings renderSettings)
+void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings)
 {
 	SetUniformMatrixBuffer();
 

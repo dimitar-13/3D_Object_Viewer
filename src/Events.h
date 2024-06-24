@@ -1,6 +1,6 @@
 #pragma once
 #include<vector>
-
+#include"CommonAppData.h"
 //TODO:Because some templates can share lets call it the same signature this can cause problems for example both onScrollChange and onMousePosChange return 
 // x and y positions as offset and because of this the update methods overlap one way to fix this is the messageType but this also makes the templates almost pointless
 // another way i thought is to make for example the scroll function return only the Y offset but this is a solution that is reling not that much on softwere design but
@@ -16,7 +16,8 @@ namespace OBJ_Viewer {
 		EVENT_WINDOW_SIZE_CHANGED,
 		EVENT_ON_SKYBOX_LOAD,
 		EVENT_ON_MODEL_LOAD,
-		EVENT_ON_FOCUSED_WINDOW_CHANGED
+		EVENT_ON_FOCUSED_WINDOW_CHANGED,
+		EVENT_WINDOW_STATE_CHANGED
 	};
 
 	enum EventCategory
@@ -46,24 +47,18 @@ namespace OBJ_Viewer {
 		virtual void OnEvent(Event& e) = 0;
 
 	};
-	struct MousePos
-	{
-		double x;
-		double y;
-	};
-
 	class MousePositionEvent : public Event
 	{
 	public:
-		MousePositionEvent(MousePos mousePos) : m_mousePos(mousePos) {
+		MousePositionEvent(Position2D mousePos) : m_mousePos(mousePos) {
 
 		}
 		EventType GetEventType()const override { return EVENT_MOUSE_POSITION_CHANGED; }
 		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
 
-		MousePos& GetMousePos() { return m_mousePos; }
+		Position2D& GetMousePos() { return m_mousePos; }
 	private:
-		MousePos m_mousePos;
+		Position2D m_mousePos;
 	};
 
 	class MouseKeyEvent : public Event
@@ -115,35 +110,29 @@ namespace OBJ_Viewer {
 	class WindowResizeEvent : public Event
 	{
 	public:
-		WindowResizeEvent(int width, int height)
-		{
-			m_width = width;
-			m_height = height;
-		}
+		WindowResizeEvent(Size2D newSize):m_windowNewSize(newSize)
+		{ }
 		EventType GetEventType()const override { return EVENT_WINDOW_SIZE_CHANGED; }
 		EventCategory GetEventCategory()const override { return WINDOW_EVENT; }
 
-		int GetWindowHeight()const { return m_height; }
-		int GetWindowWidth()const { return m_width; }
-
+		Size2D GetWindowSize()const { return m_windowNewSize; }
 	private:
-		int m_width;
-		int m_height;
+		Size2D m_windowNewSize;
 	};
 
 
 	class ScrollPositionChanged : public Event
 	{
 	public:
-		ScrollPositionChanged(MousePos mousePos) : m_mousePos(mousePos) {
+		ScrollPositionChanged(Position2D mousePos) : m_mousePos(mousePos) {
 
 		}
 		EventType GetEventType()const override { return EVENT_MOUSE_SCROLL_CHANGED; }
 		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
 
-		MousePos& GetScrollPosition() { return m_mousePos; }
+		Position2D& GetScrollPosition() { return m_mousePos; }
 	private:
-		MousePos m_mousePos;
+		Position2D m_mousePos;
 	};
 
 }

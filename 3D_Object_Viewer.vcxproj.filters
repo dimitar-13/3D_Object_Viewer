@@ -155,7 +155,7 @@
     <ClInclude Include="Shaders\ShaderPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IObserver.h">
+    <ClInclude Include="src\Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\MeshGeneratingMethods.h">
@@ -201,6 +201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\AppEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommonAppData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

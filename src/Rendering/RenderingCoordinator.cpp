@@ -19,10 +19,12 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_UILayer->RenderUI();
-		RenderScene();
-		glfwSwapBuffers(window);
+		if (m_currentWindowState != WINDOW_STATE_MINIMIZED){
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			m_UILayer->RenderUI();
+			RenderScene();
+			glfwSwapBuffers(window);
+		}
 		glfwPollEvents();
 	}
 
@@ -44,12 +46,20 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	framebuffer.UnbindFramebuffer();
 }
 
+void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)
+{
+	if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_WINDOW_STATE_CHANGED)
+		m_currentWindowState = dynamic_cast<WindowStateChangedEvent&>(e).GetWindowState();
+}
+
 
 OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):m_application(application)
 {
 	std::shared_ptr<RenderingMediator> mediator = std::make_shared<RenderingMediator>();
 	m_sceneRenderer = std::make_shared<SceneRenderer>(application, mediator);
 	m_UILayer = std::make_unique<UILayer>(m_application, mediator, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
+	m_application.AddEventListener(this);
+
 }
 
 

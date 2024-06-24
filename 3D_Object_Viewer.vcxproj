@@ -186,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AppEvent.h" />
+    <ClInclude Include="src\CommonAppData.h" />
     <ClInclude Include="src\RenderingMediator.h" />
     <ClInclude Include="src\Rendering\SceneRenderer.h" />
     <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
@@ -198,7 +199,7 @@
     <ClInclude Include="Shaders\ShaderPath.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\DialogWrapper.h" />
-    <ClInclude Include="src\IObserver.h" />
+    <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\Scene\Mesh.h" />
     <ClInclude Include="src\MeshGeneratingMethods.h" />
     <ClInclude Include="src\ModelLoader.h" />

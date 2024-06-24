@@ -15,7 +15,7 @@ OBJ_Viewer::Application::Application()
 		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
 	}
 	
-	WindowMetrics metrics = { STARTUP_WINDOW_WIDTH,STARTUP_WINDOW_HEIGHT };
+	Size2D metrics = { STARTUP_WINDOW_WIDTH,STARTUP_WINDOW_HEIGHT };
 	const char* winTitle = "3D_viewer";
 	this->m_window = new Window(metrics, winTitle,std::bind(&Application::OnEvent,this,std::placeholders::_1));
 	if (this->m_window->GetGLFW_Window() == NULL)
@@ -30,7 +30,7 @@ OBJ_Viewer::Application::Application()
 		std::cout << "[ERROR]:GLEW failed to initialize." << '\n';
 	}
 	glewExperimental = GL_TRUE;
-	glViewport(0, 0, metrics.m_winWidth, metrics.m_winHeight);
+	glViewport(0, 0, metrics.width, metrics.height);
 	InitImGui();
 
 	m_eventListeners.push_back(&m_inputHandler);
@@ -41,8 +41,8 @@ OBJ_Viewer::Application::Application()
 
 void OBJ_Viewer::Application::ResizeBuffer(int newWidth, int newHeight)
 {
-	auto size = m_sceneFramebuffer->GetBufferSize();
-	if (!(size.first == newWidth && size.second == newHeight))
+	Size2D size = m_sceneFramebuffer->GetFramebufferSize();
+	if (!(size.width == newWidth && size.height == newHeight))
 		glViewport(0, 0, newWidth, newHeight);
 
 	this->m_sceneFramebuffer->ResizeFramebuffer(newWidth, newHeight);

@@ -5,7 +5,7 @@
 
 namespace OBJ_Viewer
 {
-	class RenderingCoordinator{
+	class RenderingCoordinator : public Listener{
 	public:
 		RenderingCoordinator(Application& appState);
 		void RenderLoop();
@@ -15,6 +15,10 @@ namespace OBJ_Viewer
 		Application& m_application;
 		std::unique_ptr<UILayer> m_UILayer;
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
+		WindowState m_currentWindowState;
+
+		// Inherited via Listener
+		void OnEvent(Event& e) override;
 	};
 }
 

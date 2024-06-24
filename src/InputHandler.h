@@ -1,7 +1,7 @@
 #pragma once
 #include<unordered_map>
 #include<GLFW/glfw3.h>
-#include"IObserver.h"
+#include"Events.h"
 namespace OBJ_Viewer
 {
 	class Application;

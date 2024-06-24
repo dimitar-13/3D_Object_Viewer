@@ -3,14 +3,28 @@
 #include<functional>
 #include"imgui.h"
 #include<iostream>
-OBJ_Viewer::Window::Window(WindowMetrics windowMetrics, const char* winTitle)
+OBJ_Viewer::Window::Window(WindowMetrics windowMetrics, const char* winTitle, std::function<void(Event&)> onEventFunc)
 {
 	this->m_winTitle = winTitle;
 	this->m_windowMetrics = windowMetrics;
 	GLFWwindow* glfwWindow = glfwCreateWindow(windowMetrics.m_winWidth, windowMetrics.m_winHeight, winTitle, NULL, NULL);
 	glfwMakeContextCurrent(glfwWindow);
 	this->m_glfwWindow = glfwWindow;
+	m_onEvent = onEventFunc;
 	SetWindowCallback();
+}
+
+glm::mat4 OBJ_Viewer::Window::GetViewportMatrix()const
+{
+	glm::mat4 result(1);
+	auto winSize = m_windowMetrics;
+	result[0][0] = (float)winSize.m_winWidth / 2;
+	result[1][1] = (float)winSize.m_winHeight / 2;
+
+	result[2][0] = result[0][0];
+	result[2][1] = result[1][1];
+
+	return result;
 }
 
 void OBJ_Viewer::Window::SetWindowCallback()
@@ -57,27 +71,31 @@ void OBJ_Viewer::Window::SetWindowCallback()
 }
 void OBJ_Viewer::Window::glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	//Update the window information;
-	m_posChangeNotifier.Notify(MOUSE_POSITION_CHANGED,xpos, ypos);
+	MousePositionEvent mouseEvent({ xpos, ypos });
+	m_onEvent(mouseEvent);
 }
 
 void OBJ_Viewer::Window::glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	m_mouseButtonNotifier.Notify(WINDOW_SIZE_CHANGED, button, action, mods);
+	MouseKeyEvent mouseKeyStateChangeEvent(button, action, mods);
+	m_onEvent(mouseKeyStateChangeEvent);
 }
 
 void OBJ_Viewer::Window::glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	m_scrollChangeNotifier.Notify(MOUSE_SCROLL_CHANGED,xoffset, yoffset);
+	ScrollPositionChanged scrollPositionChangedEvent({ xoffset, yoffset });
+	m_onEvent(scrollPositionChangedEvent);
 }
 
 void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	m_windowKeyNotifier.Notify(WINDOW_SIZE_CHANGED,key,scancode,action,mods);
+	KeyboardKeyEvent keyboardKeyStateEvent(key, scancode, action, mods);
+	m_onEvent(keyboardKeyStateEvent);
 }
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
 	this->m_windowMetrics = { width,height };
-	m_windowSizeChanged.Notify(WINDOW_SIZE_CHANGED, width, height);
+	WindowResizeEvent winSizeChangedEvent(width, height);
+	m_onEvent(winSizeChangedEvent);
 }

@@ -4,17 +4,17 @@
 #include"IObserver.h"
 namespace OBJ_Viewer
 {
+	class Application;
 	enum KeyState {
 		KEY_STATE_UKNOWN = -1,
 		KEY_PRESSED = GLFW_PRESS,
 		KEY_HELD = GLFW_REPEAT,
 		KEY_RELEASED = GLFW_RELEASE,
 	};
-	class MouseInputStateManager:public IObserver<int, int, int> {
+	class MouseInputStateManager {
 	public:
 		KeyState GetButtonState(int button);
-	private:
-		void Update(MessageType type, int button, int action, int mods) override;
+		void onButtonStateChanged(MouseKeyEvent& e);
 	private:
 		std::unordered_map<int, KeyState> m_mouseKeyHashes = {
 					{GLFW_MOUSE_BUTTON_1, KEY_RELEASED },
@@ -28,11 +28,10 @@ namespace OBJ_Viewer
 		};
 	};
 
-	class KeyboardInputStateManager:public IObserver<int, int, int,int> {
+	class KeyboardInputStateManager{
 	public:
 		KeyState GetKeyState(int key);
-	private:
-		void Update(MessageType type, int key, int scancode, int action, int mods) override;
+		void onKeyStateChanged(KeyboardKeyEvent& e);
 	private:
 	std::unordered_map<int, KeyState> m_keyHashes = {
 	{GLFW_KEY_END, KEY_RELEASED },
@@ -158,10 +157,9 @@ namespace OBJ_Viewer
 	{GLFW_KEY_MENU, KEY_RELEASED}};
 	};
 
-	class InputHandler
+	class InputHandler:public Listener
 	{
 	public:
-		InputHandler(Notifier<int, int, int>* mouseButtonNotifier, Notifier<int, int, int, int>* keyboardKeyNotifier);
 		bool isKeyboardPressed(int keycode) { return m_keyboardInputManager.GetKeyState(keycode) == KEY_PRESSED; }
 		bool isKeyboardKeyHeld(int keycode) { return m_keyboardInputManager.GetKeyState(keycode) == KEY_HELD; }
 		bool isMouseButtonPressed(int mouseButton) { return m_mouseInputManager.GetButtonState(mouseButton) == KEY_PRESSED; }
@@ -171,9 +169,17 @@ namespace OBJ_Viewer
 
 		KeyState GetKeyState(int keycode);
 	private:
+		friend class Application;
+		InputHandler() = default;
+		InputHandler(InputHandler& copy) = delete;
+
 		MouseInputStateManager m_mouseInputManager;
 		KeyboardInputStateManager m_keyboardInputManager;
+
 		const char* m_crrentlyFocusedWindowName = "SceneWindow";
-};
+
+		// Inherited via Listener
+		void OnEvent(Event& e) override;
+	};
 }
 

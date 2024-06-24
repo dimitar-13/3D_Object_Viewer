@@ -3,8 +3,7 @@
 #include"Scene/Camera.h"
 #include"Scene/Skybox.h"
 #include"Scene/Model.h"
-#include"AppState.h"
-
+#include"Application.h"
 namespace OBJ_Viewer {
 	class Renderer
 	{

@@ -13,16 +13,16 @@ inline std::vector<OBJ_Viewer::SkyboxFace> itemsFaces = {
 		OBJ_Viewer::SKYBOX_FACE_FRONT,
 		OBJ_Viewer::SKYBOX_FACE_BACK};
 
-OBJ_Viewer::UILayer::UILayer(AppState* appState,
-	std::shared_ptr<SceneRenderer> sceneRenderer,
+OBJ_Viewer::UILayer::UILayer(Application& appState,
+	std::shared_ptr<RenderingMediator> renderingMediator,
 	ImGuiWindowFlags imGuiWindowFlags,
-	ImGuiDockNodeFlags imGuiDockSpaceFlags)
+	ImGuiDockNodeFlags imGuiDockSpaceFlags):m_application(appState)
 {
-	m_appState = appState;
-	this->m_sceneRenderer = sceneRenderer;
+	m_appEventCallback = m_application.GetOnAppEventCallback();
 
 	this->m_imgGuiDockSpaceFlags = imGuiDockSpaceFlags;
 	this->m_imGuiWindowFlags = imGuiWindowFlags;
+	m_mediator = renderingMediator;
 
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -38,9 +38,9 @@ OBJ_Viewer::UILayer::UILayer(AppState* appState,
 void OBJ_Viewer::UILayer::RenderUI()
 {
 
-	auto& pSettings = m_appState->GetScene_RefSettings();
-	std::shared_ptr<Model> SceneModel = m_sceneRenderer->GetSceneModel().lock();
-	const Framebuffer& sceneFrameBuffer = m_appState->GetSceneFrameBuffer();
+	auto& pSettings = m_application.GetScene_RefSettings();
+	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
+	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
 	const char* currentlyActiveWindow = UI_WINDOW_UNKNOWN;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -178,7 +178,14 @@ void OBJ_Viewer::UILayer::RenderUI()
 			UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
 
 		ImVec2 winSize = ImGui::GetWindowSize();
-		m_appState->ResizeBuffer(winSize.x, winSize.y);
+		ImVec2 winPos = ImGui::GetWindowPos();
+		SceneViewport sceneWinViewport;
+		sceneWinViewport.x = winPos.x;
+		sceneWinViewport.y = winPos.y;
+		sceneWinViewport.width = winSize.x;
+		sceneWinViewport.height = winSize.y;
+
+		m_application.UpdateSceneViewport(sceneWinViewport);
 		ImGui::BeginChild("GameRender");
 		ImGui::Image((ImTextureID)sceneFrameBuffer.GetFramebufferHandle(), winSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 		ImGui::EndChild();
@@ -188,7 +195,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	m_appState->GetGlobalInputHandler().SetCurrentlyFocusedWindow(currentlyActiveWindow);
+	m_application.GetGlobalInputHandler().SetCurrentlyFocusedWindow(currentlyActiveWindow);
 
 	SceneModel->ApplyTransformation(position, scale, glm::vec3(1), 0);
 
@@ -212,10 +219,10 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 		OBJ_Viewer::SKYBOX_FACE_BACK };
 	}
 	std::shared_ptr<Skybox> sceneSkybox;
-	bool isSkyboxExpired = m_sceneRenderer->GetSkyboxModel().expired();
+	bool isSkyboxExpired = m_mediator->GetSkybox().expired();
 	if (!isSkyboxExpired)
 	{
-		sceneSkybox = m_sceneRenderer->GetSkyboxModel().lock();
+		sceneSkybox = m_mediator->GetSkybox().lock();
 		std::vector <std::shared_ptr<Texture>> skyboxTextures = sceneSkybox->GetSkyboxFaceTextures();
 
 		int noTextureLoaded = 0;
@@ -274,7 +281,7 @@ void OBJ_Viewer::UILayer::RenderComboBox(std::string comboLabel, int index)
 			bool is_selected = (itemsLabel[index] == itemsLabel[n]); // You can store your selection however you want, outside or inside your objects
 			if (ImGui::Selectable(itemsLabel[n].c_str(), is_selected))
 			{	
-				m_sceneRenderer->SwapSkyboxFaces(itemsFaces[index], itemsFaces[n]);
+				m_mediator->GetSkybox().lock()->SwapSkyboxFaceTextures(itemsFaces[index], itemsFaces[n]);
 				break;
 			}
 		}
@@ -287,7 +294,8 @@ void OBJ_Viewer::UILayer::LoadModel()
 	DialogWrapper dialog;
 	dialog.OpenDialog();
 	auto VecPaths = dialog.GetDialogResult();
-	m_sceneRenderer->LoadModel(VecPaths[0]);
+	EventOnModelLoaded e(std::string(VecPaths.at(0)));
+	m_appEventCallback(e);
 }
 
 void OBJ_Viewer::UILayer::LoadSkybox()
@@ -295,5 +303,11 @@ void OBJ_Viewer::UILayer::LoadSkybox()
 	DialogWrapper dialog;
 	dialog.OpenDialogMultiple("png,jpeg,jpg");
 	auto VecPaths = dialog.GetDialogResult();
-	m_sceneRenderer->LoadSkybox(VecPaths);
+	std::vector<std::string> m_stringVector(VecPaths.size());
+	for (uint32_t i = 0; i < VecPaths.size(); i++)
+	{
+		m_stringVector[i] = std::string(VecPaths.at(i));
+	}
+	EventOnSkyboxLoaded e(m_stringVector);
+	m_appEventCallback(e);
 }

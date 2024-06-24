@@ -18,7 +18,7 @@ namespace OBJ_Viewer
 	};
 	class Skybox {
 	public:
-		Skybox(std::vector<char*>& textPaths);
+		Skybox(std::vector<std::string>& textPaths);
 		~Skybox();
 		void BindSkyboxTexture()const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle); }
 		void SwapSkyboxFaceTextures(SkyboxFace toBeSwapped, SkyboxFace swappedWith);

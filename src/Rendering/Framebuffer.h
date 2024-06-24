@@ -11,6 +11,12 @@ namespace OBJ_Viewer {
 		FRAMEBUFFER_NORMAL_ATTACHMENT = 4,
 		FRAMEBUFFER_SPECULAR_ATTACHMENT = 8
 	};
+	struct FrameBufferSize
+	{
+		int m_Width;
+		int m_Height;
+	};
+
 
 	class Framebuffer
 	{
@@ -23,6 +29,7 @@ namespace OBJ_Viewer {
 		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer); }
 		void UnbindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 		bool isFramebufferValid()const;
+		FrameBufferSize GetFramebufferSize()const { return { m_Width ,m_Height }; }
 		void ResizeFramebuffer(int newWidth, int newHeight);
 		~Framebuffer();
 	private:

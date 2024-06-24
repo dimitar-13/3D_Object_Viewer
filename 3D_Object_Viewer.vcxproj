@@ -145,7 +145,6 @@
       <FileType>Document</FileType>
     </Text>
     <ClCompile Include="src\Rendering\SceneRenderer.cpp" />
-    <ClCompile Include="src\AppState.cpp" />
     <ClCompile Include="src\Rendering\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
@@ -186,8 +185,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AppEvent.h" />
+    <ClInclude Include="src\RenderingMediator.h" />
     <ClInclude Include="src\Rendering\SceneRenderer.h" />
-    <ClInclude Include="src\AppState.h" />
     <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
     <ClInclude Include="src\Scene\Skybox.h" />
     <ClInclude Include="src\Scene\Model.h" />

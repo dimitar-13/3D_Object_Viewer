@@ -1,7 +1,7 @@
 #include "Skybox.h"
 #include"MeshGeneratingMethods.h"
 #include<algorithm>
-OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_skyboxVAO(std::move(GenerateCubeVAO(true)))
+OBJ_Viewer::Skybox::Skybox(std::vector < std::string > & textPaths) :m_skyboxVAO(std::move(GenerateCubeVAO(true)))
 {
 	TextureSize pTextureSize;
 	int pPresentChannelsCount;
@@ -18,7 +18,7 @@ OBJ_Viewer::Skybox::Skybox(std::vector<char*>& textPaths):m_skyboxVAO(std::move(
 	TextureFormat format;
 	for (size_t i = 0; i < 6; i++)
 	{
-		TexturePixelDataWrapper reader(textPaths[i], &pTextureSize, &pPresentChannelsCount);
+		TexturePixelDataWrapper reader(textPaths[i].c_str(), &pTextureSize, &pPresentChannelsCount);
 		BufferData pixelBufferData;
 		pixelBufferData.type = OPENGL_PIXEL_UNPACK_BUFFER;
 		pixelBufferData.data = reader.GetTexturePixelData();

@@ -10,7 +10,7 @@ OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app
 	this->m_EulerAngles.m_pitchAngle =0.0f;
 	this->m_EulerAngles.m_yawAngle = 90.0f;
 	//Use to set the x_previous and y_previous of the 'm_EulerAngleHelper' so we can avoid conditions;
-	m_EulerAngleHelper.calculateEulerAngles(this->m_EulerAngles.m_yawAngle,this->m_EulerAngles.m_pitchAngle);
+	m_EulerAngleHelper.calculateEulerAngles(Position2D{ this->m_EulerAngles.m_yawAngle,this->m_EulerAngles.m_pitchAngle });
 	CalculatePositionVector();
 
 }
@@ -39,11 +39,11 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 	if (app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
-		m_EulerAngleHelper.calculateEulerAngles(mousePos.x, mousePos.y);
+		m_EulerAngleHelper.calculateEulerAngles(mousePos);
 	}
 	else if (app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
-		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(mousePos.x, mousePos.y);
+		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(mousePos);
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 		CalculatePositionVector();
 	}
@@ -122,12 +122,12 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 }
 
 
-OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::calculateEulerAngles(double xpos, double ypos)
+OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::calculateEulerAngles(Position2D newMousePosition)
 {
 	//Check if mouse button is held and then move;
-	EulerAngles result = {static_cast<float>(xpos - m_previousXPos), static_cast<float>(m_previousYPos - ypos)};
-	m_previousXPos = xpos;
-	m_previousYPos = ypos;
+	EulerAngles result = {static_cast<float>(newMousePosition.x - m_previousMousePosition.x),
+		static_cast<float>(newMousePosition.y - m_previousMousePosition.y)};
+	m_previousMousePosition = newMousePosition;
 	ConstrainAngles(result);
 	return result;
 }

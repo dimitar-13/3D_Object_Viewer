@@ -13,7 +13,7 @@ layout(std140) uniform Matrices
 };
 void main()
 {
-	gl_Position =  ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);
+	gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);
 }
 
 #Shader:fragment

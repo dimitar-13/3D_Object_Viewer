@@ -4,11 +4,11 @@
 namespace OBJ_Viewer {
 	struct ModelData
 	{
-		uint32_t m_vertexCount;
-		uint32_t m_faceCount;
-		uint32_t m_triangleCount;
-		uint32_t textureCount;
-		//const char* m_modelPath;
+		size_t vertexCount;
+		size_t faceCount;
+		size_t triangleCount;
+		size_t textureCount = 0;
+		std::string modelPath = "Unavailable";
 	};
 
 	class Model

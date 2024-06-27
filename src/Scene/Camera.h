@@ -22,11 +22,10 @@ namespace OBJ_Viewer
 	};
 	class EulerAngleHelper {
 	public:
-		EulerAngles calculateEulerAngles(double xpos, double ypos);
+		EulerAngles calculateEulerAngles(Position2D newMousePosition);
 		void ConstrainAngles(EulerAngles& angle);
 	private:
-		double m_previousXPos = 0;
-		double m_previousYPos = 0;
+		Position2D m_previousMousePosition;
 	};
 
 	//TODO:When the user presses button(button for reset) it will reset the camera to look at the starting position.

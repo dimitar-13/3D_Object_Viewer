@@ -25,7 +25,7 @@ namespace OBJ_Viewer
 	private:
 		std::vector<aiMesh*> m_meshes;
 		std::vector<std::shared_ptr<Material>> m_SceneMaterials;
-		ModelData m_MeshData;
+		ModelData m_ModelData;
 		std::string m_modelPath;
 		bool m_AssimpScene;
 	};

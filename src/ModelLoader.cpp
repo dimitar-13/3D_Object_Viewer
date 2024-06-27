@@ -9,13 +9,14 @@ OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path)
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path,
 		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices);
+		aiProcess_Triangulate );
 
 	if (nullptr == scene) {
 		std::cout << "Assimp failed to load the 3D model file at path:" << path << '\n';
 		return nullptr;
 	}
+	m_ModelData.modelPath = std::string(path);
+
 	m_modelPath.append(path);
 	m_modelPath = m_modelPath.substr(0, m_modelPath.find_last_of('\\'));
 	std::replace(m_modelPath.begin(), m_modelPath.end(), '\\', '/');
@@ -25,7 +26,7 @@ OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path)
 	m_SceneMaterials = GetSceneMaterials(scene);
 
 	auto meshArray = CreateMeshArray();
-	Model* result = new Model(meshArray, AssimpToGlmMatrix4x4(scene->mRootNode->mTransformation),m_MeshData);
+	Model* result = new Model(meshArray, AssimpToGlmMatrix4x4(scene->mRootNode->mTransformation), m_ModelData);
 	
 	return result;
 }
@@ -60,7 +61,7 @@ std::vector< std::shared_ptr<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateM
 std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assimpMesh)
 {
 	std::vector<Vertex> vertexData(assimpMesh->mNumVertices);
-	m_MeshData.m_vertexCount += assimpMesh->mNumVertices;
+	m_ModelData.vertexCount += assimpMesh->mNumVertices;
 	std::vector<unsigned int> indexData;
 	for (size_t i = 0; i < assimpMesh->mNumVertices;i++)
 	{
@@ -89,8 +90,8 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 		}
 	}
 
-	m_MeshData.m_faceCount += assimpMesh->mNumFaces;
-	m_MeshData.m_triangleCount += m_MeshData.m_vertexCount / 3;
+	m_ModelData.faceCount += assimpMesh->mNumFaces;
+	m_ModelData.triangleCount += m_ModelData.vertexCount / 3;
 	for (size_t i = 0; i < assimpMesh->mNumFaces; i++)
 	{
 		aiFace face = assimpMesh->mFaces[i];
@@ -159,6 +160,8 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 	//TODO:Change to get all of the material textures. A single material can have more than 1 textures in it.
 	for (uint32_t i = 0; i < textureCount; i++)
 	{
+		m_ModelData.textureCount++;
+
 		aiString TexturePath;
 		mat->GetTexture(type, i, &TexturePath);
 		std::string fullPath = GetModelTexturePathAbsolute(TexturePath);

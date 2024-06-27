@@ -37,22 +37,20 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,
 
 void OBJ_Viewer::UILayer::RenderUI()
 {
-
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
 	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
 	const char* currentlyActiveWindow = UI_WINDOW_UNKNOWN;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-
-	float xPos = 1.0f;
-	
+	ImGui::NewFrame();	
 	
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::vec3 rotation = { 0,0,0 };
 	SceneModel->GetMatrixDecomposed(position, rotation, scale);
+	glm::vec3 previousScale = scale;
+
 	uint32_t vertexCount = 4050, triangleCount = 2323, faceCount = 23232;
 
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -78,18 +76,44 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::InputFloat3("Position", &position[0]);
 		ImGui::InputFloat3("Rotation", &rotation[0]);
 		ImGui::InputFloat3("Scale", &scale[0]);
+		ImGui::Checkbox("Use uniform scale", &pSettings.m_isUniformScale);
+		if (pSettings.m_isUniformScale)
+		{
+			float scaleValue = scale.x != previousScale.x ? scale.x:
+				scale.y != previousScale.y ? scale.y : scale.z;
+			scale = glm::vec3(scaleValue);
+		}
 		ImGui::Separator();
 		ImGui::Text("Model rendering settings.");
 		ImGui::Checkbox("Wireframe?", &pSettings.m_isWireFrameRenderingOn);
+		ImGui::SetItemTooltip("Is wireframe view enabled.");
+
 		if (pSettings.m_isWireFrameRenderingOn)
 		{
 			ImGui::InputFloat("Wire line Thickness",&pSettings.wireframeSettings.lineThickness);
 			ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
+			ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
+			ImGui::Separator();
 		}
 		ImGui::Checkbox("Albedo?", &pSettings.m_isRenderAlbedoTextureOn);
+		ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
 		ImGui::Checkbox("Specular?", &pSettings.m_isRenderSpecularTextureOn);
+		ImGui::SetItemTooltip("Should the model display with the reflective/specular texture.");
 		ImGui::Checkbox("Normals?", &pSettings.m_isRenderNormalTextureOn);
+		ImGui::SetItemTooltip("Should the model display with the normal map(apply on light calculations).");
 		ImGui::Checkbox("Ambient occlusion?", &pSettings.m_isRenderAmbientOcclusionTextureOn);
+		ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
+
+
+		ImGui::Separator();
+		ImGui::Checkbox("Show normal map texture", &pSettings.m_showNormalMapTexture);
+		ImGui::Checkbox("Show mesh UV", &pSettings.m_showMeshUV);
+
+		//ImGui::Separator();
+		//ImGui::Image(0,
+		//	{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+
+
 	}ImGui::End();
 
 	//ModelData modelData = (*m_pCurrentlyLoadedModel)->GetModelData();
@@ -97,12 +121,15 @@ void OBJ_Viewer::UILayer::RenderUI()
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
 			UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+		ModelData currentModelData = SceneModel->GetModelData();
 
-		ImGui::Text("Object triangle count:%d", 1);
-		ImGui::Text("Object vertex count:%d", 2);
-		ImGui::Text("Object face count:%d", 3);
-		ImGui::Text("Texture count:%d", 6);
-		ImGui::Text("File path %s", "Dummy path");
+		ImGui::Text("Object triangle count:%d", currentModelData.triangleCount);
+		ImGui::Text("Object vertex count:%d", currentModelData.vertexCount);
+		ImGui::Text("Object face count:%d", currentModelData.faceCount);
+		ImGui::Text("Texture count:%d", currentModelData.textureCount);
+
+		ImGui::Text("File path %s", currentModelData.modelPath.c_str());
+		ImGui::SetItemTooltip("Path:%s", currentModelData.modelPath.c_str());
 
 		ImGui::Separator();
 		ImGui::Text("Scene settings.");
@@ -184,7 +211,6 @@ void OBJ_Viewer::UILayer::RenderUI()
 		sceneWinViewport.y = winPos.y;
 		sceneWinViewport.width = winSize.x;
 		sceneWinViewport.height = winSize.y;
-
 		m_application.UpdateSceneViewport(sceneWinViewport);
 		ImGui::BeginChild("GameRender");
 		ImGui::Image((ImTextureID)sceneFrameBuffer.GetFramebufferHandle(), winSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
@@ -293,6 +319,10 @@ void OBJ_Viewer::UILayer::LoadModel()
 {
 	DialogWrapper dialog;
 	dialog.OpenDialog();
+	//If error occurs or the user change their mind we wont sent an event;
+	if (dialog.isDialogClosed())
+		return;
+
 	auto VecPaths = dialog.GetDialogResult();
 	EventOnModelLoaded e(std::string(VecPaths.at(0)));
 	m_appEventCallback(e);
@@ -302,6 +332,11 @@ void OBJ_Viewer::UILayer::LoadSkybox()
 {
 	DialogWrapper dialog;
 	dialog.OpenDialogMultiple("png,jpeg,jpg");
+
+	//If error occurs or the user change their mind we wont sent an event;
+	if (dialog.isDialogClosed())
+		return;
+
 	auto VecPaths = dialog.GetDialogResult();
 	std::vector<std::string> m_stringVector(VecPaths.size());
 	for (uint32_t i = 0; i < VecPaths.size(); i++)

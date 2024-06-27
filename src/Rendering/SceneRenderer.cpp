@@ -31,10 +31,14 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 
 	ModelData data;
 	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(std::move(GenerateCubeVAO()));
+	//Thise are not correct
+	data.vertexCount = mesh->GetMeshVAO().GetVertexCount();
+	data.triangleCount = data.vertexCount/3;
+	data.faceCount = data.triangleCount/2;
+
 	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ mesh }, glm::mat4(1), data);
 
 	m_gridVAO = std::make_unique<VertexAttributeObject>(planeVerts, planeIndexData);
-
 	m_renderingMediator->SetSceneModel(m_sceneModel);
 	//TODO:Get this somewhere else
 	
@@ -104,6 +108,7 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 		m_gridShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
 		Renderer::RenderGrid(*m_gridShader, *m_gridVAO, *m_sceneCamera, renderSettings.m_gridData);
 	}
+
 }
 
 void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
@@ -124,7 +129,13 @@ void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 		return;
 
 	ModelLoader loader;
-	m_sceneModel.reset(loader.LoadModel(path.c_str()));
+	Model* newModel = loader.LoadModel(path.c_str());
+	if (newModel == nullptr)
+	{
+		std::cout << "Failed to load the model." << '\n';
+		return;
+	}
+	m_sceneModel.reset(newModel);
 }
 
 void OBJ_Viewer::SceneRenderer::InitShaders()

@@ -1,10 +1,7 @@
 #pragma once
 #include<vector>
 #include"CommonAppData.h"
-//TODO:Because some templates can share lets call it the same signature this can cause problems for example both onScrollChange and onMousePosChange return 
-// x and y positions as offset and because of this the update methods overlap one way to fix this is the messageType but this also makes the templates almost pointless
-// another way i thought is to make for example the scroll function return only the Y offset but this is a solution that is reling not that much on softwere design but
-// more on tricks;
+
 namespace OBJ_Viewer {
 	enum EventType
 	{

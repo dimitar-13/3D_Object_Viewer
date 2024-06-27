@@ -29,6 +29,7 @@ namespace OBJ_Viewer {
 	{
 		float lineThickness = 4.f;
 		glm::vec3 lineColor = glm::vec3(0, 1, 0);
+		bool isPointRenderingOn = false;
 	};
 	struct SceneLightInfo
 	{
@@ -46,6 +47,11 @@ namespace OBJ_Viewer {
 		bool m_isRenderSpecularTextureOn = true;
 		bool m_isRenderNormalTextureOn = true;
 		bool m_isRenderAmbientOcclusionTextureOn = true;
+
+		bool m_isUniformScale = true;
+		bool m_showNormalMapTexture = true;
+		bool m_showMeshUV = true;
+
 		GridData m_gridData;
 		SceneLightInfo lightInfo;
 		WireFrameSettings wireframeSettings;

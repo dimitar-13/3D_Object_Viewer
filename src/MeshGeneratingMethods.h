@@ -91,4 +91,15 @@ namespace OBJ_Viewer {
         return  isOnlyPosition ? std::make_unique<VertexAttributeObject>(ONE_BY_ONE_CUBE_POSITION_VECTOR, ONE_BY_ONE_CUBE_INDICIES) :
             std::make_unique<VertexAttributeObject>(CUBE_VERTEX_VECTOR, ONE_BY_ONE_CUBE_INDICIES);
     }
+    //inline std::unique_ptr<VertexAttributeObject> GenerateArrow(bool isOnlyPosition = false)
+    //{
+    //    std::vector<glm::vec3> m_arrowPos = {
+    //        //Base
+    //        {0.5,0,0},
+    //        {-.05,0,0},
+    //        {-.5,.5,0},
+    //        {.5,.5,0}
+
+    //    };
+    //}
 }

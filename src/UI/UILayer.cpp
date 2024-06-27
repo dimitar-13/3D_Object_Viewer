@@ -95,16 +95,17 @@ void OBJ_Viewer::UILayer::RenderUI()
 			ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
 			ImGui::Separator();
 		}
-		ImGui::Checkbox("Albedo?", &pSettings.m_isRenderAlbedoTextureOn);
-		ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
-		ImGui::Checkbox("Specular?", &pSettings.m_isRenderSpecularTextureOn);
-		ImGui::SetItemTooltip("Should the model display with the reflective/specular texture.");
-		ImGui::Checkbox("Normals?", &pSettings.m_isRenderNormalTextureOn);
-		ImGui::SetItemTooltip("Should the model display with the normal map(apply on light calculations).");
-		ImGui::Checkbox("Ambient occlusion?", &pSettings.m_isRenderAmbientOcclusionTextureOn);
-		ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
 
-
+		/*Texture checkbox enable view*/ {
+			ImGui::Checkbox("Albedo?", &pSettings.m_isRenderAlbedoTextureOn);
+			ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
+			ImGui::Checkbox("Specular?", &pSettings.m_isRenderSpecularTextureOn);
+			ImGui::SetItemTooltip("Should the model display with the reflective/specular texture.");
+			ImGui::Checkbox("Normals?", &pSettings.m_isRenderNormalTextureOn);
+			ImGui::SetItemTooltip("Should the model display with the normal map(apply on light calculations).");
+			ImGui::Checkbox("Ambient occlusion?", &pSettings.m_isRenderAmbientOcclusionTextureOn);
+			ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
+		}
 		ImGui::Separator();
 		ImGui::Checkbox("Show normal map texture", &pSettings.m_showNormalMapTexture);
 		ImGui::Checkbox("Show mesh UV", &pSettings.m_showMeshUV);
@@ -115,6 +116,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 
 	}ImGui::End();
+
 
 	//ModelData modelData = (*m_pCurrentlyLoadedModel)->GetModelData();
 	if (ImGui::Begin(UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
@@ -132,49 +134,96 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::SetItemTooltip("Path:%s", currentModelData.modelPath.c_str());
 
 		ImGui::Separator();
+
 		ImGui::Text("Scene settings.");
-		ImGui::Checkbox("UseWorldGrid?", &pSettings.m_isWireGridOn);
-		if (pSettings.m_isWireGridOn)
+		ImGui::Separator();
+		if (ImGui::CollapsingHeader("World grid settings."))
 		{
-			ImGui::SliderFloat("Grid scale", &pSettings.m_gridData.gridScale, 1.f, 10.f);
-			ImGui::ColorPicker4("Grid color", &pSettings.m_gridData.gridLineColor[0]);
-			ImGui::Checkbox("Shade axis.", &pSettings.m_gridData.isAxisShaded);
-		}
-		ImGui::Checkbox("Enable lights?", &pSettings.m_isRenderingLightOn);
-
-		if (pSettings.m_isRenderingLightOn)
-		{
-			ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
-			//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
-			/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
-			will return negative value, a value that we can use to get the closest valid number in cases of 7 we get 7 += 4 - 7 <=> 7+=-3
-			and we use the min function in cases that we are within our range.We do it this way to avoid branching.
-			UPDATE: Added this for values below 0 as well by checking the value of 'lightCount' if its below zero we gonna add the positive version of it.
-			*/
-
-			pSettings.lightInfo.lightCount = 
-				pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount):
-				pSettings.lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
-
-			for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
+			ImGui::Checkbox("UseWorldGrid?", &pSettings.m_isWireGridOn);
+			if (pSettings.m_isWireGridOn)
 			{
-				if (i < pSettings.lightInfo.lightCount)
+				ImGui::SliderFloat("Grid scale", &pSettings.m_gridData.gridScale, 1.f, 10.f);
+				ImGui::ColorPicker4("Grid color", &pSettings.m_gridData.gridLineColor[0]);
+				ImGui::Checkbox("Shade axis.", &pSettings.m_gridData.isAxisShaded);
+			}
+		}
+		ImGui::Separator();
+		if (ImGui::CollapsingHeader("Light settings."))
+		{
+			ImGui::Checkbox("Enable lights?", &pSettings.m_isRenderingLightOn);
+
+			if (pSettings.m_isRenderingLightOn)
+			{
+				static std::vector<const char*> shadingModes = { "Rim light shading","Toon light shading","Bling-Phong light shading" };
+				static const char* currentShadingModel = shadingModes[2];
+				if (ImGui::BeginCombo("Shading mode", currentShadingModel)) // The second parameter is the label previewed before opening the combo.
 				{
-					RenderLightSettingsPanel(i, 
-					&pSettings.lightInfo.lights[i].color,
-					&pSettings.lightInfo.lights[i].direction);
-					ImGui::Separator();
+					for (int n = 0; n < shadingModes.size(); n++)
+					{
+						bool is_selected = (currentShadingModel == shadingModes[n]); // You can store your selection however you want, outside or inside your objects
+						if (ImGui::Selectable(shadingModes[n], is_selected))
+						{
+							currentShadingModel = shadingModes[n];
+							break;
+						}
+					}
+					ImGui::EndCombo();
 				}
-				else
+			
+				ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
+				//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
+				/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
+				will return negative value, a value that we can use to get the closest valid number in cases of 7 we get 7 += 4 - 7 <=> 7+=-3
+				and we use the min function in cases that we are within our range.We do it this way to avoid branching.
+				UPDATE: Added this for values below 0 as well by checking the value of 'lightCount' if its below zero we gonna add the positive version of it.
+				*/
+
+				pSettings.lightInfo.lightCount =
+					pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount) :
+					pSettings.lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
+				for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
 				{
-					pSettings.lightInfo.lights[i].color = glm::vec3(0);
+					if (i < pSettings.lightInfo.lightCount)
+					{
+						if (ImGui::CollapsingHeader(std::string("Light " + std::to_string(i+1)).c_str()))
+						{
+							RenderLightSettingsPanel(i,
+								&pSettings.lightInfo.lights[i].color,
+								&pSettings.lightInfo.lights[i].direction);
+						}
+					}
+					else
+					{
+						pSettings.lightInfo.lights[i].color = glm::vec3(0);
+					}
 				}
 			}
 		}
-		ImGui::Checkbox("Enable skybox?", &pSettings.m_isSkyboxOn);
-		if (pSettings.m_isSkyboxOn)
+		ImGui::Separator();
+		if (ImGui::CollapsingHeader("Skybox settings."))
 		{
-			RenderSkyboxSettings();
+			ImGui::Checkbox("Enable skybox?", &pSettings.m_isSkyboxOn);
+			if (pSettings.m_isSkyboxOn)
+			{
+				RenderSkyboxSettings();
+			}
+		}
+		ImGui::Separator();
+
+		static std::vector<const char*> projectionWay = { "Perspective","Orthogonraphic" };
+		static const char* selectedProjection = projectionWay[0];
+		if (ImGui::BeginCombo("Camera projection", selectedProjection, ImGuiComboFlags_WidthFitPreview)) // The second parameter is the label previewed before opening the combo.
+		{
+			for (int n = 0; n < projectionWay.size(); n++)
+			{
+				bool is_selected = (selectedProjection == projectionWay[n]); // You can store your selection however you want, outside or inside your objects
+				if (ImGui::Selectable(projectionWay[n], is_selected))
+				{
+					selectedProjection = projectionWay[n];
+					break;
+				}
+			}
+			ImGui::EndCombo();
 		}
 
 	}ImGui::End();
@@ -191,11 +240,37 @@ void OBJ_Viewer::UILayer::RenderUI()
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
 			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
 
-		if (ImGui::Button("Open obj file"))
+		if (ImGui::Button("Import 3D model."))
 		{
 			LoadModel();
 		}
+		ImGui::SameLine();
+		ImGui::Checkbox("Disable fbx file imports",&pSettings.m_disableFBXLoading);
+		ImGui::SetItemTooltip("Due to security vulnerability fbx files are disabled. Enable them on you own risk or if the model is from trusted source");
 		ImGui::Text("Loading stuff here.");
+		//Add imported textures preview
+		
+
+		ImGui::Text("Albedo");
+		ImGui::SameLine();
+		ImGui::Text("Normal");
+		ImGui::SameLine();
+		ImGui::Text("Specular");
+		ImGui::SameLine();
+		ImGui::Text("Ambient Occlusion");
+
+		ImGui::Image(0,
+			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		ImGui::Image(0,
+			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		ImGui::Image(0,
+			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
+		ImGui::Image(0,
+			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine();
 
 	}ImGui::End();
 
@@ -233,6 +308,7 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 	static 
 	int SelectedItemTemp;
 	ImGui::Separator();
+	
 	if (ImGui::Button("Load skybox textures."))
 	{
 		LoadSkybox();

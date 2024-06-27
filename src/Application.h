@@ -51,7 +51,7 @@ namespace OBJ_Viewer {
 		bool m_isUniformScale = true;
 		bool m_showNormalMapTexture = true;
 		bool m_showMeshUV = true;
-
+		bool m_disableFBXLoading = true;
 		GridData m_gridData;
 		SceneLightInfo lightInfo;
 		WireFrameSettings wireframeSettings;

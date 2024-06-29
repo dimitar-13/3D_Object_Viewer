@@ -85,12 +85,12 @@ void OBJ_Viewer::Renderer::RenderObjectWithWireFrame(const ShaderClass& shaderTo
 
 	shaderToUse.UniformSet3FloatVector("u_Color", glm::vec3(0,1,0));
 	glLineWidth(5.);
-	Renderer::IsWireFrameOn(true);
+	//Renderer::IsWireFrameOn(true);
 
 	mesh.GetMeshVAO().BindBuffer();
 	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
 	mesh.GetMeshVAO().UnBind();	
-	Renderer::IsWireFrameOn(false);
+	//Renderer::IsWireFrameOn(false);
 }
 
 void OBJ_Viewer::Renderer::BindMaterialTexture(const ShaderClass& shaderToUse, std::shared_ptr<Texture> textureToBind, GLenum textureUnit, const char* textureName)

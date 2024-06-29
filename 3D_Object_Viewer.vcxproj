@@ -227,6 +227,7 @@
     <None Include="Shaders\LightShader.glsl" />
     <None Include="Shaders\MaterialShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
+    <None Include="Shaders\WireframePointShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Normal_Map_dummy_texture.jpg" />

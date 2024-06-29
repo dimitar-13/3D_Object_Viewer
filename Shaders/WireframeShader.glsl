@@ -27,8 +27,9 @@ uniform float frameThickness;
 void main()
 {
     float minDist = min(distance.x,min(distance.y,distance.z));
-    float mixVal = smoothstep(frameThickness - 1.,frameThickness + 1.,minDist);
-	FragColor = vec4(vec3(mix(u_frameColor,vec3(1),mixVal)),1);
+    float mixVal = smoothstep(frameThickness - 1, frameThickness + 1, minDist );
+    vec3 FinalColor = vec3(mix( u_frameColor, vec3(1), mixVal ));
+    FragColor = vec4(FinalColor,1);
 }
 
 #Shader:geometry
@@ -45,9 +46,9 @@ void main()
     vec3 p2 = (viewportMatrix * (gl_in[1].gl_Position.xyz/gl_in[1].gl_Position.w)).xyz;
     vec3 p3 = (viewportMatrix * (gl_in[2].gl_Position.xyz/gl_in[2].gl_Position.w)).xyz;
 
-    float a =length(p3 - p1);
-    float b =length(p1 - p2);
-    float c =length(p3 - p2);
+    float a =length(p2 - p3);
+    float b =length(p3 - p1);
+    float c =length(p2 - p1);
 
     float alpha = acos( (b*b + c*c - a*a) / (2.0*b*c) );
     float beta = acos( (a*a + c*c - b*b) / (2.0*a*c) );

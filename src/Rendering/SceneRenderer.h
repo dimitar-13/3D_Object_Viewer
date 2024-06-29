@@ -41,6 +41,7 @@ namespace OBJ_Viewer {
 		std::unique_ptr<ShaderClass> m_lightShader;
 		std::unique_ptr<ShaderClass> m_materialShader;
 		std::unique_ptr<ShaderClass> m_wireframeShader;
+		std::unique_ptr<ShaderClass> m_wireframePointShader;
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;
 

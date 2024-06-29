@@ -274,7 +274,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	}ImGui::End();
 
-	if(ImGui::Begin(UI_LAYER_SCENE_WINDOW_NAME))
+	if(ImGui::Begin(UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
 			UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
@@ -286,8 +286,9 @@ void OBJ_Viewer::UILayer::RenderUI()
 		sceneWinViewport.y = winPos.y;
 		sceneWinViewport.width = winSize.x;
 		sceneWinViewport.height = winSize.y;
+
 		m_application.UpdateSceneViewport(sceneWinViewport);
-		ImGui::BeginChild("GameRender");
+		ImGui::BeginChild("GameRender", winSize,ImGuiChildFlags_None, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
 		ImGui::Image((ImTextureID)sceneFrameBuffer.GetFramebufferHandle(), winSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 		ImGui::EndChild();
 

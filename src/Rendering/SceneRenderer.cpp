@@ -59,6 +59,29 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 	{
 		if (renderSettings.m_isWireFrameRenderingOn)
 		{
+			if (renderSettings.wireframeSettings.isPointRenderingOn)
+			{
+				const glm::mat3 viewportTransform = ConstructViewportMatrix();
+
+				m_wireframePointShader->UseShader();
+				m_wireframePointShader->UniformSet3FloatVector("u_Color", renderSettings.wireframeSettings.lineColor);
+				m_wireframePointShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
+				m_wireframePointShader->UniformSet1Float("pointSize", renderSettings.wireframeSettings.lineThickness);
+
+				Renderer::RenderMesh(*m_wireframePointShader, *mesh, *m_sceneCamera);
+				//	m_clearColorShader->UseShader();
+				//	m_clearColorShader->UniformSet3FloatVector("u_Color", glm::vec3(1));
+				//	Renderer::RenderMesh(*m_clearColorShader, *mesh, *m_sceneCamera);
+				//	Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_POINT);
+				//	glPointSize(renderSettings.wireframeSettings.lineThickness);
+				//	m_wireframePointShader->UseShader();
+				//	m_wireframePointShader->UniformSet3FloatVector("u_Color", renderSettings.wireframeSettings.lineColor);
+				//	glPolygonOffset(1.f, .1f);
+				//	Renderer::RenderMesh(*m_wireframePointShader, *mesh, *m_sceneCamera);
+				//Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_FILLED);
+
+				continue;
+			}
 			const glm::mat3 viewportTransform = ConstructViewportMatrix();
 			m_wireframeShader->UseShader();
 			m_wireframeShader->UniformSet3FloatVector("u_frameColor", renderSettings.wireframeSettings.lineColor);
@@ -96,14 +119,12 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 	{
 		glDisable(GL_CULL_FACE);
 
-		Renderer::IsWireFrameOn(false);
 		Renderer::RenderSkybox(*m_skyboxShader, *m_sceneSkybox, *m_sceneCamera);
 		glEnable(GL_CULL_FACE);
 	}
 
 	if (renderSettings.m_isWireGridOn)
 	{
-		Renderer::IsWireFrameOn(false);
 		m_gridShader->UseShader();
 		m_gridShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
 		Renderer::RenderGrid(*m_gridShader, *m_gridVAO, *m_sceneCamera, renderSettings.m_gridData);
@@ -146,7 +167,7 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 	m_lightShader = std::make_unique<ShaderClass>(GetConcatShaderPath("LightShader.glsl").c_str());
 	m_materialShader = std::make_unique<ShaderClass>(GetConcatShaderPath("MaterialShader.glsl").c_str());
 	m_wireframeShader = std::make_unique<ShaderClass>(GetConcatShaderPath("WireframeShader.glsl").c_str());
-
+	m_wireframePointShader = std::make_unique<ShaderClass>(GetConcatShaderPath("WireframePointShader.glsl").c_str());
 
 	m_uniformMatrixBuffer = std::make_unique<UniformBuffer>("Matrices", 0, 3 * sizeof(glm::mat4), nullptr);
 	m_uniformMatrixBuffer->BindBufferRange(0, 3 * sizeof(glm::mat4));
@@ -160,7 +181,7 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 	m_lightShader->BindUBOToShader(*m_uniformMatrixBuffer);
 	m_materialShader->BindUBOToShader(*m_uniformMatrixBuffer);
 	m_wireframeShader->BindUBOToShader(*m_uniformMatrixBuffer);
-
+	m_wireframePointShader->BindUBOToShader(*m_uniformMatrixBuffer);
 
 	m_lightShader->BindUBOToShader(*m_uniformLightBuffer);
 

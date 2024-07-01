@@ -125,22 +125,11 @@ void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,cons
 	const glm::mat3 viewportTransform = ConstructViewportMatrix();
 	if (wireframeAppSettings.isPointRenderingOn)
 	{
-
+		constexpr static float pointSizeOffset = 1.;
 		m_wireframePointShader->UseShader();
 		m_wireframePointShader->UniformSet3FloatVector("u_Color", wireframeAppSettings.lineColor);
 		m_wireframePointShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
-		m_wireframePointShader->UniformSet1Float("pointSize", wireframeAppSettings.lineThickness);
-
-		//	m_clearColorShader->UseShader();
-		//	m_clearColorShader->UniformSet3FloatVector("u_Color", glm::vec3(1));
-		//	Renderer::RenderMesh(*m_clearColorShader, *mesh, *m_sceneCamera);
-		//	Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_POINT);
-		//	glPointSize(renderSettings.wireframeSettings.lineThickness);
-		//	m_wireframePointShader->UseShader();
-		//	m_wireframePointShader->UniformSet3FloatVector("u_Color", renderSettings.wireframeSettings.lineColor);
-		//	glPolygonOffset(1.f, .1f);
-		//	Renderer::RenderMesh(*m_wireframePointShader, *mesh, *m_sceneCamera);
-		//Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_FILLED);
+		m_wireframePointShader->UniformSet1Float("pointSize", wireframeAppSettings.lineThickness + pointSizeOffset);
 		Renderer::RenderMesh(*m_wireframePointShader, mesh, *m_sceneCamera);
 	}
 	else

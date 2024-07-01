@@ -16,12 +16,13 @@ namespace OBJ_Viewer {
 	class Window {
 	public:
 		Window(Size2D windowMetrics, const char* winTitle,std::function<void(Event&)> onEventFunc);
+		~Window() { glfwDestroyWindow(m_glfwWindow); }
 		Size2D GetWindowSize()const { return this->m_windowSize; }
 		GLFWwindow* GetGLFW_Window()const { return this->m_glfwWindow; }
 		glm::mat4 GetViewportMatrix()const;
 	private:
 		Size2D m_windowSize;
-		GLFWwindow* m_glfwWindow;
+		GLFWwindow* m_glfwWindow = nullptr;
 		const char* m_winTitle;
 		std::function<void(Event&)> m_onEvent;
 		WindowState windowState = WINDOW_STATE_NORMAL;

@@ -47,6 +47,8 @@ in FRAG_INFO{
 	in vec3 normals;
 }fragment_in;
 
+
+
 uniform Material Mesh_material;
 
 void main()

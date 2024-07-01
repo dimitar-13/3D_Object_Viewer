@@ -7,9 +7,17 @@
 #include"Rendering/Framebuffer.h"
 #include<array>
 #include"AppEvent.h"
+
 namespace OBJ_Viewer {
 
-
+	enum LightShadingModel
+	{
+		LIGHT_MODEL_BLIN_PHONG = 0,
+		LIGHT_MODEL_TOON_SHADING = 1,
+		LIGHT_MODEL_RIM_SHADING = 2,
+		LIGHT_MODEL_RIM_AND_TOON_SHADING = 3,
+		LIGHT_MODEL_UKNOWN
+	};
 	constexpr int MAX_LIGHT_COUNT = 4;
 
 	struct GridData
@@ -27,7 +35,7 @@ namespace OBJ_Viewer {
 	};
 	struct WireFrameSettings
 	{
-		float lineThickness = 4.f;
+		float lineThickness = 1.f;
 		glm::vec3 lineColor = glm::vec3(0, 1, 0);
 		bool isPointRenderingOn = false;
 	};
@@ -35,6 +43,14 @@ namespace OBJ_Viewer {
 	{
 		int lightCount = 1;
 		std::array<DirectionalLight, MAX_LIGHT_COUNT>lights;
+		LightShadingModel currentLightModel = LIGHT_MODEL_BLIN_PHONG;
+	};
+	struct TextureComposition
+	{
+		bool isRenderAlbedoTextureOn = true;
+		bool isRenderSpecularTextureOn = true;
+		bool isRenderNormalTextureOn = true;
+		bool isRenderAmbientOcclusionTextureOn = true;
 	};
 	struct RenderStateSettings
 	{
@@ -43,10 +59,7 @@ namespace OBJ_Viewer {
 		bool m_isWireGridOn = false;
 		bool m_isRenderingLightOn = false;
 
-		bool m_isRenderAlbedoTextureOn = true;
-		bool m_isRenderSpecularTextureOn = true;
-		bool m_isRenderNormalTextureOn = true;
-		bool m_isRenderAmbientOcclusionTextureOn = true;
+		TextureComposition currentlySetTextures;
 
 		bool m_isUniformScale = true;
 		bool m_showNormalMapTexture = true;
@@ -75,11 +88,11 @@ namespace OBJ_Viewer {
 	public:
 		Application();
 		RenderStateSettings& GetScene_RefSettings() { return m_appStetting; }
-		InputHandler& GetGlobalInputHandler() { return m_inputHandler; }
+		InputHandler& GetGlobalInputHandler() { return *m_inputHandler; }
 		Window& GetGlobalAppWindow() { return *m_window; }
 		const Framebuffer& GetSceneFrameBuffer()const { return *m_sceneFramebuffer; }
 		SceneViewport GetSceneViewport()const { return m_sceneViewport; }
-		void AddEventListener(Listener* listener) { m_eventListeners.push_back(listener); }
+		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
 		void UpdateSceneViewport(SceneViewport newViewport) { m_sceneViewport = newViewport; ResizeBuffer(newViewport.width, newViewport.height); }
 		std::function<void(Event&)> GetOnAppEventCallback() { return std::bind(&Application::OnEvent, this, std::placeholders::_1);}
 		~Application();
@@ -89,11 +102,11 @@ namespace OBJ_Viewer {
 		void OnEvent(Event& winEvent);
 	private:
 		RenderStateSettings m_appStetting;
-		Window* m_window;
-		InputHandler m_inputHandler;
-		Framebuffer* m_sceneFramebuffer;
-		RenderingCoordinator* m_appRenderingCoordinator;
-		std::vector<Listener*> m_eventListeners;
+		std::unique_ptr<Window> m_window;
+		std::unique_ptr<InputHandler> m_inputHandler;
+		std::unique_ptr<Framebuffer> m_sceneFramebuffer;
+		std::unique_ptr<RenderingCoordinator> m_appRenderingCoordinator;
+		std::vector<std::weak_ptr<Listener>> m_eventListeners;
 
 		SceneViewport m_sceneViewport;
 	};

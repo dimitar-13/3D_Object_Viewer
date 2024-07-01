@@ -54,7 +54,7 @@ namespace OBJ_Viewer
 		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
-		Application& app;
+		Application& m_app;
 
 		glm::vec3 m_cameraCenter = glm::vec3(0);
 		Position2D m_lastMousePos = Position2D{0,0};

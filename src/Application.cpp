@@ -4,6 +4,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include<iostream>
 #include"Rendering/RenderingCoordinator.h"
+#include<iostream>
 #define STARTUP_WINDOW_WIDTH 1200
 #define STARTUP_WINDOW_HEIGHT 1500
 
@@ -17,7 +18,7 @@ OBJ_Viewer::Application::Application()
 	
 	Size2D metrics = { STARTUP_WINDOW_WIDTH,STARTUP_WINDOW_HEIGHT };
 	const char* winTitle = "3D_viewer";
-	this->m_window = new Window(metrics, winTitle,std::bind(&Application::OnEvent,this,std::placeholders::_1));
+	this->m_window = std::make_unique <Window>(metrics, winTitle,std::bind(&Application::OnEvent,this,std::placeholders::_1));
 	if (this->m_window->GetGLFW_Window() == NULL)
 	{
 		glfwTerminate();
@@ -33,9 +34,10 @@ OBJ_Viewer::Application::Application()
 	glViewport(0, 0, metrics.width, metrics.height);
 	InitImGui();
 
-	m_eventListeners.push_back(&m_inputHandler);
-	m_sceneFramebuffer = new Framebuffer(STARTUP_WINDOW_WIDTH, STARTUP_WINDOW_HEIGHT, FRAMEBUFFER_COLOR_ATTACHMENT);
-	m_appRenderingCoordinator = new RenderingCoordinator(*this);
+	m_inputHandler = std::unique_ptr<InputHandler>(new InputHandler());
+
+	m_sceneFramebuffer = std::make_unique<Framebuffer>(STARTUP_WINDOW_WIDTH, STARTUP_WINDOW_HEIGHT, FRAMEBUFFER_COLOR_ATTACHMENT);
+	m_appRenderingCoordinator = std::make_unique<RenderingCoordinator>(*this);
 	m_appRenderingCoordinator->RenderLoop();
 }
 
@@ -53,9 +55,6 @@ OBJ_Viewer::Application::~Application()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-	delete(m_sceneFramebuffer);
-	delete(m_appRenderingCoordinator);
-	glfwDestroyWindow(this->m_window->GetGLFW_Window());
 	glfwTerminate();
 }
 void OBJ_Viewer::Application::InitImGui()
@@ -72,8 +71,14 @@ void OBJ_Viewer::Application::InitImGui()
 
 void OBJ_Viewer::Application::OnEvent(Event& winEvent)
 {
-	for (auto* listener : m_eventListeners)
+	m_inputHandler->OnEvent(winEvent);
+	dynamic_cast<Listener&>(*m_appRenderingCoordinator).OnEvent(winEvent);
+	for (uint32_t i = 0; i < m_eventListeners.size(); i++)
 	{
-		listener->OnEvent(winEvent);
+		if (auto listener = m_eventListeners[i].lock())
+		{
+			listener->OnEvent(winEvent);
+		}
+	
 	}
 }

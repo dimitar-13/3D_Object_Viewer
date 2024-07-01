@@ -42,7 +42,6 @@ namespace OBJ_Viewer {
 	{
 	public:
 		virtual void OnEvent(Event& e) = 0;
-
 	};
 	class MousePositionEvent : public Event
 	{

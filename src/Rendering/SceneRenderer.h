@@ -29,6 +29,11 @@ namespace OBJ_Viewer {
 
 		void LoadSkybox(std::vector<std::string>&);
 		void LoadModel(const std::string& path);
+
+		void RenderGrid(const GridData& appGridData);
+		void SetUpShaderForLightRendering(const Mesh& mesh, TextureComposition textureFlags, SceneLightInfo lightInfo);
+		void SetUpForWireframeRendering(const Mesh& mesh,const WireFrameSettings& wireframeAppSettings);
+		void RenderSkybox();
 	private:
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
@@ -42,6 +47,7 @@ namespace OBJ_Viewer {
 		std::unique_ptr<ShaderClass> m_materialShader;
 		std::unique_ptr<ShaderClass> m_wireframeShader;
 		std::unique_ptr<ShaderClass> m_wireframePointShader;
+
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;
 

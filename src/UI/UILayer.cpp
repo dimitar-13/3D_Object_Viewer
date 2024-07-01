@@ -97,13 +97,13 @@ void OBJ_Viewer::UILayer::RenderUI()
 		}
 
 		/*Texture checkbox enable view*/ {
-			ImGui::Checkbox("Albedo?", &pSettings.m_isRenderAlbedoTextureOn);
+			ImGui::Checkbox("Albedo?", &pSettings.currentlySetTextures.isRenderAlbedoTextureOn);
 			ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
-			ImGui::Checkbox("Specular?", &pSettings.m_isRenderSpecularTextureOn);
+			ImGui::Checkbox("Specular?", &pSettings.currentlySetTextures.isRenderSpecularTextureOn);
 			ImGui::SetItemTooltip("Should the model display with the reflective/specular texture.");
-			ImGui::Checkbox("Normals?", &pSettings.m_isRenderNormalTextureOn);
+			ImGui::Checkbox("Normals?", &pSettings.currentlySetTextures.isRenderNormalTextureOn);
 			ImGui::SetItemTooltip("Should the model display with the normal map(apply on light calculations).");
-			ImGui::Checkbox("Ambient occlusion?", &pSettings.m_isRenderAmbientOcclusionTextureOn);
+			ImGui::Checkbox("Ambient occlusion?", &pSettings.currentlySetTextures.isRenderAmbientOcclusionTextureOn);
 			ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
 		}
 		ImGui::Separator();
@@ -154,16 +154,17 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 			if (pSettings.m_isRenderingLightOn)
 			{
-				static std::vector<const char*> shadingModes = { "Rim light shading","Toon light shading","Bling-Phong light shading" };
-				static const char* currentShadingModel = shadingModes[2];
-				if (ImGui::BeginCombo("Shading mode", currentShadingModel)) // The second parameter is the label previewed before opening the combo.
+				static std::vector<const char*> shadingModes = {"Bling-Phong light shading","Toon light shading", "Rim light shading","Rim + toon shading"};
+				static const char* currentShadingModel = shadingModes[pSettings.lightInfo.currentLightModel];
+				if (ImGui::BeginCombo("Shading mode", currentShadingModel)) 
 				{
 					for (int n = 0; n < shadingModes.size(); n++)
 					{
-						bool is_selected = (currentShadingModel == shadingModes[n]); // You can store your selection however you want, outside or inside your objects
+						bool is_selected = (currentShadingModel == shadingModes[n]);
 						if (ImGui::Selectable(shadingModes[n], is_selected))
 						{
 							currentShadingModel = shadingModes[n];
+							pSettings.lightInfo.currentLightModel = static_cast<LightShadingModel>(n);
 							break;
 						}
 					}

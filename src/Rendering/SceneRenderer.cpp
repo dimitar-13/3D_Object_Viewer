@@ -11,10 +11,10 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	InitShaders();
 	
 	auto windowSize = m_app.GetGlobalAppWindow().GetWindowSize();
-	m_app.AddEventListener(this);
 	m_sceneCamera = std::make_unique<Camera>(5.0f, windowSize,
 		app);
-	app.AddEventListener(m_sceneCamera.get());
+	m_app.AddEventListener(m_sceneCamera);
+
 	m_renderingMediator = mediator;
 
 	std::vector <glm::vec3> planeVerts = {
@@ -51,68 +51,29 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 {
 	SetUniformMatrixBuffer();
 
-	//glLineWidth(renderSettings.wireframeSettings.lineThickness);
-	
-
-
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())
 	{
+
 		if (renderSettings.m_isWireFrameRenderingOn)
 		{
-			if (renderSettings.wireframeSettings.isPointRenderingOn)
+			SetUpForWireframeRendering(*mesh,renderSettings.wireframeSettings);
+		}
+		else
+		{
+			if (!renderSettings.m_isRenderingLightOn)
 			{
-				const glm::mat3 viewportTransform = ConstructViewportMatrix();
+				mesh->GetMaterial().
+					BindMaterialWithShader(*m_materialShader,
+						renderSettings.m_isWireFrameRenderingOn || !renderSettings.currentlySetTextures.isRenderAlbedoTextureOn
+						? static_cast<MaterialFlags>(0) : IS_ALBEDO_ON);
+				Renderer::RenderMesh(*m_materialShader, *mesh, *m_sceneCamera);
 
-				m_wireframePointShader->UseShader();
-				m_wireframePointShader->UniformSet3FloatVector("u_Color", renderSettings.wireframeSettings.lineColor);
-				m_wireframePointShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
-				m_wireframePointShader->UniformSet1Float("pointSize", renderSettings.wireframeSettings.lineThickness);
-
-				Renderer::RenderMesh(*m_wireframePointShader, *mesh, *m_sceneCamera);
-				//	m_clearColorShader->UseShader();
-				//	m_clearColorShader->UniformSet3FloatVector("u_Color", glm::vec3(1));
-				//	Renderer::RenderMesh(*m_clearColorShader, *mesh, *m_sceneCamera);
-				//	Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_POINT);
-				//	glPointSize(renderSettings.wireframeSettings.lineThickness);
-				//	m_wireframePointShader->UseShader();
-				//	m_wireframePointShader->UniformSet3FloatVector("u_Color", renderSettings.wireframeSettings.lineColor);
-				//	glPolygonOffset(1.f, .1f);
-				//	Renderer::RenderMesh(*m_wireframePointShader, *mesh, *m_sceneCamera);
-				//Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_FILLED);
-
-				continue;
 			}
-			const glm::mat3 viewportTransform = ConstructViewportMatrix();
-			m_wireframeShader->UseShader();
-			m_wireframeShader->UniformSet3FloatVector("u_frameColor", renderSettings.wireframeSettings.lineColor);
-			m_wireframeShader->UniformSet1Float("frameThickness", renderSettings.wireframeSettings.lineThickness);
-
-			m_wireframeShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
-			Renderer::RenderMesh(*m_wireframeShader, *mesh, *m_sceneCamera);
-			continue;
+			else
+			{
+				SetUpShaderForLightRendering(*mesh,renderSettings.currentlySetTextures, renderSettings.lightInfo);
+			}
 		}
-		std::shared_ptr<Material> mat = mesh->GetMaterial().lock();
-
-		if (!renderSettings.m_isRenderingLightOn)
-		{
-			mat->BindMaterialWithShader(*m_materialShader, renderSettings.m_isWireFrameRenderingOn || !renderSettings.m_isRenderAlbedoTextureOn
-				? static_cast<MaterialFlags>(0) : IS_ALBEDO_ON);
-		}
-		if (renderSettings.m_isRenderingLightOn)
-		{
-			MaterialFlags flags = static_cast<MaterialFlags>(
-				renderSettings.m_isRenderAlbedoTextureOn * IS_ALBEDO_ON |
-				renderSettings.m_isRenderNormalTextureOn * IS_CUSTOM_NORMALS_ON |
-				renderSettings.m_isRenderSpecularTextureOn * IS_CUSTOM_SPECULAR_ON |
-				renderSettings.m_isRenderAmbientOcclusionTextureOn * IS_AMBIENT_OCCLUSION_ON);
-
-			mat->BindMaterialWithLightShader(*m_lightShader, flags);
-			m_uniformLightBuffer->SendBufferSubData(0, renderSettings.lightInfo.lights.size() * sizeof(DirectionalLight), renderSettings.lightInfo.lights.data());
-
-			Renderer::RenderMeshLight(*m_lightShader, *mesh, *m_sceneCamera, renderSettings.lightInfo);
-			continue;
-		}
-		Renderer::RenderMesh(*m_materialShader, *mesh, *m_sceneCamera);
 	}
 
 	if (m_sceneSkybox != nullptr && renderSettings.m_isSkyboxOn)
@@ -125,12 +86,74 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 
 	if (renderSettings.m_isWireGridOn)
 	{
-		m_gridShader->UseShader();
-		m_gridShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
-		Renderer::RenderGrid(*m_gridShader, *m_gridVAO, *m_sceneCamera, renderSettings.m_gridData);
+		RenderGrid(renderSettings.m_gridData);
 	}
 
 }
+
+void OBJ_Viewer::SceneRenderer::RenderGrid(const GridData& appGridData)
+{
+	m_gridShader->UseShader();
+	m_gridShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
+	Renderer::RenderGrid(*m_gridShader, *m_gridVAO, *m_sceneCamera, appGridData);
+}
+
+void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh,TextureComposition textureFlags,SceneLightInfo lightInfo)
+{
+	MaterialFlags flags = static_cast<MaterialFlags>(
+		textureFlags.isRenderAlbedoTextureOn * IS_ALBEDO_ON |
+		textureFlags.isRenderNormalTextureOn * IS_CUSTOM_NORMALS_ON |
+		textureFlags.isRenderSpecularTextureOn * IS_CUSTOM_SPECULAR_ON |
+		textureFlags.isRenderAmbientOcclusionTextureOn * IS_AMBIENT_OCCLUSION_ON);
+
+	mesh.GetMaterial().BindMaterialWithLightShader(*m_lightShader, flags);
+
+	m_uniformLightBuffer->SendBufferSubData(0, lightInfo.lights.size() * sizeof(DirectionalLight), lightInfo.lights.data());
+
+	m_lightShader->UniformSet1Int("isToonShadingOn", 
+		lightInfo.currentLightModel == LIGHT_MODEL_TOON_SHADING || lightInfo.currentLightModel == LIGHT_MODEL_RIM_AND_TOON_SHADING);
+	m_lightShader->UniformSet1Int("isRimLightOn",
+		lightInfo.currentLightModel == LIGHT_MODEL_RIM_SHADING || lightInfo.currentLightModel == LIGHT_MODEL_RIM_AND_TOON_SHADING);
+
+	m_lightShader->UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
+	Renderer::RenderMesh(*m_lightShader, mesh, *m_sceneCamera);
+
+}
+
+void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,const WireFrameSettings& wireframeAppSettings)
+{
+	const glm::mat3 viewportTransform = ConstructViewportMatrix();
+	if (wireframeAppSettings.isPointRenderingOn)
+	{
+
+		m_wireframePointShader->UseShader();
+		m_wireframePointShader->UniformSet3FloatVector("u_Color", wireframeAppSettings.lineColor);
+		m_wireframePointShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
+		m_wireframePointShader->UniformSet1Float("pointSize", wireframeAppSettings.lineThickness);
+
+		//	m_clearColorShader->UseShader();
+		//	m_clearColorShader->UniformSet3FloatVector("u_Color", glm::vec3(1));
+		//	Renderer::RenderMesh(*m_clearColorShader, *mesh, *m_sceneCamera);
+		//	Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_POINT);
+		//	glPointSize(renderSettings.wireframeSettings.lineThickness);
+		//	m_wireframePointShader->UseShader();
+		//	m_wireframePointShader->UniformSet3FloatVector("u_Color", renderSettings.wireframeSettings.lineColor);
+		//	glPolygonOffset(1.f, .1f);
+		//	Renderer::RenderMesh(*m_wireframePointShader, *mesh, *m_sceneCamera);
+		//Renderer::SetRenderPrimitiveType(PRIMITIVE_TYPE_FILLED);
+		Renderer::RenderMesh(*m_wireframePointShader, mesh, *m_sceneCamera);
+	}
+	else
+	{
+		m_wireframeShader->UseShader();
+		m_wireframeShader->UniformSet3FloatVector("u_frameColor", wireframeAppSettings.lineColor);
+		m_wireframeShader->UniformSet1Float("frameThickness", wireframeAppSettings.lineThickness);
+
+		m_wireframeShader->UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
+		Renderer::RenderMesh(*m_wireframeShader, mesh, *m_sceneCamera);
+	}
+}
+
 
 void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 {

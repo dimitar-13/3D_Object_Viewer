@@ -76,7 +76,14 @@ layout(std140) uniform LightInfo
 
 uniform Material Mesh_material;
 uniform vec3 cameraPosition;
+uniform bool isToonShadingOn;
+uniform bool isRimLightOn;
 
+
+const int toonColorLevel = 4;
+const float recipricalToonLevel = 1./toonColorLevel;
+const float rimLightPowerFactor = 4;
+float GetRimLightFactor(vec3 CameraToPixel,vec3 fragNormal);
 void main()
 {
 	vec3 Color = vec3(0,0,0);
@@ -111,15 +118,33 @@ vec3 CalculateLight(FragLightData fragData,vec3 viewPosition,DirectionalLight li
 	vec3 fragNormal = normalize(fragData.FragNormal);
 
 	float diff = max(0.,dot(fragNormal,-light.LightDirection));
-	vec3 diffuse = light.lightColor * diff * fragData.FragColor;
 
+	if(isToonShadingOn)
+		diff = ceil(diff*toonColorLevel)*recipricalToonLevel;
+
+	vec3 diffuseColor = light.lightColor* fragData.FragColor;
+	vec3 diffuse = diffuseColor * diff;
+	
 	vec3 viewDir =normalize(viewPosition - fragData.FragPosition);
-	vec3 halfVector = normalize(viewDir + -light.LightDirection);
 
+	vec3 RimColor = vec3(0,0,0);
+	if(isRimLightOn)
+		RimColor = diffuseColor*GetRimLightFactor(viewDir,fragNormal);
+
+	vec3 halfVector = normalize(viewDir + -light.LightDirection);
 	float spec = pow(max(0.,dot(fragNormal,halfVector)),fragData.materialShininess);
 	vec3 specular = light.lightColor * spec* float(diff != 0) * fragData.FragSpecularVal;
 
-	return ambient + diffuse +specular;
+	return ambient + diffuse + RimColor + specular*(isToonShadingOn || isRimLightOn  ? 0 : 1);
+}
+
+float GetRimLightFactor(vec3 CameraToPixel,vec3 fragNormal)
+{
+	CameraToPixel = normalize(CameraToPixel);
+	fragNormal = normalize(fragNormal);
+
+	return pow(max(1 - dot(CameraToPixel,fragNormal),0),rimLightPowerFactor);
+
 }
 
 

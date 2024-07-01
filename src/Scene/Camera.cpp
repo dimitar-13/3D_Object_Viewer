@@ -2,7 +2,7 @@
 #include "Camera.h"
 
 OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app):
-	app(app)
+	m_app(app)
 {
 	this->m_zoom = CameraZoom;
 	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)screenSize.width / (float)screenSize.height, 0.1f, 100.0f);
@@ -36,24 +36,24 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
 	auto& mousePos = e.GetMousePos();
 
-	if (app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
 		m_EulerAngleHelper.calculateEulerAngles(mousePos);
 	}
-	else if (app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(mousePos);
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 		CalculatePositionVector();
 	}
 
-	if (app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_2) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
 		m_lastMousePos = mousePos;
 	}
-	else if (app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_2) && app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		constexpr float movementSpeed = .005;
 		glm::mat3 viewSpaceOrthogonalVectors = glm::mat3(m_viewMatrix);

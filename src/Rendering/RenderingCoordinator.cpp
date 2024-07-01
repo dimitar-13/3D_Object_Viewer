@@ -57,8 +57,8 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application)
 {
 	std::shared_ptr<RenderingMediator> mediator = std::make_shared<RenderingMediator>();
 	m_sceneRenderer = std::make_shared<SceneRenderer>(application, mediator);
+	m_application.AddEventListener(m_sceneRenderer);
 	m_UILayer = std::make_unique<UILayer>(m_application, mediator, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
-	m_application.AddEventListener(this);
 
 }
 

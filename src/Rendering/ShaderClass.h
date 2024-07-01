@@ -19,9 +19,9 @@ namespace OBJ_Viewer
 	public:
 		//TODO:Shaders will be stored in a file and they can have different type like: skyboxShader,wireframe shader and etc. Every shader will start with #SHADER_TYPE:(the type of the shader).
 		ShaderClass(const char* filePath);
-		void UniformSet3FloatVector(const char* name, const glm::vec3 value)const { glProgramUniform3fv(this->m_shaderHandle, findUniform(name), 1, &value[0]); }
-		void UniformSet4x4FloatMatrix(const char* name, const glm::mat4 value)const { glProgramUniformMatrix4fv(this->m_shaderHandle, findUniform(name), 1,GL_FALSE, &value[0][0]); }
-		void UniformSet3x3FloatMatrix(const char* name, const glm::mat3 value)const { glProgramUniformMatrix3fv(this->m_shaderHandle, findUniform(name), 1, GL_FALSE, &value[0][0]); }
+		void UniformSet3FloatVector(const char* name, const glm::vec3& value)const { glProgramUniform3fv(this->m_shaderHandle, findUniform(name), 1, &value[0]); }
+		void UniformSet4x4FloatMatrix(const char* name, const glm::mat4& value)const { glProgramUniformMatrix4fv(this->m_shaderHandle, findUniform(name), 1,GL_FALSE, &value[0][0]); }
+		void UniformSet3x3FloatMatrix(const char* name, const glm::mat3& value)const { glProgramUniformMatrix3fv(this->m_shaderHandle, findUniform(name), 1, GL_FALSE, &value[0][0]); }
 		void UniformSet1Int(const char* name, const int value)const { glProgramUniform1i(this->m_shaderHandle, findUniform(name),value); }
 		void UniformSet1Float(const char* name, const float value)const { glProgramUniform1f(this->m_shaderHandle, findUniform(name), value); }
 		void BindUBOToShader(const UniformBuffer& buffer)const;

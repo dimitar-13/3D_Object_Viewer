@@ -40,4 +40,15 @@ namespace OBJ_Viewer {
 		Size2D m_metrics;
 		WindowState m_state;
 	};
+	class EventCameraProjectionChanged : public Event
+	{
+	public:
+		EventCameraProjectionChanged(bool isProjectionPerspective):m_isProjectionPerspective(isProjectionPerspective)
+		{}
+		EventType GetEventType()const override { return EVENT_CAMERA_PROJECTION_TYPE_CHANGED; }
+		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		bool isCameraProjectionPerspective()const { return m_isProjectionPerspective; }
+	private:
+		bool m_isProjectionPerspective;
+	};
 }

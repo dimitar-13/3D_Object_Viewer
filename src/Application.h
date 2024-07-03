@@ -60,6 +60,7 @@ namespace OBJ_Viewer {
 		bool m_isRenderingLightOn = false;
 
 		TextureComposition currentlySetTextures;
+		bool isCurrentProjectionPerspective = true;
 
 		bool m_isUniformScale = true;
 		bool m_showNormalMapTexture = true;

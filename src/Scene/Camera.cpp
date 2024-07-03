@@ -29,6 +29,13 @@ void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 	constexpr float sensitivity = 0.01f;
 	constexpr float maxZoom = 0.002;
 	this->m_zoom += this->m_zoom - e.GetScrollPosition().y <= maxZoom ? 0 : -e.GetScrollPosition().y;
+
+	if (!m_isProjectionPerspective)
+	{
+		Size2D windowSize = m_app.GetSceneFrameBuffer().GetFramebufferSize();
+		CalculateOthoProjection(windowSize);
+	}
+
 	RecalculateViewMatrix();
 }
 
@@ -81,7 +88,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 void OBJ_Viewer::Camera::onWinSizeChanged(WindowResizeEvent& e)
 {
 	const Size2D winSize = e.GetWindowSize();
-	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)winSize.width/ (float)winSize.height, 0.1f, 100.0f);
+	RecalculateProjection(winSize);
 }
 
 void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
@@ -92,6 +99,37 @@ void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 		RecalculateViewMatrix();
 	}
 }
+
+void OBJ_Viewer::Camera::RecalculateProjection(Size2D windowSize)
+{
+	windowSize = (windowSize.width == 0 || windowSize.height == 0) ? m_app.GetSceneFrameBuffer().GetFramebufferSize() : windowSize;
+
+	if (m_isProjectionPerspective)
+		m_projectionMatrix = glm::perspective(glm::radians(45.0f), (float)windowSize.width / (float)windowSize.height, 0.1f, 100.0f);
+	else
+	{
+		CalculateOthoProjection(windowSize);
+	}
+}
+
+void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e)
+{
+	m_isProjectionPerspective = e.isCameraProjectionPerspective();
+	RecalculateProjection();
+}
+
+void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D windowSize)
+{
+	float orthoScale = this->m_zoom / 500;
+	/*Orthographic projection doesn't really have a zoom since all you see must stay true to its size so instead we shrink the
+	* box defined by the left,right,bottom,top planes so that smaller values will get bigger meaning that since ortho matrix
+	* is just a scale and translate we make the scale bigger by multiplying left,right,bottom,top with the 'orthoScale'.
+	*/
+	m_projectionMatrix = glm::ortho(-((float)windowSize.width / 2) * orthoScale, ((float)windowSize.width / 2) * orthoScale,
+		-((float)windowSize.height / 2) * orthoScale, ((float)windowSize.height / 2) * orthoScale, -1.f/ orthoScale, 100.f);
+}
+
+
 
 void OBJ_Viewer::Camera::RecalculateViewMatrix()
 {
@@ -115,6 +153,9 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 		break;
 	case EVENT_KEY_PRESSES:
 		this->onKeyPressedEvent(dynamic_cast<KeyboardKeyEvent&>(e));
+		break;
+	case EVENT_CAMERA_PROJECTION_TYPE_CHANGED:
+		this->OnProjectionModeChanged(dynamic_cast<EventCameraProjectionChanged&>(e));
 		break;
 	default:
 		break;

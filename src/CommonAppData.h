@@ -4,6 +4,7 @@ namespace OBJ_Viewer {
 	{
 		int width;
 		int height;
+
 	};
 	struct Position2D
 	{

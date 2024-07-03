@@ -210,22 +210,13 @@ void OBJ_Viewer::UILayer::RenderUI()
 			}
 		}
 		ImGui::Separator();
-
-		static std::vector<const char*> projectionWay = { "Perspective","Orthogonraphic" };
-		static const char* selectedProjection = projectionWay[0];
-		if (ImGui::BeginCombo("Camera projection", selectedProjection, ImGuiComboFlags_WidthFitPreview)) // The second parameter is the label previewed before opening the combo.
+		if (ImGui::Button("Switch camera projection"))
 		{
-			for (int n = 0; n < projectionWay.size(); n++)
-			{
-				bool is_selected = (selectedProjection == projectionWay[n]); // You can store your selection however you want, outside or inside your objects
-				if (ImGui::Selectable(projectionWay[n], is_selected))
-				{
-					selectedProjection = projectionWay[n];
-					break;
-				}
-			}
-			ImGui::EndCombo();
+			pSettings.isCurrentProjectionPerspective = !pSettings.isCurrentProjectionPerspective;
+			EventCameraProjectionChanged e(pSettings.isCurrentProjectionPerspective);
+			m_appEventCallback(e);
 		}
+		ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
 
 	}ImGui::End();
 

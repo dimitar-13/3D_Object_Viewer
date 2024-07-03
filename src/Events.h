@@ -14,7 +14,8 @@ namespace OBJ_Viewer {
 		EVENT_ON_SKYBOX_LOAD,
 		EVENT_ON_MODEL_LOAD,
 		EVENT_ON_FOCUSED_WINDOW_CHANGED,
-		EVENT_WINDOW_STATE_CHANGED
+		EVENT_WINDOW_STATE_CHANGED,
+		EVENT_CAMERA_PROJECTION_TYPE_CHANGED
 	};
 
 	enum EventCategory
@@ -130,5 +131,4 @@ namespace OBJ_Viewer {
 	private:
 		Position2D m_mousePos;
 	};
-
 }

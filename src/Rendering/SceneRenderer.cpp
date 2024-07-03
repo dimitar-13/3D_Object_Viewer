@@ -49,6 +49,7 @@ OBJ_Viewer::SceneRenderer::~SceneRenderer()
 }
 void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings)
 {
+	//m_sceneCamera->SetProjection(renderSettings.isCurrentProjectionPerspective);
 	SetUniformMatrixBuffer();
 
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())

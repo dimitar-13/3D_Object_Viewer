@@ -45,6 +45,11 @@ namespace OBJ_Viewer {
 		std::array<DirectionalLight, MAX_LIGHT_COUNT>lights;
 		LightShadingModel currentLightModel = LIGHT_MODEL_BLIN_PHONG;
 	};
+	struct UV_ViewAppSetting
+	{
+		bool isUV_ViewOn = false;
+		float UV_scaleFactor = 58.0f;
+	};
 	struct TextureComposition
 	{
 		bool isRenderAlbedoTextureOn = true;
@@ -64,7 +69,7 @@ namespace OBJ_Viewer {
 
 		bool m_isUniformScale = true;
 		bool m_showNormalMapTexture = true;
-		bool m_showMeshUV = true;
+		UV_ViewAppSetting m_uvViewSettings;
 		bool m_disableFBXLoading = true;
 		GridData m_gridData;
 		SceneLightInfo lightInfo;

@@ -35,6 +35,7 @@ namespace OBJ_Viewer
 	{
 	public:
 		Camera(float CameraZoom,Size2D screenSize, Application& app);
+		Camera(const Camera& other) = delete;
 		void CalculatePositionVector();
 		//void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj) { pView = &m_viewMatrix; pProj = &m_projectionMatrix; }
 		void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj)const { *pView = m_viewMatrix; *pProj = m_projectionMatrix; }

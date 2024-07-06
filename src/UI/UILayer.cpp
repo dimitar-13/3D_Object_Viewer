@@ -108,7 +108,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 		}
 		ImGui::Separator();
 		ImGui::Checkbox("Show normal map texture", &pSettings.m_showNormalMapTexture);
-		ImGui::Checkbox("Show mesh UV", &pSettings.m_showMeshUV);
+		ImGui::Checkbox("Show mesh UV", &pSettings.m_uvViewSettings.isUV_ViewOn);
+		if(pSettings.m_uvViewSettings.isUV_ViewOn)
+		{
+			ImGui::SliderFloat("Uv scale", &pSettings.m_uvViewSettings.UV_scaleFactor,1.f,150.f);
+		}
 
 		//ImGui::Separator();
 		//ImGui::Image(0,

@@ -214,6 +214,7 @@
     <None Include="Shaders\LightShader.glsl" />
     <None Include="Shaders\MaterialShader.glsl" />
     <None Include="Shaders\WireframePointShader.glsl" />
+    <None Include="Shaders\UVShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">

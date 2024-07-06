@@ -38,21 +38,23 @@ namespace OBJ_Viewer {
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
 		std::shared_ptr<Skybox> m_sceneSkybox;
-		std::unique_ptr<VertexAttributeObject> m_gridVAO;
+		VertexAttributeObject m_gridVAO;
 
-		std::unique_ptr<ShaderClass> m_clearColorShader;
-		std::unique_ptr<ShaderClass> m_gridShader;
-		std::unique_ptr<ShaderClass> m_skyboxShader;
-		std::unique_ptr<ShaderClass> m_lightShader;
-		std::unique_ptr<ShaderClass> m_materialShader;
-		std::unique_ptr<ShaderClass> m_wireframeShader;
-		std::unique_ptr<ShaderClass> m_wireframePointShader;
+		ShaderClass m_clearColorShader;
+		ShaderClass m_gridShader;
+		ShaderClass m_skyboxShader;
+		ShaderClass m_lightShader;
+		ShaderClass m_materialShader;
+		ShaderClass m_wireframeShader;
+		ShaderClass m_wireframePointShader;
+		ShaderClass m_UVShader;
+
 
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;
 
-		std::unique_ptr<UniformBuffer> m_uniformMatrixBuffer;
-		std::unique_ptr<UniformBuffer> m_uniformLightBuffer;	
+		UniformBuffer m_uniformMatrixBuffer;
+		UniformBuffer m_uniformLightBuffer;	
 	};
 }
 

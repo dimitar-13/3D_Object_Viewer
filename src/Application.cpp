@@ -75,7 +75,7 @@ void OBJ_Viewer::Application::OnEvent(Event& winEvent)
 	dynamic_cast<Listener&>(*m_appRenderingCoordinator).OnEvent(winEvent);
 	for (uint32_t i = 0; i < m_eventListeners.size(); i++)
 	{
-		if (auto listener = m_eventListeners[i].lock())
+		if (std::shared_ptr<Listener> listener = m_eventListeners[i].lock())
 		{
 			listener->OnEvent(winEvent);
 		}

@@ -84,41 +84,94 @@ void OBJ_Viewer::UILayer::RenderUI()
 			scale = glm::vec3(scaleValue);
 		}
 		ImGui::Separator();
-		ImGui::Text("Model rendering settings.");
-		ImGui::Checkbox("Wireframe?", &pSettings.m_isWireFrameRenderingOn);
-		ImGui::SetItemTooltip("Is wireframe view enabled.");
-
-		if (pSettings.m_isWireFrameRenderingOn)
+		if (ImGui::BeginChild("Rendering modes"))
 		{
-			ImGui::InputFloat("Wire line Thickness",&pSettings.wireframeSettings.lineThickness);
-			ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
-			ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
+			ImGui::Text("Model rendering modes.");
+			static bool renderingModeContainer;
+			ImGui::Checkbox("Wireframe", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_WIREFRAME));
+			ImGui::SetItemTooltip("Renders wireframe of the 3D model.");
+			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_WIREFRAME : pSettings.m_currentRenderingMode;
+
+			ImGui::Checkbox("Clear color rendering.", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_SOLID_COLOR));
+			ImGui::SetItemTooltip("Renders the mesh using a single color.");
+			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_SOLID_COLOR : pSettings.m_currentRenderingMode;
+
+			ImGui::Checkbox("Individual textures", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_INDIVIDUAL_TEXTURES));
+			ImGui::SetItemTooltip("Renders only single selected texture.");
+			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_INDIVIDUAL_TEXTURES : pSettings.m_currentRenderingMode;
+
+			ImGui::Checkbox("Uv mode", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_UV));
+			ImGui::SetItemTooltip("Renders checkerboard texture for UV inspection.");
+			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_UV : pSettings.m_currentRenderingMode;
+
+			ImGui::Checkbox("Light rendering", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_LIGHT));
+			ImGui::SetItemTooltip("Render the 3D object with light calculations.");
+			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_LIGHT : pSettings.m_currentRenderingMode;
+
 			ImGui::Separator();
-		}
-
-		/*Texture checkbox enable view*/ {
-			ImGui::Checkbox("Albedo?", &pSettings.currentlySetTextures.isRenderAlbedoTextureOn);
-			ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
-			ImGui::Checkbox("Specular?", &pSettings.currentlySetTextures.isRenderSpecularTextureOn);
-			ImGui::SetItemTooltip("Should the model display with the reflective/specular texture.");
-			ImGui::Checkbox("Normals?", &pSettings.currentlySetTextures.isRenderNormalTextureOn);
-			ImGui::SetItemTooltip("Should the model display with the normal map(apply on light calculations).");
-			ImGui::Checkbox("Ambient occlusion?", &pSettings.currentlySetTextures.isRenderAmbientOcclusionTextureOn);
-			ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
-		}
-		ImGui::Separator();
-		ImGui::Checkbox("Show normal map texture", &pSettings.m_showNormalMapTexture);
-		ImGui::Checkbox("Show mesh UV", &pSettings.m_uvViewSettings.isUV_ViewOn);
-		if(pSettings.m_uvViewSettings.isUV_ViewOn)
-		{
-			ImGui::SliderFloat("Uv scale", &pSettings.m_uvViewSettings.UV_scaleFactor,1.f,150.f);
-		}
-
-		//ImGui::Separator();
-		//ImGui::Image(0,
-		//	{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+			ImGui::Text("Mode settings.");
+			switch (pSettings.m_currentRenderingMode)
+			{
+			case RENDER_MODE_WIREFRAME:
+				ImGui::InputFloat("Wire line Thickness", &pSettings.wireframeSettings.lineThickness);
+				ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
+				ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
+				break;
+	
+			case RENDER_MODE_LIGHT:
+				static bool isAlbedoOn = pSettings.m_MaterialFlags & IS_ALBEDO_ON;
+				static bool isNormalOn = pSettings.m_MaterialFlags & IS_CUSTOM_SPECULAR_ON;
+				static bool isRoughnessOn = pSettings.m_MaterialFlags & IS_CUSTOM_NORMALS_ON;
+				static bool isAmbientOcclusionOn = pSettings.m_MaterialFlags & IS_AMBIENT_OCCLUSION_ON;
 
 
+				ImGui::Checkbox("Albedo?", &isAlbedoOn);
+				ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
+
+				ImGui::Checkbox("Specular?", &isRoughnessOn);
+				ImGui::SetItemTooltip("Should the model display with the reflective/specular texture.");
+
+				ImGui::Checkbox("Normals?", &isNormalOn);
+				ImGui::SetItemTooltip("Should the model display with the normal map(apply on light calculations).");
+
+				ImGui::Checkbox("Ambient occlusion?", &isAmbientOcclusionOn);
+				ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
+
+				pSettings.m_MaterialFlags = FLAGS_NONE;
+				pSettings.m_MaterialFlags = isAlbedoOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_ALBEDO_ON) : pSettings.m_MaterialFlags;
+				pSettings.m_MaterialFlags = isNormalOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_CUSTOM_NORMALS_ON): pSettings.m_MaterialFlags;
+				pSettings.m_MaterialFlags = isRoughnessOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_CUSTOM_SPECULAR_ON) : pSettings.m_MaterialFlags;
+				pSettings.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_AMBIENT_OCCLUSION_ON) : pSettings.m_MaterialFlags;
+				break;
+
+			case RENDER_MODE_INDIVIDUAL_TEXTURES:
+				static bool selectedTexture;
+
+				ImGui::Checkbox("Color texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ALBEDO));
+				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_ALBEDO : pSettings.m_curentIndividualTexture;
+
+				ImGui::Checkbox("Normal texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_NORMAL));
+				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_NORMAL : pSettings.m_curentIndividualTexture;
+
+				ImGui::Checkbox("Specular/Metallic texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ROUGHNESS_METALLIC));
+				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_ROUGHNESS_METALLIC : pSettings.m_curentIndividualTexture;
+
+				ImGui::Checkbox("Ambient occlusion", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_AMBIENT_OCCLUSION));
+				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_AMBIENT_OCCLUSION : pSettings.m_curentIndividualTexture;
+				break;
+
+			case RENDER_MODE_UV:
+				ImGui::SliderFloat("Uv scale", &pSettings.m_uvViewSettings.UV_scaleFactor, 1.f, 150.f);
+				break;
+
+			case RENDER_MODE_SOLID_COLOR:
+				//TODO:Implement
+				ImGui::ColorPicker3("Mesh color", &pSettings.m_colorRenderingColor[0]);
+				break;
+			default:
+				break;
+			}
+		}ImGui::EndChild();
 	}ImGui::End();
 
 
@@ -154,56 +207,53 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::Separator();
 		if (ImGui::CollapsingHeader("Light settings."))
 		{
-			ImGui::Checkbox("Enable lights?", &pSettings.m_isRenderingLightOn);
-
-			if (pSettings.m_isRenderingLightOn)
+	
+			static std::vector<const char*> shadingModes = {"Bling-Phong light shading","Toon light shading", "Rim light shading","Rim + toon shading"};
+			static const char* currentShadingModel = shadingModes[pSettings.lightInfo.currentLightModel];
+			if (ImGui::BeginCombo("Shading mode", currentShadingModel)) 
 			{
-				static std::vector<const char*> shadingModes = {"Bling-Phong light shading","Toon light shading", "Rim light shading","Rim + toon shading"};
-				static const char* currentShadingModel = shadingModes[pSettings.lightInfo.currentLightModel];
-				if (ImGui::BeginCombo("Shading mode", currentShadingModel)) 
+				for (int n = 0; n < shadingModes.size(); n++)
 				{
-					for (int n = 0; n < shadingModes.size(); n++)
+					bool is_selected = (currentShadingModel == shadingModes[n]);
+					if (ImGui::Selectable(shadingModes[n], is_selected))
 					{
-						bool is_selected = (currentShadingModel == shadingModes[n]);
-						if (ImGui::Selectable(shadingModes[n], is_selected))
-						{
-							currentShadingModel = shadingModes[n];
-							pSettings.lightInfo.currentLightModel = static_cast<LightShadingModel>(n);
-							break;
-						}
+						currentShadingModel = shadingModes[n];
+						pSettings.lightInfo.currentLightModel = static_cast<LightShadingModel>(n);
+						break;
 					}
-					ImGui::EndCombo();
 				}
+				ImGui::EndCombo();
+			}
 			
-				ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
-				//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
-				/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
+			ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
+			//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
+			/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
 				will return negative value, a value that we can use to get the closest valid number in cases of 7 we get 7 += 4 - 7 <=> 7+=-3
 				and we use the min function in cases that we are within our range.We do it this way to avoid branching.
 				UPDATE: Added this for values below 0 as well by checking the value of 'lightCount' if its below zero we gonna add the positive version of it.
 				*/
 
-				pSettings.lightInfo.lightCount =
-					pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount) :
-					pSettings.lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
-				for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
+			pSettings.lightInfo.lightCount =
+				pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount) :
+				pSettings.lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
+			for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
+			{
+				if (i < pSettings.lightInfo.lightCount)
 				{
-					if (i < pSettings.lightInfo.lightCount)
+					if (ImGui::CollapsingHeader(std::string("Light " + std::to_string(i+1)).c_str()))
 					{
-						if (ImGui::CollapsingHeader(std::string("Light " + std::to_string(i+1)).c_str()))
-						{
-							RenderLightSettingsPanel(i,
-								&pSettings.lightInfo.lights[i].color,
-								&pSettings.lightInfo.lights[i].direction);
-						}
-					}
-					else
-					{
-						pSettings.lightInfo.lights[i].color = glm::vec3(0);
+						RenderLightSettingsPanel(i,
+							&pSettings.lightInfo.lights[i].color,
+							&pSettings.lightInfo.lights[i].direction);
 					}
 				}
-			}
+				else
+				{
+					pSettings.lightInfo.lights[i].color = glm::vec3(0);
+				}
+			}	
 		}
+
 		ImGui::Separator();
 		if (ImGui::CollapsingHeader("Skybox settings."))
 		{
@@ -243,30 +293,33 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::SameLine();
 		ImGui::Checkbox("Disable fbx file imports",&pSettings.m_disableFBXLoading);
 		ImGui::SetItemTooltip("Due to security vulnerability fbx files are disabled. Enable them on you own risk or if the model is from trusted source");
-		ImGui::Text("Loading stuff here.");
+		ImGui::Separator();
+
+		ImGui::Text("Scene material textures.");
 		//Add imported textures preview
 		
-
+		static constexpr float spacing = 50.f;
+		static const ImVec2 textSize = { 70,70 };
 		ImGui::Text("Albedo");
-		ImGui::SameLine();
+		ImGui::SameLine(0, spacing);
 		ImGui::Text("Normal");
-		ImGui::SameLine();
+		ImGui::SameLine(0, spacing);
 		ImGui::Text("Specular");
-		ImGui::SameLine();
+		ImGui::SameLine(0, spacing);
 		ImGui::Text("Ambient Occlusion");
 
 		ImGui::Image(0,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
+			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine(0, spacing);
 		ImGui::Image(0,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
+			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine(0, spacing);
 		ImGui::Image(0,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
+			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine(0, spacing);
 		ImGui::Image(0,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
+			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::SameLine(0, spacing);
 
 	}ImGui::End();
 
@@ -392,7 +445,7 @@ void OBJ_Viewer::UILayer::LoadModel()
 {
 	DialogWrapper dialog;
 	dialog.OpenDialog();
-	//If error occurs or the user change their mind we wont sent an event;
+	//If error occurs or the user change their mind we wont send an event;
 	if (dialog.isDialogClosed())
 		return;
 
@@ -406,7 +459,7 @@ void OBJ_Viewer::UILayer::LoadSkybox()
 	DialogWrapper dialog;
 	dialog.OpenDialogMultiple("png,jpeg,jpg");
 
-	//If error occurs or the user change their mind we wont sent an event;
+	//If error occurs or the user change their mind we wont send an event;
 	if (dialog.isDialogClosed())
 		return;
 

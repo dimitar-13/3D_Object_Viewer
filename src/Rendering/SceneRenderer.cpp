@@ -21,6 +21,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	m_wireframeShader(GetConcatShaderPath("WireframeShader.glsl").c_str()),
 	m_wireframePointShader(GetConcatShaderPath("WireframePointShader.glsl").c_str()),
 	m_UVShader(GetConcatShaderPath("UVShader.glsl").c_str()),
+	m_singleTextureShader(GetConcatShaderPath("SingleTextureInspectShader.glsl").c_str()),
 	m_app(app),
 	m_uniformLightBuffer("LightInfo", 1, MAX_LIGHT_COUNT * 2 * sizeof(glm::vec4), nullptr),
 	m_uniformMatrixBuffer("Matrices", 0, 3 * sizeof(glm::mat4), nullptr)
@@ -51,37 +52,39 @@ OBJ_Viewer::SceneRenderer::~SceneRenderer()
 }
 void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings)
 {
-	//m_sceneCamera->SetProjection(renderSettings.isCurrentProjectionPerspective);
 	SetUniformMatrixBuffer();
 
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())
 	{
+		switch(renderSettings.m_currentRenderingMode)
+		{
+		case RENDER_MODE_WIREFRAME:
+			SetUpForWireframeRendering(*mesh, renderSettings.wireframeSettings);
+			break;
 
-		if (renderSettings.m_isWireFrameRenderingOn)
-		{
-			SetUpForWireframeRendering(*mesh,renderSettings.wireframeSettings);
-		}
-		if (renderSettings.m_uvViewSettings.isUV_ViewOn)
-		{
+		case RENDER_MODE_SOLID_COLOR:
+			m_clearColorShader.UseShader();
+			m_clearColorShader.UniformSet3FloatVector("u_Color", renderSettings.m_colorRenderingColor);
+			m_mainRenderer.RenderMesh(m_clearColorShader, mesh->GetMeshVAO(), *m_sceneCamera);
+			break;
+
+		case RENDER_MODE_INDIVIDUAL_TEXTURES:
+			m_singleTextureShader.UseShader();
+			if(auto texture = mesh->GetMaterial().GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
+				m_mainRenderer.BindMaterialTexture(m_singleTextureShader, texture, GL_TEXTURE1, "textureToInspect");
+			m_mainRenderer.RenderMesh(m_singleTextureShader, mesh->GetMeshVAO(), *m_sceneCamera);
+			break;
+
+		case RENDER_MODE_UV:
 			m_UVShader.UseShader();
 			m_UVShader.UniformSet1Float("uvScale", renderSettings.m_uvViewSettings.UV_scaleFactor);
-			Renderer::RenderMesh(m_UVShader, *mesh, *m_sceneCamera);
-		}
-		else
-		{
-			if (!renderSettings.m_isRenderingLightOn)
-			{
-				mesh->GetMaterial().
-					BindMaterialWithShader(m_materialShader,
-						renderSettings.m_isWireFrameRenderingOn || !renderSettings.currentlySetTextures.isRenderAlbedoTextureOn
-						? static_cast<MaterialFlags>(0) : IS_ALBEDO_ON);
-				Renderer::RenderMesh(m_materialShader, *mesh, *m_sceneCamera);
-
-			}
-			else
-			{
-				SetUpShaderForLightRendering(*mesh,renderSettings.currentlySetTextures, renderSettings.lightInfo);
-			}
+			m_mainRenderer.RenderMesh(m_UVShader, mesh->GetMeshVAO(), *m_sceneCamera);
+			break;
+		case RENDER_MODE_LIGHT:
+			SetUpShaderForLightRendering(*mesh, renderSettings.m_MaterialFlags, renderSettings.lightInfo);
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -89,7 +92,7 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 	{
 		glDisable(GL_CULL_FACE);
 
-		Renderer::RenderSkybox(m_skyboxShader, *m_sceneSkybox, *m_sceneCamera);
+		m_mainRenderer.RenderSkybox(m_skyboxShader, *m_sceneSkybox, *m_sceneCamera);
 		glEnable(GL_CULL_FACE);
 	}
 
@@ -104,19 +107,11 @@ void OBJ_Viewer::SceneRenderer::RenderGrid(const GridData& appGridData)
 {
 	m_gridShader.UseShader();
 	m_gridShader.UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
-	Renderer::RenderGrid(m_gridShader, m_gridVAO, *m_sceneCamera, appGridData);
+	m_mainRenderer.RenderGrid(m_gridShader, m_gridVAO, *m_sceneCamera, appGridData);
 }
 
-void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh,TextureComposition textureFlags,SceneLightInfo lightInfo)
+void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags,SceneLightInfo lightInfo)
 {
-	MaterialFlags flags = static_cast<MaterialFlags>(
-		textureFlags.isRenderAlbedoTextureOn * IS_ALBEDO_ON |
-		textureFlags.isRenderNormalTextureOn * IS_CUSTOM_NORMALS_ON |
-		textureFlags.isRenderSpecularTextureOn * IS_CUSTOM_SPECULAR_ON |
-		textureFlags.isRenderAmbientOcclusionTextureOn * IS_AMBIENT_OCCLUSION_ON);
-
-	mesh.GetMaterial().BindMaterialWithLightShader(m_lightShader, flags);
-
 	m_uniformLightBuffer.SendBufferSubData(0, lightInfo.lights.size() * sizeof(DirectionalLight), lightInfo.lights.data());
 
 	m_lightShader.UniformSet1Int("isToonShadingOn", 
@@ -125,7 +120,7 @@ void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh,Te
 		lightInfo.currentLightModel == LIGHT_MODEL_RIM_SHADING || lightInfo.currentLightModel == LIGHT_MODEL_RIM_AND_TOON_SHADING);
 
 	m_lightShader.UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
-	Renderer::RenderMesh(m_lightShader, mesh, *m_sceneCamera);
+	m_mainRenderer.RenderMeshMaterialWithLight(m_lightShader, mesh.GetMeshVAO(), mesh.GetMaterial(), materialFlags, *m_sceneCamera);
 
 }
 
@@ -139,7 +134,7 @@ void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,cons
 		m_wireframePointShader.UniformSet3FloatVector("u_Color", wireframeAppSettings.lineColor);
 		m_wireframePointShader.UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
 		m_wireframePointShader.UniformSet1Float("pointSize", wireframeAppSettings.lineThickness + pointSizeOffset);
-		Renderer::RenderMesh(m_wireframePointShader, mesh, *m_sceneCamera);
+		m_mainRenderer.RenderMesh(m_wireframePointShader, mesh.GetMeshVAO(), *m_sceneCamera);
 	}
 	else
 	{
@@ -148,7 +143,7 @@ void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,cons
 		m_wireframeShader.UniformSet1Float("frameThickness", wireframeAppSettings.lineThickness);
 
 		m_wireframeShader.UniformSet3x3FloatMatrix("viewportMatrix", viewportTransform);
-		Renderer::RenderMesh(m_wireframeShader, mesh, *m_sceneCamera);
+		m_mainRenderer.RenderMesh(m_wireframeShader, mesh.GetMeshVAO(), *m_sceneCamera);
 	}
 }
 

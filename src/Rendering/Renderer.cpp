@@ -1,12 +1,65 @@
 #include "Renderer.h"
-void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const Mesh& mesh, const Camera& mainCamera)
+OBJ_Viewer::Renderer::Renderer()
+{
+	m_defaultWhiteTexture = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
+	m_defaultNormal = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/Normal_Map_dummy_texture.jpg");
+}
+void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO, const Camera& mainCamera)
 {
 	shaderToUse.UseShader();
-	//shaderToUse.UniformSet4x4FloatMatrix("ViewProjMatrix", mainCamera.GetViewProjMatrix());
 
-	mesh.GetMeshVAO().BindBuffer();
-	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
-	mesh.GetMeshVAO().UnBind();	
+	meshVAO.BindBuffer();
+	glDrawElements(GL_TRIANGLES, meshVAO.GetIndexCount(), GL_UNSIGNED_INT, NULL);
+	meshVAO.UnBind();
+}
+
+void OBJ_Viewer::Renderer::RenderMeshMaterialWithLight(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO,
+	const Material& material,MaterialFlags renderMaterialFlags, const Camera& mainCamera)
+{
+	shaderToUse.UseShader();
+
+	meshVAO.BindBuffer();
+
+	if (!material.GetMaterialTexture(MATERIAL_TEXTURE_ALBEDO).expired() && renderMaterialFlags & OBJ_Viewer::IS_ALBEDO_ON )
+	{
+		BindMaterialTexture(shaderToUse, material.GetMaterialTexture(MATERIAL_TEXTURE_ALBEDO).lock(), GL_TEXTURE1, "Mesh_material.albedo");
+	}
+	else
+	{
+		BindMaterialTexture(shaderToUse, m_defaultWhiteTexture, GL_TEXTURE1, "Mesh_material.albedo");
+	}
+
+	if (!material.GetMaterialTexture(MATERIAL_TEXTURE_NORMAL).expired() && renderMaterialFlags & OBJ_Viewer::IS_CUSTOM_NORMALS_ON)
+	{
+		BindMaterialTexture(shaderToUse, material.GetMaterialTexture(MATERIAL_TEXTURE_NORMAL).lock(), GL_TEXTURE2, "Mesh_material.normalMap");
+	}
+	else
+	{
+		BindMaterialTexture(shaderToUse, m_defaultWhiteTexture, GL_TEXTURE2, "Mesh_material.normalMap");
+	}
+
+	if (!material.GetMaterialTexture(MATERIAL_TEXTURE_ROUGHNESS_METALLIC).expired() && renderMaterialFlags & OBJ_Viewer::IS_CUSTOM_SPECULAR_ON)
+	{
+		BindMaterialTexture(shaderToUse, material.GetMaterialTexture(MATERIAL_TEXTURE_ROUGHNESS_METALLIC).lock(), GL_TEXTURE3, "Mesh_material.roughtness");
+	}
+	else
+	{
+		BindMaterialTexture(shaderToUse, m_defaultWhiteTexture, GL_TEXTURE3, "Mesh_material.roughtness");
+	}
+
+	if (!material.GetMaterialTexture(MATERIAL_TEXTURE_AMBIENT_OCCLUSION).expired() && renderMaterialFlags & OBJ_Viewer::IS_AMBIENT_OCCLUSION_ON)
+	{
+		BindMaterialTexture(shaderToUse,material.GetMaterialTexture(MATERIAL_TEXTURE_AMBIENT_OCCLUSION).lock(), GL_TEXTURE4, "Mesh_material.ambientOcclusion");
+	}
+	else
+	{
+		BindMaterialTexture(shaderToUse, m_defaultWhiteTexture, GL_TEXTURE4, "Mesh_material.ambientOcclusion");
+	}
+
+	shaderToUse.UniformSet3FloatVector("Mesh_material.color", material.GetMaterialData().color);
+	shaderToUse.UniformSet1Float("Mesh_material.specular", material.GetMaterialData().roughness);
+	glDrawElements(GL_TRIANGLES, meshVAO.GetIndexCount(), GL_UNSIGNED_INT, NULL);
+	meshVAO.UnBind();
 }
 
 void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao, const Camera& mainCamera, const GridData gridInfo)
@@ -17,8 +70,7 @@ void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const Vert
 	shaderToUse.UseShader();
 	glm::mat4 view, proj;
 	mainCamera.GetViewAndProjectionSeparate(&view, &proj);
-	//shaderToUse.UniformSet4x4FloatMatrix("ProjectionMatrix", proj);
-	//shaderToUse.UniformSet4x4FloatMatrix("ViewMatrix", view);
+
 	shaderToUse.UniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
 	shaderToUse.UniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
 	shaderToUse.UniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);
@@ -48,29 +100,23 @@ void OBJ_Viewer::Renderer::RenderSkybox(const ShaderClass& skyboxShader, const S
 	glDepthFunc(GL_LESS);
 
 }
-
-void OBJ_Viewer::Renderer::RenderObjectWithWireFrame(const ShaderClass& shaderToUse, const Mesh& mesh, const Camera& mainCamera)
-{
-	shaderToUse.UseShader();
-	shaderToUse.UniformSet3FloatVector("u_Color",glm::vec3(1));
-	mesh.GetMeshVAO().BindBuffer();
-	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
-	mesh.GetMeshVAO().UnBind();
-
-	shaderToUse.UniformSet3FloatVector("u_Color", glm::vec3(0,1,0));
-	glLineWidth(5.);
-	//Renderer::IsWireFrameOn(true);
-
-	mesh.GetMeshVAO().BindBuffer();
-	glDrawElements(GL_TRIANGLES, mesh.GetMeshVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
-	mesh.GetMeshVAO().UnBind();	
-	//Renderer::IsWireFrameOn(false);
-}
-
 void OBJ_Viewer::Renderer::BindMaterialTexture(const ShaderClass& shaderToUse, std::shared_ptr<Texture> textureToBind, GLenum textureUnit, const char* textureName)
 {
 	shaderToUse.UseShader();
 	glActiveTexture(textureUnit);
 	textureToBind->BindTexture();
 	shaderToUse.UniformSet1Int(textureName, textureUnit - GL_TEXTURE0);
+}
+
+std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDefaultTexture(const std::string& path)
+{
+	TextureBuilder builder;
+	int channelCount;
+	TextureSize textureSize;
+	TexturePixelDataWrapper reader(path.c_str(), &textureSize, &channelCount);
+	TextureFormat format = GetFormatByChannelCount(channelCount);
+	return builder.SetTextureFormat(format).
+		SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(textureSize).
+		SetTexturePixelData(reader.GetTexturePixelData()).SetTextureWrapT(TEXTURE_WRAP_CLAMP_TO_EDGE).
+		SetTextureWrapS(TEXTURE_WRAP_CLAMP_TO_EDGE).buildTexture();
 }

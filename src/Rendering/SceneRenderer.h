@@ -8,6 +8,7 @@
 #include"Application.h"
 #include"RenderingMediator.h"
 #include"Events.h"
+#include"Renderer.h"
 namespace OBJ_Viewer {
 	class SceneRenderer : public Listener
 	{
@@ -31,7 +32,7 @@ namespace OBJ_Viewer {
 		void LoadModel(const std::string& path);
 
 		void RenderGrid(const GridData& appGridData);
-		void SetUpShaderForLightRendering(const Mesh& mesh, TextureComposition textureFlags, SceneLightInfo lightInfo);
+		void SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags, SceneLightInfo lightInfo);
 		void SetUpForWireframeRendering(const Mesh& mesh,const WireFrameSettings& wireframeAppSettings);
 		void RenderSkybox();
 	private:
@@ -48,11 +49,11 @@ namespace OBJ_Viewer {
 		ShaderClass m_wireframeShader;
 		ShaderClass m_wireframePointShader;
 		ShaderClass m_UVShader;
-
+		ShaderClass m_singleTextureShader;
 
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;
-
+		Renderer m_mainRenderer;
 		UniformBuffer m_uniformMatrixBuffer;
 		UniformBuffer m_uniformLightBuffer;	
 	};

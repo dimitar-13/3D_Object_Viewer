@@ -30,24 +30,17 @@ uniform float uvScale;
 
 void main()
 {
+	/*For more info about the shader: https://www.shadertoy.com/view/l3yXRc */
+
 	vec2 uv = FragUV * uvScale;
 
 	vec3 FinalColor = vec3(0.0);
-	uv = mod(uv, vec2(2.0f));
 
-	float isCubeWhiteColX = step(2,step(1,uv.x)+1 - step(1,uv.y));
+	uv = sin(uv*3.14);
+    float v = uv.x*uv.y;
+    v = clamp( .5+.5* v/fwidth(v) ,0.,1. );
 
-	float isCubeWhiteColY = step(2,1 - step(1,uv.x) + step(1,uv.y));
-
-	float isCubeWhiteCol = max(isCubeWhiteColX, isCubeWhiteColY);
-	
-	float mixFactor = isCubeWhiteCol*min(
-	(1. - pow(abs(fract(uv.x)*2. -1.),SMOOTHNESS_FACTOR)),
-	(1. - pow(abs(fract(uv.y)*2. -1.),SMOOTHNESS_FACTOR)));
-
-	FinalColor = mix(WhiteCol,GrayCol,mixFactor);
-
-	FragColor = vec4(FinalColor, 1.0);
+	FragColor = vec4(mix( GrayCol, WhiteCol, v) , 1.0);
 }
 
 

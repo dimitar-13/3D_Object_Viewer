@@ -7,6 +7,7 @@
 #include"Rendering/Framebuffer.h"
 #include<array>
 #include"AppEvent.h"
+#include"Scene/Material.h"
 
 namespace OBJ_Viewer {
 
@@ -17,6 +18,17 @@ namespace OBJ_Viewer {
 		LIGHT_MODEL_RIM_SHADING = 2,
 		LIGHT_MODEL_RIM_AND_TOON_SHADING = 3,
 		LIGHT_MODEL_UKNOWN
+	};
+
+
+	enum RenderingMode
+	{
+		RENDER_MODE_UKNOWN,
+		RENDER_MODE_WIREFRAME,
+		RENDER_MODE_SOLID_COLOR,
+		RENDER_MODE_LIGHT,
+		RENDER_MODE_UV,
+		RENDER_MODE_INDIVIDUAL_TEXTURES
 	};
 	constexpr int MAX_LIGHT_COUNT = 4;
 
@@ -47,28 +59,19 @@ namespace OBJ_Viewer {
 	};
 	struct UV_ViewAppSetting
 	{
-		bool isUV_ViewOn = false;
 		float UV_scaleFactor = 58.0f;
-	};
-	struct TextureComposition
-	{
-		bool isRenderAlbedoTextureOn = true;
-		bool isRenderSpecularTextureOn = true;
-		bool isRenderNormalTextureOn = true;
-		bool isRenderAmbientOcclusionTextureOn = true;
 	};
 	struct RenderStateSettings
 	{
-		bool m_isWireFrameRenderingOn = false;
-		bool m_isSkyboxOn = false;
 		bool m_isWireGridOn = false;
-		bool m_isRenderingLightOn = false;
-
-		TextureComposition currentlySetTextures;
+		bool m_isSkyboxOn = false;
+		RenderingMode m_currentRenderingMode = RENDER_MODE_SOLID_COLOR;
+		glm::vec3 m_colorRenderingColor = glm::vec3(1);
+		MaterialFlags m_MaterialFlags = FLAGS_ALL;
 		bool isCurrentProjectionPerspective = true;
 
 		bool m_isUniformScale = true;
-		bool m_showNormalMapTexture = true;
+		MaterialTextures m_curentIndividualTexture = MATERIAL_TEXTURE_ALBEDO;
 		UV_ViewAppSetting m_uvViewSettings;
 		bool m_disableFBXLoading = true;
 		GridData m_gridData;
@@ -88,6 +91,7 @@ namespace OBJ_Viewer {
 		int width;
 		int height;
 	};
+
 	class RenderingCoordinator;
 	class Application
 	{

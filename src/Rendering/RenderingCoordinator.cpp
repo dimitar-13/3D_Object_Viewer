@@ -15,13 +15,16 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glBlendFunc(GL_ONE_MINUS_DST_ALPHA,GL_DST_ALPHA);
+	
 
 	while (!glfwWindowShouldClose(window))
 	{
-		if (m_currentWindowState != WINDOW_STATE_MINIMIZED){
+		if (m_currentWindowState != WINDOW_STATE_MINIMIZED) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			m_UILayer->RenderUI();
+
+			if (!m_application.isUIHidden())
+				m_UILayer->RenderUI();
+
 			RenderScene();
 			glfwSwapBuffers(window);
 		}
@@ -44,6 +47,13 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	m_sceneRenderer->RenderScene(appSettings);
 
 	framebuffer.UnbindFramebuffer();
+
+
+
+	if (m_application.isUIHidden())
+	{
+		m_sceneRenderer->RenderFramebufferSampledFullScreenQuad();
+	}
 }
 
 void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)

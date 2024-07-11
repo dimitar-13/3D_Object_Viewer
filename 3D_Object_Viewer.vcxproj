@@ -187,6 +187,9 @@
   <ItemGroup>
     <ClInclude Include="src\AppEvent.h" />
     <ClInclude Include="src\CommonAppData.h" />
+    <ClInclude Include="src\Controls\AppKeyBindings.h" />
+    <ClInclude Include="src\Controls\KeyboardKeys.h" />
+    <ClInclude Include="src\Controls\MouseKeys.h" />
     <ClInclude Include="src\RenderingMediator.h" />
     <ClInclude Include="src\Rendering\SceneRenderer.h" />
     <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
@@ -226,6 +229,7 @@
     <None Include="Shaders\GridShader.glsl" />
     <None Include="Shaders\LightShader.glsl" />
     <None Include="Shaders\MaterialShader.glsl" />
+    <None Include="Shaders\SceneSampleShader.glsl" />
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
     <None Include="Shaders\UVShader.glsl" />

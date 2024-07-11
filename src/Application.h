@@ -8,9 +8,8 @@
 #include<array>
 #include"AppEvent.h"
 #include"Scene/Material.h"
-
+#include"Controls/AppKeyBindings.h"
 namespace OBJ_Viewer {
-
 	enum LightShadingModel
 	{
 		LIGHT_MODEL_BLIN_PHONG = 0,
@@ -98,6 +97,7 @@ namespace OBJ_Viewer {
 	public:
 		Application();
 		RenderStateSettings& GetScene_RefSettings() { return m_appStetting; }
+		bool isUIHidden()const { return m_isUIHidden; }
 		InputHandler& GetGlobalInputHandler() { return *m_inputHandler; }
 		Window& GetGlobalAppWindow() { return *m_window; }
 		const Framebuffer& GetSceneFrameBuffer()const { return *m_sceneFramebuffer; }
@@ -110,10 +110,12 @@ namespace OBJ_Viewer {
 		void InitImGui();
 		void ResizeBuffer(int newWidht, int newHeight);
 		void OnEvent(Event& winEvent);
+		void OnAppKeyBindPressed(KeyboardKeyEvent& e);
 	private:
 		RenderStateSettings m_appStetting;
+		bool m_isUIHidden = false;
 		std::unique_ptr<Window> m_window;
-		std::unique_ptr<InputHandler> m_inputHandler;
+		std::shared_ptr<InputHandler> m_inputHandler;
 		std::unique_ptr<Framebuffer> m_sceneFramebuffer;
 		std::unique_ptr<RenderingCoordinator> m_appRenderingCoordinator;
 		std::vector<std::weak_ptr<Listener>> m_eventListeners;

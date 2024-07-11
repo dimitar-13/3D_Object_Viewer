@@ -1,6 +1,6 @@
 #include "InputHandler.h"
 #include<iostream>
-OBJ_Viewer::KeyState OBJ_Viewer::KeyboardInputStateManager::GetKeyState(int key)
+OBJ_Viewer::KeyState OBJ_Viewer::KeyboardInputStateManager::GetKeyState(KeyboardKey key)
 {
 	if (m_keyHashes.find(key) == m_keyHashes.end())
 		return KEY_STATE_UKNOWN;
@@ -25,7 +25,7 @@ void OBJ_Viewer::MouseInputStateManager::onButtonStateChanged(MouseKeyEvent& e)
 	m_mouseKeyHashes.at(e.GetKeyCode()) = state;
 }
 
-OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(int button)
+OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(MouseKey button)
 {
 	if (m_mouseKeyHashes.find(button) == m_mouseKeyHashes.end())
 		return KEY_STATE_UKNOWN;

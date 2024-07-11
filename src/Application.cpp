@@ -34,8 +34,8 @@ OBJ_Viewer::Application::Application()
 	glViewport(0, 0, metrics.width, metrics.height);
 	InitImGui();
 
-	m_inputHandler = std::unique_ptr<InputHandler>(new InputHandler());
-
+	m_inputHandler = std::shared_ptr<InputHandler>(new InputHandler());
+	AddEventListener(m_inputHandler);
 	m_sceneFramebuffer = std::make_unique<Framebuffer>(STARTUP_WINDOW_WIDTH, STARTUP_WINDOW_HEIGHT, FRAMEBUFFER_COLOR_ATTACHMENT);
 	m_appRenderingCoordinator = std::make_unique<RenderingCoordinator>(*this);
 	m_appRenderingCoordinator->RenderLoop();
@@ -44,10 +44,17 @@ OBJ_Viewer::Application::Application()
 void OBJ_Viewer::Application::ResizeBuffer(int newWidth, int newHeight)
 {
 	Size2D size = m_sceneFramebuffer->GetFramebufferSize();
-	if (!(size.width == newWidth && size.height == newHeight))
-		glViewport(0, 0, newWidth, newHeight);
+	
+	if ((size.width == newWidth && size.height == newHeight))
+		return;
+	glViewport(0, 0, newWidth, newHeight);
 
 	this->m_sceneFramebuffer->ResizeFramebuffer(newWidth, newHeight);
+
+	FramebufferResizeEvent e(Size2D{ newWidth, newHeight });
+
+	OnEvent(e);
+
 }
 
 OBJ_Viewer::Application::~Application()
@@ -71,14 +78,33 @@ void OBJ_Viewer::Application::InitImGui()
 
 void OBJ_Viewer::Application::OnEvent(Event& winEvent)
 {
-	m_inputHandler->OnEvent(winEvent);
-	dynamic_cast<Listener&>(*m_appRenderingCoordinator).OnEvent(winEvent);
 	for (uint32_t i = 0; i < m_eventListeners.size(); i++)
 	{
 		if (std::shared_ptr<Listener> listener = m_eventListeners[i].lock())
 		{
 			listener->OnEvent(winEvent);
 		}
-	
+	}
+	if (winEvent.GetEventType() == EVENT_KEY_PRESSES )
+	{
+		KeyboardKeyEvent e = dynamic_cast<KeyboardKeyEvent&>(winEvent);
+		OnAppKeyBindPressed(e);
+	}
+	else if (winEvent.GetEventType() == EVENT_WINDOW_SIZE_CHANGED && m_isUIHidden)
+	{
+		WindowResizeEvent e = dynamic_cast<WindowResizeEvent&>(winEvent);
+		Size2D winSize = e.GetWindowSize();
+		ResizeBuffer(winSize.width, winSize.height);
+	}
+}
+
+void OBJ_Viewer::Application::OnAppKeyBindPressed(KeyboardKeyEvent& e)
+{
+	m_isUIHidden = e.GetKeyCode() == KEY_BIND_HIDE_UI && e.GetKeyAction() == GLFW_PRESS ? !m_isUIHidden : m_isUIHidden;
+	if (m_isUIHidden && e.GetKeyCode() == KEY_BIND_HIDE_UI)
+	{
+		Size2D winSize = m_window->GetWindowSize();
+		ResizeBuffer(winSize.width, winSize.height);
+		m_inputHandler->SetCurrentlyFocusedWindow(UI_LAYER_SCENE_WINDOW_NAME);
 	}
 }

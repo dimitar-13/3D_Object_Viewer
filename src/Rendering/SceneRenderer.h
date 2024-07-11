@@ -16,6 +16,7 @@ namespace OBJ_Viewer {
 		SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator);
 		~SceneRenderer();
 		void RenderScene(const RenderStateSettings& renderSettings);
+		void RenderFramebufferSampledFullScreenQuad();
 		void SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with);
 		std::weak_ptr<Model> GetSceneModel() { return m_sceneModel; }
 		std::weak_ptr<Skybox> GetSkyboxModel() { return m_sceneSkybox; }
@@ -39,7 +40,7 @@ namespace OBJ_Viewer {
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
 		std::shared_ptr<Skybox> m_sceneSkybox;
-		VertexAttributeObject m_gridVAO;
+		VertexAttributeObject m_screenQuad;
 
 		ShaderClass m_clearColorShader;
 		ShaderClass m_gridShader;
@@ -50,6 +51,7 @@ namespace OBJ_Viewer {
 		ShaderClass m_wireframePointShader;
 		ShaderClass m_UVShader;
 		ShaderClass m_singleTextureShader;
+		ShaderClass m_postProcessingShader;
 
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;

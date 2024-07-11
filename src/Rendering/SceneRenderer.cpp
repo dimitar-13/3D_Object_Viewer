@@ -8,7 +8,7 @@
 #include"MeshGeneratingMethods.h"
 
 OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) :
-	m_gridVAO({ { -1.0f,1.0f,0.0f },
+	m_screenQuad({ { -1.0f,1.0f,0.0f },
 				{ -1.0f, -1.0f, 0.0 },
 				{ 1.0f,  1.0f, 0.0 },
 				{ 1.0f, -1.0f, 0.0 } },
@@ -22,6 +22,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	m_wireframePointShader(GetConcatShaderPath("WireframePointShader.glsl").c_str()),
 	m_UVShader(GetConcatShaderPath("UVShader.glsl").c_str()),
 	m_singleTextureShader(GetConcatShaderPath("SingleTextureInspectShader.glsl").c_str()),
+	m_postProcessingShader(GetConcatShaderPath("SceneSampleShader.glsl").c_str()),
 	m_app(app),
 	m_uniformLightBuffer("LightInfo", 1, MAX_LIGHT_COUNT * 2 * sizeof(glm::vec4), nullptr),
 	m_uniformMatrixBuffer("Matrices", 0, 3 * sizeof(glm::mat4), nullptr)
@@ -30,7 +31,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 
 	InitShaders();
 	m_renderingMediator = mediator;
-	m_sceneCamera = std::make_shared<Camera>(5.0f, app.GetGlobalAppWindow().GetWindowSize(), app);
+	m_sceneCamera = std::make_shared<Camera>(5.0f, app.GetSceneFrameBuffer().GetFramebufferSize(), app);
 	m_app.AddEventListener(m_sceneCamera);
 
 	ModelData data;
@@ -103,11 +104,29 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 
 }
 
+void OBJ_Viewer::SceneRenderer::RenderFramebufferSampledFullScreenQuad()
+{
+	const Framebuffer& mainFramebuffer = m_app.GetSceneFrameBuffer();
+
+	glActiveTexture(GL_TEXTURE1);
+	Texture& framebufferTexture = mainFramebuffer.GetFramebufferTexture();
+
+	glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		framebufferTexture.BindTexture();
+		m_postProcessingShader.UseShader();
+		m_postProcessingShader.UniformSet1Int("u_framebufferTexture", 1);
+		m_mainRenderer.RenderMesh(m_postProcessingShader, m_screenQuad, *m_sceneCamera);
+		framebufferTexture.UnbindTexture();
+	glDisable(GL_BLEND);
+
+}
+
 void OBJ_Viewer::SceneRenderer::RenderGrid(const GridData& appGridData)
 {
 	m_gridShader.UseShader();
 	m_gridShader.UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
-	m_mainRenderer.RenderGrid(m_gridShader, m_gridVAO, *m_sceneCamera, appGridData);
+	m_mainRenderer.RenderGrid(m_gridShader, m_screenQuad, *m_sceneCamera, appGridData);
 }
 
 void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags,SceneLightInfo lightInfo)

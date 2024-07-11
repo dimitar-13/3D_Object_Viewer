@@ -3,6 +3,7 @@
 #include"Texture.h"
 #include<iostream>
 #include"CommonAppData.h"
+
 namespace OBJ_Viewer {
 
 	enum FramebufferAttachmentsFlags

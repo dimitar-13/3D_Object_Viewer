@@ -48,7 +48,7 @@ namespace OBJ_Viewer
 
 		void onScrollChanged(ScrollPositionChanged& e);
 		void onMousePositionChanged(MousePositionEvent& e);
-		void onWinSizeChanged(WindowResizeEvent& e);
+		void onWinSizeChanged(FramebufferResizeEvent& e);
 		void onKeyPressedEvent(KeyboardKeyEvent& e);
 		void RecalculateProjection(Size2D windowSize = {0,0});
 		void OnProjectionModeChanged(EventCameraProjectionChanged& e);

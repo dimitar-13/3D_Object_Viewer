@@ -43,24 +43,24 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
 	auto& mousePos = e.GetMousePos();
 
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
 		m_EulerAngleHelper.calculateEulerAngles(mousePos);
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(mousePos);
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 		CalculatePositionVector();
 	}
 
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(GLFW_MOUSE_BUTTON_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
 		m_lastMousePos = mousePos;
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(GLFW_MOUSE_BUTTON_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		constexpr float movementSpeed = .005;
 		glm::mat3 viewSpaceOrthogonalVectors = glm::mat3(m_viewMatrix);
@@ -68,7 +68,8 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		//We calculate the offset in camera/view space first.
 		Position2D delta = Position2D{ mousePos.x - m_lastMousePos.x,mousePos.y - m_lastMousePos.y};
 		viewDirectionVector.x = delta.x*movementSpeed;
-		viewDirectionVector.y = delta.y*movementSpeed;
+		//We flip the y since opengl flips its y component 
+		viewDirectionVector.y = -delta.y*movementSpeed;
 		//TL;DR: We use transpose as a cheap inverse since the "viewSpaceOrthogonalVectors" is a 3 orthogonal vector matrix
 		//and then we bring our viewSpace delta into word space.
 		/*Why we do it like this ? 
@@ -85,9 +86,9 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 
 }
 
-void OBJ_Viewer::Camera::onWinSizeChanged(WindowResizeEvent& e)
+void OBJ_Viewer::Camera::onWinSizeChanged(FramebufferResizeEvent& e)
 {
-	const Size2D winSize = e.GetWindowSize();
+	const Size2D winSize = e.GetNewFramebufferSize();
 	RecalculateProjection(winSize);
 }
 
@@ -142,8 +143,8 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 {
 	switch (e.GetEventType())
 	{
-	case EVENT_WINDOW_SIZE_CHANGED:
-		this->onWinSizeChanged(dynamic_cast<WindowResizeEvent&>(e));
+	case EVENT_FRAMEBUFFER_SIZE_CHANGED:
+		this->onWinSizeChanged(dynamic_cast<FramebufferResizeEvent&>(e));
 		break;
 	case EVENT_MOUSE_POSITION_CHANGED:
 		this->onMousePositionChanged(dynamic_cast<MousePositionEvent&>(e));

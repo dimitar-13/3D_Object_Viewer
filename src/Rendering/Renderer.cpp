@@ -64,6 +64,7 @@ void OBJ_Viewer::Renderer::RenderMeshMaterialWithLight(const ShaderClass& shader
 
 void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao, const Camera& mainCamera, const GridData gridInfo)
 {
+	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 

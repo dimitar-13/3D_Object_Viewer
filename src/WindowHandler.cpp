@@ -78,7 +78,7 @@ void OBJ_Viewer::Window::glfwCursorPositionCallback(GLFWwindow* window, double x
 
 void OBJ_Viewer::Window::glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	MouseKeyEvent mouseKeyStateChangeEvent(button, action, mods);
+	MouseKeyEvent mouseKeyStateChangeEvent(static_cast<MouseKey>(button), action, mods);
 	m_onEvent(mouseKeyStateChangeEvent);
 }
 
@@ -90,23 +90,22 @@ void OBJ_Viewer::Window::glfwScrollCallback(GLFWwindow* window, double xoffset, 
 
 void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	KeyboardKeyEvent keyboardKeyStateEvent(key, scancode, action, mods);
+	KeyboardKeyEvent keyboardKeyStateEvent(static_cast<KeyboardKey>(key), scancode, action, mods);
 	m_onEvent(keyboardKeyStateEvent);
 }
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
 	int isVisible = glfwGetWindowAttrib(window, GLFW_VISIBLE);
+	this->m_windowSize = Size2D{ width,height };
 	if (width == 0 || height == 0)
 	{
-		this->m_windowSize = Size2D{ width,height };
 		WindowStateChangedEvent e(Size2D{ width, height }, WINDOW_STATE_MINIMIZED);
 		m_onEvent(e);
 		return;
 	}
 	else if (m_windowSize.width == 0 || m_windowSize.height == 0 && (width != 0 || height != 0))
 	{
-		this->m_windowSize = Size2D{ width,height };
 		WindowStateChangedEvent e(Size2D{ width, height }, WINDOW_STATE_NORMAL);
 		m_onEvent(e);
 		return;

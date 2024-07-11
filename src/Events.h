@@ -1,6 +1,8 @@
 #pragma once
 #include<vector>
 #include"CommonAppData.h"
+#include"Controls/KeyboardKeys.h"
+#include"Controls/MouseKeys.h"
 
 namespace OBJ_Viewer {
 	enum EventType
@@ -15,7 +17,8 @@ namespace OBJ_Viewer {
 		EVENT_ON_MODEL_LOAD,
 		EVENT_ON_FOCUSED_WINDOW_CHANGED,
 		EVENT_WINDOW_STATE_CHANGED,
-		EVENT_CAMERA_PROJECTION_TYPE_CHANGED
+		EVENT_CAMERA_PROJECTION_TYPE_CHANGED,
+		EVENT_FRAMEBUFFER_SIZE_CHANGED
 	};
 
 	enum EventCategory
@@ -61,20 +64,20 @@ namespace OBJ_Viewer {
 	class MouseKeyEvent : public Event
 	{
 	public:
-		MouseKeyEvent(int key, int action, int mod) {
-			m_keyCode = key;
+		MouseKeyEvent(MouseKey key, int action, int mod) {
+			m_key = key;
 			m_action = action;
 			m_mod = mod;
 		}
 		EventType GetEventType()const override { return EVENT_MOUSE_BUTTON_PRESSED; }
 		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
 
-		int GetKeyCode()const { return m_keyCode; }
+		MouseKey GetKeyCode()const { return m_key; }
 		int GetKeyAction()const { return m_action; }
 		int GetKeyMod()const { return m_mod; }
 
 	private:
-		int m_keyCode;
+		MouseKey m_key;
 		int m_action;
 		int m_mod;
 	};
@@ -82,8 +85,8 @@ namespace OBJ_Viewer {
 	class KeyboardKeyEvent : public Event
 	{
 	public:
-		KeyboardKeyEvent(int key, int scanCode, int action, int mod) {
-			m_keyCode = key;
+		KeyboardKeyEvent(KeyboardKey key, int scanCode, int action, int mod) {
+			m_key = key;
 			m_scanCode = scanCode;
 			m_action = action;
 			m_mod = mod;
@@ -91,14 +94,14 @@ namespace OBJ_Viewer {
 		EventType GetEventType()const override { return EVENT_KEY_PRESSES; }
 		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
 
-		int GetKeyCode()const { return m_keyCode; }
+		KeyboardKey GetKeyCode()const { return m_key; }
 		int GetKeyAction()const { return m_action; }
 		int GetKeyMod()const { return m_mod; }
 		int GetKeyScanCode()const { return m_scanCode; }
 
 
 	private:
-		int m_keyCode;
+		KeyboardKey m_key;
 		int m_scanCode;
 		int m_action;
 		int m_mod;
@@ -117,6 +120,18 @@ namespace OBJ_Viewer {
 		Size2D m_windowNewSize;
 	};
 
+	class FramebufferResizeEvent : public Event
+	{
+	public:
+		FramebufferResizeEvent(Size2D newSize) :m_framebufferSize(newSize)
+		{ }
+		EventType GetEventType()const override { return EVENT_FRAMEBUFFER_SIZE_CHANGED; }
+		EventCategory GetEventCategory()const override { return APP_EVENT; }
+
+		Size2D GetNewFramebufferSize()const { return m_framebufferSize; }
+	private:
+		Size2D m_framebufferSize;
+	};
 
 	class ScrollPositionChanged : public Event
 	{

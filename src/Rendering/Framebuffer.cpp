@@ -38,9 +38,6 @@ bool OBJ_Viewer::Framebuffer::isFramebufferValid() const
 
 void OBJ_Viewer::Framebuffer::ResizeFramebuffer(int newWidth, int newHeight)
 {
-	if (m_framebufferSize.width == newWidth && m_framebufferSize.height == newHeight)
-		return;
-
 	m_framebufferSize.width = newWidth;
 	m_framebufferSize.height = newHeight;
 
@@ -52,6 +49,7 @@ void OBJ_Viewer::Framebuffer::ResizeFramebuffer(int newWidth, int newHeight)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->m_readBuffer);
 
 	UnbindFramebuffer();
+
 }
 
 OBJ_Viewer::Framebuffer::~Framebuffer()

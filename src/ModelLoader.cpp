@@ -166,7 +166,7 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 		mat->GetTexture(type, i, &TexturePath);
 		std::string fullPath = GetModelTexturePathAbsolute(TexturePath);
 
-		TextureSize textureSize;
+		Size2D textureSize;
 		int presentChannelCount;
 
 		TexturePixelDataWrapper textureReader(fullPath.c_str(), &textureSize, &presentChannelCount);

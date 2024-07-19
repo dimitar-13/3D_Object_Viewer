@@ -8,6 +8,7 @@
 #include"MeshGeneratingMethods.h"
 
 OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) :
+	m_multiSampleSceneFrameBuffer(app.GetSceneFrameBuffer().GetFramebufferSize(),FRAMEBUFFER_COLOR_ATTACHMENT,true,8),
 	m_screenQuad({ { -1.0f,1.0f,0.0f },
 				{ -1.0f, -1.0f, 0.0 },
 				{ 1.0f,  1.0f, 0.0 },
@@ -54,10 +55,18 @@ OBJ_Viewer::SceneRenderer::~SceneRenderer()
 void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings)
 {
 	SetUniformMatrixBuffer();
+	Framebuffer& appFramebuffer = m_app.GetSceneFrameBuffer();
+	if (renderSettings.m_EnableAA)
+		m_multiSampleSceneFrameBuffer.BindFramebuffer();
+	else
+		appFramebuffer.BindFramebuffer();
+
+
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())
 	{
-		switch(renderSettings.m_currentRenderingMode)
+		switch (renderSettings.m_currentRenderingMode)
 		{
 		case RENDER_MODE_WIREFRAME:
 			SetUpForWireframeRendering(*mesh, renderSettings.wireframeSettings);
@@ -71,7 +80,7 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 
 		case RENDER_MODE_INDIVIDUAL_TEXTURES:
 			m_singleTextureShader.UseShader();
-			if(auto texture = mesh->GetMaterial().GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
+			if (auto texture = mesh->GetMaterial().GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
 				m_mainRenderer.BindMaterialTexture(m_singleTextureShader, texture, GL_TEXTURE1, "textureToInspect");
 			m_mainRenderer.RenderMesh(m_singleTextureShader, mesh->GetMeshVAO(), *m_sceneCamera);
 			break;
@@ -88,6 +97,12 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 			break;
 		}
 	}
+	if (renderSettings.m_EnableAA)
+	{
+		appFramebuffer.CopyFramebufferContent(m_multiSampleSceneFrameBuffer);
+		m_multiSampleSceneFrameBuffer.UnbindFramebuffer();
+	}
+
 
 	if (m_sceneSkybox != nullptr && renderSettings.m_isSkyboxOn)
 	{
@@ -102,6 +117,8 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 		RenderGrid(renderSettings.m_gridData);
 	}
 
+	appFramebuffer.UnbindFramebuffer();
+
 }
 
 void OBJ_Viewer::SceneRenderer::RenderFramebufferSampledFullScreenQuad()
@@ -110,12 +127,16 @@ void OBJ_Viewer::SceneRenderer::RenderFramebufferSampledFullScreenQuad()
 
 	glActiveTexture(GL_TEXTURE1);
 	Texture& framebufferTexture = mainFramebuffer.GetFramebufferTexture();
+	static Size2D winSize = m_app.GetGlobalAppWindow().GetWindowSize();
+	glm::vec2 uRes = glm::vec2(winSize.width, winSize.height);
 
 	glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		framebufferTexture.BindTexture();
 		m_postProcessingShader.UseShader();
 		m_postProcessingShader.UniformSet1Int("u_framebufferTexture", 1);
+		m_postProcessingShader.UniformSet2FloatVector("u_resolution", uRes);
+
 		m_mainRenderer.RenderMesh(m_postProcessingShader, m_screenQuad, *m_sceneCamera);
 		framebufferTexture.UnbindTexture();
 	glDisable(GL_BLEND);
@@ -242,6 +263,8 @@ void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
 		OnModelLoadEvent(dynamic_cast<EventOnModelLoaded&>(e));
 	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_ON_SKYBOX_LOAD)
 		OnSkyboxLoadEvent(dynamic_cast<EventOnSkyboxLoaded&>(e));
+	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_FRAMEBUFFER_SIZE_CHANGED)
+		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(m_app.GetSceneFrameBuffer().GetFramebufferSize());
 }
 
 void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)

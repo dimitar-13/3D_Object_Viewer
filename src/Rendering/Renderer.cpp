@@ -113,7 +113,7 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDefaultTexture(
 {
 	TextureBuilder builder;
 	int channelCount;
-	TextureSize textureSize;
+	Size2D textureSize;
 	TexturePixelDataWrapper reader(path.c_str(), &textureSize, &channelCount);
 	TextureFormat format = GetFormatByChannelCount(channelCount);
 	return builder.SetTextureFormat(format).

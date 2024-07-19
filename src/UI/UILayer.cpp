@@ -271,7 +271,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 			m_appEventCallback(e);
 		}
 		ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
-
+		ImGui::Checkbox("Enable AA", &pSettings.m_EnableAA);
 	}ImGui::End();
 
 	if(ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))

@@ -40,6 +40,7 @@ namespace OBJ_Viewer {
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
 		std::shared_ptr<Skybox> m_sceneSkybox;
+		Framebuffer m_multiSampleSceneFrameBuffer;
 		VertexAttributeObject m_screenQuad;
 
 		ShaderClass m_clearColorShader;

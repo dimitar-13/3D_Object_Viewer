@@ -46,16 +46,13 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	//I didnt thought of this but if you want to do blending and you render the grid last do yourself a favor and set the alpha here to 0;
 	glClearColor(0, 0, 0, 0);
 
-	m_sceneRenderer->RenderScene(appSettings);
-
-	//framebuffer.UnbindFramebuffer();
-
-
-
 	if (m_application.isUIHidden())
 	{
-		m_sceneRenderer->RenderFramebufferSampledFullScreenQuad();
+		m_sceneRenderer->RenderScene(appSettings);
 	}
+	else
+		m_sceneRenderer->RenderScene(appSettings, &framebuffer);
+
 }
 
 void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)

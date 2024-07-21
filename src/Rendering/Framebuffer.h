@@ -22,6 +22,7 @@ namespace OBJ_Viewer {
 		GLuint GetFramebufferHandle()const { return this->m_framebuffer; }
 		Texture& GetFramebufferTexture()const { return *this->m_texture; }
 		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer); }
+		static void BindDefaultFramebuffer() {  glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 		void UnbindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 		bool isFramebufferValid()const;
 		Size2D GetFramebufferSize()const { return m_framebufferSize; }

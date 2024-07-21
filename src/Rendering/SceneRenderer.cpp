@@ -8,7 +8,8 @@
 #include"MeshGeneratingMethods.h"
 
 OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) :
-	m_multiSampleSceneFrameBuffer(app.GetSceneFrameBuffer().GetFramebufferSize(),FRAMEBUFFER_COLOR_ATTACHMENT,true,8),
+	m_multiSampleSceneFrameBuffer(app.GetSceneFrameBuffer().GetFramebufferSize(),FRAMEBUFFER_COLOR_ATTACHMENT,true,11),
+	m_intermidiateFramebuffer(app.GetSceneFrameBuffer().GetFramebufferSize(), FRAMEBUFFER_COLOR_ATTACHMENT),
 	m_screenQuad({ { -1.0f,1.0f,0.0f },
 				{ -1.0f, -1.0f, 0.0 },
 				{ 1.0f,  1.0f, 0.0 },
@@ -23,11 +24,10 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	m_wireframePointShader(GetConcatShaderPath("WireframePointShader.glsl").c_str()),
 	m_UVShader(GetConcatShaderPath("UVShader.glsl").c_str()),
 	m_singleTextureShader(GetConcatShaderPath("SingleTextureInspectShader.glsl").c_str()),
-	m_postProcessingShader(GetConcatShaderPath("SceneSampleShader.glsl").c_str()),
+	m_postProcessingShader(GetConcatShaderPath("PostProcessShader.glsl").c_str()),
 	m_app(app),
 	m_uniformLightBuffer("LightInfo", 1, MAX_LIGHT_COUNT * 2 * sizeof(glm::vec4), nullptr),
 	m_uniformMatrixBuffer("Matrices", 0, 3 * sizeof(glm::mat4), nullptr)
-
 {
 
 	InitShaders();
@@ -37,7 +37,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 
 	ModelData data;
 	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(std::move(GenerateCubeVAO()));
-	//Thise are not correct
+	//These are not correct
 	data.vertexCount = mesh->GetMeshVAO().GetVertexCount();
 	data.triangleCount = data.vertexCount/3;
 	data.faceCount = data.triangleCount/2;
@@ -52,14 +52,14 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 OBJ_Viewer::SceneRenderer::~SceneRenderer()
 {
 }
-void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings)
+void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSettings, Framebuffer* outputFrameBuffer)
 {
 	SetUniformMatrixBuffer();
-	Framebuffer& appFramebuffer = m_app.GetSceneFrameBuffer();
+
 	if (renderSettings.m_EnableAA)
 		m_multiSampleSceneFrameBuffer.BindFramebuffer();
 	else
-		appFramebuffer.BindFramebuffer();
+		m_intermidiateFramebuffer.BindFramebuffer();
 
 
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -97,14 +97,16 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 			break;
 		}
 	}
+
 	if (renderSettings.m_EnableAA)
 	{
-		appFramebuffer.CopyFramebufferContent(m_multiSampleSceneFrameBuffer);
+		m_intermidiateFramebuffer.CopyFramebufferContent(m_multiSampleSceneFrameBuffer);
 		m_multiSampleSceneFrameBuffer.UnbindFramebuffer();
+
+		m_intermidiateFramebuffer.BindFramebuffer();
 	}
 
-
-	if (m_sceneSkybox != nullptr && renderSettings.m_isSkyboxOn)
+	if (renderSettings.m_isSkyboxOn && m_sceneSkybox != nullptr)
 	{
 		glDisable(GL_CULL_FACE);
 
@@ -116,32 +118,45 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 	{
 		RenderGrid(renderSettings.m_gridData);
 	}
+	m_intermidiateFramebuffer.UnbindFramebuffer();
 
-	appFramebuffer.UnbindFramebuffer();
 
+	if (outputFrameBuffer == nullptr)
+	{
+		Framebuffer::BindDefaultFramebuffer();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		PostProcessScene(renderSettings.m_EnableAA);
+	}
+	else
+	{
+		outputFrameBuffer->BindFramebuffer();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		PostProcessScene(renderSettings.m_EnableAA);
+		outputFrameBuffer->UnbindFramebuffer();
+	}
 }
 
-void OBJ_Viewer::SceneRenderer::RenderFramebufferSampledFullScreenQuad()
+void OBJ_Viewer::SceneRenderer::PostProcessScene(bool doFXAA)
 {
-	const Framebuffer& mainFramebuffer = m_app.GetSceneFrameBuffer();
-
 	glActiveTexture(GL_TEXTURE1);
-	Texture& framebufferTexture = mainFramebuffer.GetFramebufferTexture();
-	static Size2D winSize = m_app.GetGlobalAppWindow().GetWindowSize();
-	glm::vec2 uRes = glm::vec2(winSize.width, winSize.height);
+	Texture& framebufferTexture = m_intermidiateFramebuffer.GetFramebufferTexture();
+
+	static SceneViewport sceneViewPort = m_app.GetSceneViewport();
+	glm::vec2 uRes = glm::vec2(sceneViewPort.width, sceneViewPort.height);
 
 	glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		framebufferTexture.BindTexture();
-		m_postProcessingShader.UseShader();
-		m_postProcessingShader.UniformSet1Int("u_framebufferTexture", 1);
-		m_postProcessingShader.UniformSet2FloatVector("u_resolution", uRes);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	framebufferTexture.BindTexture();
+	m_postProcessingShader.UseShader();
+	m_postProcessingShader.UniformSet1Int("u_framebufferTexture", 1);
+	m_postProcessingShader.UniformSet2FloatVector("u_resolution", uRes);
+	m_postProcessingShader.UniformSet1Int("u_useAA", doFXAA);
 
-		m_mainRenderer.RenderMesh(m_postProcessingShader, m_screenQuad, *m_sceneCamera);
-		framebufferTexture.UnbindTexture();
+	m_mainRenderer.RenderMesh(m_postProcessingShader, m_screenQuad, *m_sceneCamera);
+	framebufferTexture.UnbindTexture();
 	glDisable(GL_BLEND);
-
 }
+
 
 void OBJ_Viewer::SceneRenderer::RenderGrid(const GridData& appGridData)
 {
@@ -186,7 +201,6 @@ void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,cons
 		m_mainRenderer.RenderMesh(m_wireframeShader, mesh.GetMeshVAO(), *m_sceneCamera);
 	}
 }
-
 
 void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 {
@@ -264,7 +278,10 @@ void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
 	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_ON_SKYBOX_LOAD)
 		OnSkyboxLoadEvent(dynamic_cast<EventOnSkyboxLoaded&>(e));
 	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_FRAMEBUFFER_SIZE_CHANGED)
+	{
 		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(m_app.GetSceneFrameBuffer().GetFramebufferSize());
+		m_intermidiateFramebuffer.ResizeFramebuffer(m_app.GetSceneFrameBuffer().GetFramebufferSize());
+	}
 }
 
 void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)

@@ -37,6 +37,8 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,
 
 void OBJ_Viewer::UILayer::RenderUI()
 {
+#pragma region Setup
+
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
 	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
@@ -66,6 +68,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), m_imgGuiDockSpaceFlags);
 	}
+#pragma endregion
+
+#pragma region ModelAndRenderingSettings
+
+
 	//Right panel for model and rendering settings.
 	if (ImGui::Begin(UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
 	{
@@ -173,14 +180,18 @@ void OBJ_Viewer::UILayer::RenderUI()
 			}
 		}ImGui::EndChild();
 	}ImGui::End();
+#pragma endregion
+
+#pragma region Scene settings
 
 
-	//ModelData modelData = (*m_pCurrentlyLoadedModel)->GetModelData();
 	if (ImGui::Begin(UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
 			UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
 		ModelData currentModelData = SceneModel->GetModelData();
+#pragma region Object info
+
 
 		ImGui::Text("Object triangle count:%d", currentModelData.triangleCount);
 		ImGui::Text("Object vertex count:%d", currentModelData.vertexCount);
@@ -191,6 +202,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::SetItemTooltip("Path:%s", currentModelData.modelPath.c_str());
 
 		ImGui::Separator();
+#pragma endregion
+
+#pragma region Grid settings
+
 
 		ImGui::Text("Scene settings.");
 		ImGui::Separator();
@@ -205,6 +220,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 			}
 		}
 		ImGui::Separator();
+#pragma endregion
+
+#pragma region  Light settings
+
+
 		if (ImGui::CollapsingHeader("Light settings."))
 		{
 	
@@ -253,8 +273,12 @@ void OBJ_Viewer::UILayer::RenderUI()
 				}
 			}	
 		}
-
 		ImGui::Separator();
+#pragma endregion
+
+#pragma region Rest of settings
+
+
 		if (ImGui::CollapsingHeader("Skybox settings."))
 		{
 			ImGui::Checkbox("Enable skybox?", &pSettings.m_isSkyboxOn);
@@ -272,7 +296,14 @@ void OBJ_Viewer::UILayer::RenderUI()
 		}
 		ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
 		ImGui::Checkbox("Enable AA", &pSettings.m_EnableAA);
+		ImGui::SetItemTooltip("Enable scene Anti-aliasing(AA).The scene AA is using MSAA + FXAA");
 	}ImGui::End();
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Loading object info
+
 
 	if(ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
@@ -322,6 +353,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::SameLine(0, spacing);
 
 	}ImGui::End();
+#pragma endregion
+
+#pragma region Scene window
+
 
 	if(ImGui::Begin(UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
@@ -330,7 +365,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 winPos = ImGui::GetWindowPos();
-		SceneViewport sceneWinViewport;
+		static SceneViewport sceneWinViewport{};
 		sceneWinViewport.x = winPos.x;
 		sceneWinViewport.y = winPos.y;
 		sceneWinViewport.width = winSize.x;
@@ -342,15 +377,17 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::EndChild();
 
 	}ImGui::End();
+#pragma endregion
+
+#pragma region Submit UI
 
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#pragma endregion
 	m_application.GetGlobalInputHandler().SetCurrentlyFocusedWindow(currentlyActiveWindow);
 
 	SceneModel->ApplyTransformation(position, scale, glm::vec3(1), 0);
-
-
 }
 
 void OBJ_Viewer::UILayer::RenderSkyboxSettings()

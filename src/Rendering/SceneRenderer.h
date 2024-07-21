@@ -15,8 +15,12 @@ namespace OBJ_Viewer {
 	public:
 		SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator);
 		~SceneRenderer();
-		void RenderScene(const RenderStateSettings& renderSettings);
-		void RenderFramebufferSampledFullScreenQuad();
+		/// <summary>
+		/// Renders a scene using the provided settings to a framebuffer.
+		/// </summary>
+		/// <param name="renderSettings">The instruction on how to render the scene. </param>
+		/// <param name="outputFrameBuffer">The output framebuffer if none provided is understood to be the default provided by GLFW.</param>
+		void RenderScene(const RenderStateSettings& renderSettings,Framebuffer* outputFrameBuffer = nullptr);
 		void SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with);
 		std::weak_ptr<Model> GetSceneModel() { return m_sceneModel; }
 		std::weak_ptr<Skybox> GetSkyboxModel() { return m_sceneSkybox; }
@@ -35,11 +39,14 @@ namespace OBJ_Viewer {
 		void RenderGrid(const GridData& appGridData);
 		void SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags, SceneLightInfo lightInfo);
 		void SetUpForWireframeRendering(const Mesh& mesh,const WireFrameSettings& wireframeAppSettings);
-		void RenderSkybox();
+		void PostProcessScene(bool doFXAA = true);
 	private:
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
 		std::shared_ptr<Skybox> m_sceneSkybox;
+		Framebuffer m_multiSampleSceneFrameBuffer;
+		Framebuffer m_intermidiateFramebuffer;
+
 		VertexAttributeObject m_screenQuad;
 
 		ShaderClass m_clearColorShader;

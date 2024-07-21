@@ -14,8 +14,8 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 	GLFWwindow* window = this->m_application.GetGlobalAppWindow().GetGLFW_Window();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_MULTISAMPLE);
 	glCullFace(GL_BACK);
-	
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -39,21 +39,20 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	auto& framebuffer =	m_application.GetSceneFrameBuffer();
 
 	//Set up the renderer based on the settings;
-	framebuffer.BindFramebuffer();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+ 
+	//framebuffer.BindFramebuffer();
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	//I didnt thought of this but if you want to do blending and you render the grid last do yourself a favor and set the alpha here to 0;
 	glClearColor(0, 0, 0, 0);
 
-	m_sceneRenderer->RenderScene(appSettings);
-
-	framebuffer.UnbindFramebuffer();
-
-
-
 	if (m_application.isUIHidden())
 	{
-		m_sceneRenderer->RenderFramebufferSampledFullScreenQuad();
+		m_sceneRenderer->RenderScene(appSettings);
 	}
+	else
+		m_sceneRenderer->RenderScene(appSettings, &framebuffer);
+
 }
 
 void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)

@@ -82,7 +82,7 @@ uniform bool isRimLightOn;
 
 const int toonColorLevel = 4;
 const float recipricalToonLevel = 1./toonColorLevel;
-const float rimLightPowerFactor = 4;
+const float rimLightPowerFactor = 6;
 float GetRimLightFactor(vec3 CameraToPixel,vec3 fragNormal);
 void main()
 {

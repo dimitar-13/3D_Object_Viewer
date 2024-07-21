@@ -30,7 +30,7 @@ namespace OBJ_Viewer
 		std::vector<OpenGLBuffer*> m_PixelBuffers;
 		GLuint m_cubeMapHandle = 0;
 		std::unique_ptr<VertexAttributeObject> m_skyboxVAO;
-		TextureSize m_CubeMapTextSize;
+		Size2D m_CubeMapTextSize;
 		TextureFormat m_format;
 	};
 

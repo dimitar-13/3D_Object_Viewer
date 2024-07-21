@@ -64,6 +64,7 @@ namespace OBJ_Viewer {
 	{
 		bool m_isWireGridOn = false;
 		bool m_isSkyboxOn = false;
+		bool m_EnableAA = true;
 		RenderingMode m_currentRenderingMode = RENDER_MODE_SOLID_COLOR;
 		glm::vec3 m_colorRenderingColor = glm::vec3(1);
 		MaterialFlags m_MaterialFlags = FLAGS_ALL;
@@ -96,11 +97,13 @@ namespace OBJ_Viewer {
 	{
 	public:
 		Application();
+		static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
+			GLsizei length, const char* message, const void* userParam);
 		RenderStateSettings& GetScene_RefSettings() { return m_appStetting; }
 		bool isUIHidden()const { return m_isUIHidden; }
 		InputHandler& GetGlobalInputHandler() { return *m_inputHandler; }
 		Window& GetGlobalAppWindow() { return *m_window; }
-		const Framebuffer& GetSceneFrameBuffer()const { return *m_sceneFramebuffer; }
+		Framebuffer& GetSceneFrameBuffer() { return *m_sceneFramebuffer; }
 		SceneViewport GetSceneViewport()const { return m_sceneViewport; }
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
 		void UpdateSceneViewport(SceneViewport newViewport) { m_sceneViewport = newViewport; ResizeBuffer(newViewport.width, newViewport.height); }

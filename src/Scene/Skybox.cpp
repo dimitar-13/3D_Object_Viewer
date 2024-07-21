@@ -3,7 +3,7 @@
 #include<algorithm>
 OBJ_Viewer::Skybox::Skybox(std::vector < std::string > & textPaths) :m_skyboxVAO(std::move(GenerateCubeVAO(true)))
 {
-	TextureSize pTextureSize;
+	Size2D pTextureSize;
 	int pPresentChannelsCount;
 	glGenTextures(1, &m_cubeMapHandle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle);

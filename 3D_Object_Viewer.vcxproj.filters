@@ -48,7 +48,7 @@
     <ClCompile Include="src\Rendering\RenderingCoordinator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModelLoader.cpp">
+    <ClCompile Include="src\Helpers\ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\VertexAttributeObject.cpp">
@@ -134,7 +134,7 @@
     <ClInclude Include="src\Rendering\RenderingCoordinator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ModelLoader.h">
+    <ClInclude Include="src\Helpers\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\VertexAttributeObject.h">
@@ -161,7 +161,7 @@
     <ClInclude Include="src\MeshGeneratingMethods.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DialogWrapper.h">
+    <ClInclude Include="src\Helpers\DialogWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\Framebuffer.h">
@@ -213,6 +213,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Controls\KeyboardKeys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers\FileFromatStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers\UnitTransformer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

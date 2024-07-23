@@ -1,7 +1,7 @@
 #include "SceneRenderer.h"
 #include "Renderer.h"
 #include "Application.h"
-#include "ModelLoader.h"
+#include "Helpers/ModelLoader.h"
 #include "Scene/Skybox.h"
 #include<memory>
 #include"ShaderPath.h"
@@ -218,9 +218,15 @@ void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 {
 	if (path.empty())
 		return;
+	LoadModelFileType modelFileFormat = FileFormatHelper::GetFileFormatFromPath(path);
+	if (m_app.GetScene_RefSettings().m_disableFBXLoading && modelFileFormat == LoadModelFileType::MODEL_TYPE_FBX)
+	{
+		std::cout << "Loading FBX files is disabled." << '\n';
+		return;
+	}
 
 	ModelLoader loader;
-	Model* newModel = loader.LoadModel(path.c_str());
+	Model* newModel = loader.LoadModel(path.c_str(), modelFileFormat);
 	if (newModel == nullptr)
 	{
 		std::cout << "Failed to load the model." << '\n';

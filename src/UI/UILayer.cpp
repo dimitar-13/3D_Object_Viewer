@@ -1,5 +1,5 @@
 #include "UILayer.h"
-#include"DialogWrapper.h"
+#include"Helpers/DialogWrapper.h"
 #include<algorithm>
 #include <iostream>
 #include<GL/glew.h>
@@ -338,7 +338,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::Text("Specular");
 		ImGui::SameLine(0, spacing);
 		ImGui::Text("Ambient Occlusion");
-
+		
 		ImGui::Image(0,
 			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 		ImGui::SameLine(0, spacing);
@@ -481,7 +481,12 @@ void OBJ_Viewer::UILayer::RenderComboBox(std::string comboLabel, int index)
 void OBJ_Viewer::UILayer::LoadModel()
 {
 	DialogWrapper dialog;
-	dialog.OpenDialog();
+	std::string filterList = "obj";
+
+	if (!m_application.GetScene_RefSettings().m_disableFBXLoading)
+		filterList += ",fbx";
+
+	dialog.OpenDialog(filterList);
 	//If error occurs or the user change their mind we wont send an event;
 	if (dialog.isDialogClosed())
 		return;

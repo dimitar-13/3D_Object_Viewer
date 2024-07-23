@@ -14,7 +14,7 @@ namespace OBJ_Viewer {
 	class Model
 	{
 	public:
-		Model(std::vector<std::shared_ptr<Mesh>> meshes,glm::mat4 modelMatrix, ModelData data);
+		Model(std::vector<std::shared_ptr<Mesh>> meshes,const glm::mat4& modelMatrix, const ModelData& data);
 		const ModelData& GetModelData()const { return this->m_data; }
 		const std::vector<std::shared_ptr<Mesh>>& GetModelMeshes()const { return this->m_meshes; }
 		glm::mat4 GetModelMatrix()const { return m_ModelMatrix; }

@@ -5,8 +5,8 @@ namespace OBJ_Viewer {
 	class DialogWrapper {
 	public:
 		DialogWrapper() = default;
-		void OpenDialog();
-		void OpenDialogMultiple(std::string filterList);
+		void OpenDialog(const std::string& filterLIst);
+		void OpenDialogMultiple(const std::string& filterList);
 		bool isDialogClosed()const { return isDialogAborted; }
 		~DialogWrapper();
 		const std::vector<nfdchar_t*> GetDialogResult() const { return outPaths; }
@@ -14,10 +14,10 @@ namespace OBJ_Viewer {
 		std::vector<nfdchar_t*> outPaths;
 		bool isDialogAborted = false;
 	};
-	inline void DialogWrapper::OpenDialog()
+	inline void DialogWrapper::OpenDialog(const std::string& filterLIst)
 	{
 		outPaths.push_back(nullptr);
-		nfdresult_t result = NFD_OpenDialog("obj", NULL, &outPaths[0]);
+		nfdresult_t result = NFD_OpenDialog(filterLIst.c_str(), NULL, &outPaths[0]);
 		if (result != NFD_OKAY) {
 			if (result == NFD_ERROR)
 				std::cout << "[ERROR]:NFD:" << NFD_GetError() << '\n';
@@ -25,7 +25,7 @@ namespace OBJ_Viewer {
 			return;
 		}
 	}
-	inline void DialogWrapper::OpenDialogMultiple(std::string filterList)
+	inline void DialogWrapper::OpenDialogMultiple(const std::string& filterList)
 	{
 		nfdpathset_t paths;
 		nfdresult_t result = NFD_OpenDialogMultiple(filterList.c_str(), NULL, &paths);

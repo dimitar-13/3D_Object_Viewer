@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include"pch.h"
-#include"Texture.h"
-#include"Scene/Material.h"
-#include"Scene/Model.h"
-#include"FileFromatStruct.h"
+#include "pch.h"
+#include "gpu_side/Texture.h"
+#include "Scene/Material.h"
+#include "Scene/Model.h"
+#include "FileFromatStruct.h"
 
 namespace OBJ_Viewer
 {

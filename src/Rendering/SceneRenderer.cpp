@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "SceneRenderer.h"
 #include "Renderer.h"
-#include "Application.h"
+#include "Core/Application.h"
 #include "Helpers/ModelLoader.h"
 #include "Scene/Skybox.h"
-#include"ShaderPath.h"
-#include"MeshGeneratingMethods.h"
+#include "ShaderPath.h"
+#include "Helpers/MeshGeneratingMethods.h"
 
 
 constexpr uint8_t MATRIX_UBO_BINDING_POINT = 0;

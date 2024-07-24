@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include"UniformBuffer.h"
+#include "gpu_side/UniformBuffer.h"
 namespace OBJ_Viewer
 {
 	enum ShaderIndex

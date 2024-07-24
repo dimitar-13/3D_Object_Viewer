@@ -169,6 +169,6 @@ void OBJ_Viewer::Application::OnAppKeyBindPressed(KeyboardKeyEvent& e)
 		viewport.height = winSize.height;
 		UpdateSceneViewport(viewport);
 
-		m_inputHandler->SetCurrentlyFocusedWindow(UI_LAYER_SCENE_WINDOW_NAME);
+		m_inputHandler->SetCurrentlyFocusedWindow(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
 	}
 }

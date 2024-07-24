@@ -1,8 +1,8 @@
 #pragma once
 #include "pch.h"
-#include"Controls/KeyboardKeys.h"
-#include"Controls/MouseKeys.h"
-#include"Events.h"
+#include "Controls/KeyboardKeys.h"
+#include "Controls/MouseKeys.h"
+#include "Core/Events.h"
 namespace OBJ_Viewer
 {
 	class Application;
@@ -177,7 +177,7 @@ namespace OBJ_Viewer
 		MouseInputStateManager m_mouseInputManager;
 		KeyboardInputStateManager m_keyboardInputManager;
 
-		const char* m_crrentlyFocusedWindowName = "SceneWindow";
+		const char* m_crrentlyFocusedWindowName = APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME;
 
 		// Inherited via Listener
 		void OnEvent(Event& e) override;

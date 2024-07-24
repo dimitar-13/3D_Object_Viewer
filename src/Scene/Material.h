@@ -1,6 +1,6 @@
 #pragma once
-#include"Texture.h"
-#include"Rendering/ShaderClass.h"
+#include "gpu_side/Texture.h"
+#include "gpu_side/ShaderClass.h"
 #include "pch.h"
 
 namespace OBJ_Viewer {

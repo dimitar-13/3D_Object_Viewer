@@ -1,8 +1,8 @@
 #pragma once
 #include"pch.h"
-#include"VertexAttributeObject.h"
-#include"Texture.h"
-#include"Rendering/OpenGLBuffer.h"
+#include"gpu_side/VertexAttributeObject.h"
+#include"gpu_side/Texture.h"
+#include"gpu_side/OpenGLBuffer.h"
 namespace OBJ_Viewer
 {
 	enum SkyboxFace

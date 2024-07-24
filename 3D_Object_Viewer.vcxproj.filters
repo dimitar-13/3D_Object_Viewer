@@ -42,7 +42,7 @@
     <ClCompile Include="src\Scene\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\ShaderClass.cpp">
+    <ClCompile Include="src\gpu_side\ShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Rendering\RenderingCoordinator.cpp">
@@ -51,25 +51,25 @@
     <ClCompile Include="src\Helpers\ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexAttributeObject.cpp">
+    <ClCompile Include="src\gpu_side\VertexAttributeObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WindowHandler.cpp">
+    <ClCompile Include="src\Core\WindowHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Framebuffer.cpp">
+    <ClCompile Include="src\gpu_side\Framebuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\InputHandler.cpp">
+    <ClCompile Include="src\Controls\InputHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
+    <ClCompile Include="src\gpu_side\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Material.cpp">
@@ -84,13 +84,13 @@
     <ClCompile Include="src\Scene\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\OpenGLBuffer.cpp">
+    <ClCompile Include="src\gpu_side\OpenGLBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\UILayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\UniformBuffer.cpp">
+    <ClCompile Include="src\gpu_side\UniformBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Rendering\SceneRenderer.cpp">
@@ -134,7 +134,7 @@
     <ClInclude Include="src\Scene\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\ShaderClass.h">
+    <ClInclude Include="src\gpu_side\ShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\RenderingCoordinator.h">
@@ -143,37 +143,37 @@
     <ClInclude Include="src\Helpers\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\VertexAttributeObject.h">
+    <ClInclude Include="src\gpu_side\VertexAttributeObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Application.h">
+    <ClInclude Include="src\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\WindowHandler.h">
+    <ClInclude Include="src\Core\WindowHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shaders\ShaderPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Events.h">
+    <ClInclude Include="src\Core\Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\MeshGeneratingMethods.h">
+    <ClInclude Include="src\Helpers\MeshGeneratingMethods.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Helpers\DialogWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Framebuffer.h">
+    <ClInclude Include="src\gpu_side\Framebuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\InputHandler.h">
+    <ClInclude Include="src\Controls\InputHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Texture.h">
+    <ClInclude Include="src\gpu_side\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Material.h">
@@ -188,25 +188,25 @@
     <ClInclude Include="src\Scene\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\OpenGLBuffer.h">
+    <ClInclude Include="src\gpu_side\OpenGLBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\UILayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\UniformBuffer.h">
+    <ClInclude Include="src\gpu_side\UniformBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\SceneRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderingMediator.h">
+    <ClInclude Include="src\Rendering\RenderingMediator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\AppEvent.h">
+    <ClInclude Include="src\Core\AppEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CommonAppData.h">
+    <ClInclude Include="src\Core\CommonAppData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Controls\MouseKeys.h">

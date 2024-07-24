@@ -1,9 +1,9 @@
 #pragma once
-#include"ShaderClass.h"
-#include"Scene/Camera.h"
-#include"Scene/Skybox.h"
-#include"Scene/Model.h"
-#include"Application.h"
+#include "gpu_side/ShaderClass.h"
+#include "Scene/Camera.h"
+#include "Scene/Skybox.h"
+#include "Scene/Model.h"
+#include "Core/Application.h"
 namespace OBJ_Viewer {
 	enum RenderPrimitiveType
 	{

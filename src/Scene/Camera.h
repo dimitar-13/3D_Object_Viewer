@@ -1,9 +1,9 @@
 #pragma once
 #include "pch.h"
-#include"Events.h"
-#include"InputHandler.h"
-#include"WindowHandler.h"
-#include"AppEvent.h"
+#include "Core/Events.h"
+#include "Controls/InputHandler.h"
+#include "Core/WindowHandler.h"
+#include "Core/AppEvent.h"
 namespace OBJ_Viewer
 {
 	struct EulerAngles {
@@ -31,7 +31,6 @@ namespace OBJ_Viewer
 	{
 	public:
 		Camera(float CameraZoom,Size2D screenSize, Application& app);
-		Camera(const Camera& other) = delete;
 		void CalculatePositionVector();
 		//void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj) { pView = &m_viewMatrix; pProj = &m_projectionMatrix; }
 		void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj)const { *pView = m_viewMatrix; *pProj = m_projectionMatrix; }

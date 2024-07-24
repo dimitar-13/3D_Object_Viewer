@@ -1,12 +1,12 @@
 #pragma once
 #include "pch.h"
-#include"WindowHandler.h"
-#include"InputHandler.h"
-#include"Rendering/Framebuffer.h"
-#include"AppEvent.h"
-#include"Scene/Material.h"
-#include"Controls/AppKeyBindings.h"
-#include"Logging/App_Logger.h"
+#include "WindowHandler.h"
+#include "Controls/InputHandler.h"
+#include "gpu_side/Framebuffer.h"
+#include "AppEvent.h"
+#include "Scene/Material.h"
+#include "Controls/AppKeyBindings.h"
+#include "Logging/App_Logger.h"
 namespace OBJ_Viewer {
 
 	namespace APP_SETTINGS {
@@ -111,6 +111,7 @@ namespace OBJ_Viewer {
 		Window& GetGlobalAppWindow() { return *m_window; }
 		Framebuffer& GetSceneFrameBuffer() { return *m_sceneFramebuffer; }
 		SceneViewport GetSceneViewport()const { return m_sceneViewport; }
+		const SceneViewport& GetSceneViewport_ConstRef()const { return m_sceneViewport; }
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
 		void UpdateSceneViewport(SceneViewport newViewport) { m_sceneViewport = newViewport; ResizeBuffer(newViewport.width, newViewport.height); }
 		std::function<void(Event&)> GetOnAppEventCallback() { return std::bind(&Application::OnEvent, this, std::placeholders::_1);}

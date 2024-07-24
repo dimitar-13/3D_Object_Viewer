@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include"CommonAppData.h"
+#include "Core/CommonAppData.h"
 namespace OBJ_Viewer {
 #pragma region TextureStructs
 	enum TextureFormat

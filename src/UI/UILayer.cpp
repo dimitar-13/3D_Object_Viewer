@@ -40,7 +40,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
 	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
-	const char* currentlyActiveWindow = UI_WINDOW_UNKNOWN;
+	const char* currentlyActiveWindow = APP_FOCUS_REGIONS::UI_WINDOW_UNKNOWN;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();	
@@ -72,10 +72,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 
 	//Right panel for model and rendering settings.
-	if (ImGui::Begin(UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)? 
-			UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
 
 		ImGui::Text("Model view settings");
 		ImGui::InputFloat3("Position", &position[0]);
@@ -193,10 +193,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Scene settings
 
 
-	if (ImGui::Begin(UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
 		ModelData currentModelData = SceneModel->GetModelData();
 #pragma region Object info
 
@@ -313,17 +313,17 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Loading object info
 
 
-	if(ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
+	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
 	ImGui::Text("Loading stuff here.");
 	}ImGui::End();
 	
-	if (ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
 
 		if (ImGui::Button("Import 3D model."))
 		{
@@ -366,10 +366,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Scene window
 
 
-	if(ImGui::Begin(UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
+	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
 
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 winPos = ImGui::GetWindowPos();

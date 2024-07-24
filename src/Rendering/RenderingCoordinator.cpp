@@ -1,7 +1,7 @@
-#include"pch.h"
+#include "pch.h"
 #include "RenderingCoordinator.h"
-#include"WindowHandler.h"
-#include"Framebuffer.h"
+#include "Core/WindowHandler.h"
+#include "gpu_side/Framebuffer.h"
 
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {

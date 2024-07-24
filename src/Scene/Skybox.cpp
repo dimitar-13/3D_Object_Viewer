@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Skybox.h"
-#include"MeshGeneratingMethods.h"
+#include "Helpers/MeshGeneratingMethods.h"
 
 OBJ_Viewer::Skybox::Skybox(std::vector < std::string > & textPaths) :m_skyboxVAO(std::move(GenerateCubeVAO(true)))
 {

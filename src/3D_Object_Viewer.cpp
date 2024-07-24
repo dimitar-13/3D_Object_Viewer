@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "Application.h"
-#include"InputHandler.h"
-#include"Rendering/RenderingCoordinator.h"
+#include "Core/Application.h"
+#include "Controls/InputHandler.h"
+#include "Rendering/RenderingCoordinator.h"
 int main()
 {
 	OBJ_Viewer::Application app;

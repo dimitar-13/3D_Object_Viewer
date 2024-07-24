@@ -1,13 +1,13 @@
 #pragma once
 #include "pch.h"
-#include"Scene/Camera.h"
-#include"Scene/Model.h"
-#include"ShaderClass.h"
-#include"Scene/Skybox.h"
-#include"Application.h"
-#include"RenderingMediator.h"
-#include"Events.h"
-#include"Renderer.h"
+#include "Scene/Camera.h"
+#include "Scene/Model.h"
+#include "gpu_side/ShaderClass.h"
+#include "Scene/Skybox.h"
+#include "Core/Application.h"
+#include "RenderingMediator.h"
+#include "Core/Events.h"
+#include "Renderer.h"
 namespace OBJ_Viewer {
 	class SceneRenderer : public Listener
 	{

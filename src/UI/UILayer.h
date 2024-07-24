@@ -1,18 +1,11 @@
 #pragma once
 #include "pch.h"
-#include"Application.h"
-#include"Rendering/SceneRenderer.h"
-#include"RenderingMediator.h"
-
-
+#include "Core/Application.h"
+#include "Rendering/SceneRenderer.h"
+#include "Rendering/RenderingMediator.h"
 
 namespace OBJ_Viewer {
 
-constexpr auto UI_LAYER_SCENE_WINDOW_NAME = "Scene";
-constexpr auto UI_LAYER_OBJECT_LOADING_WINDOW_NAME = "Loading panel";
-constexpr auto UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME = "ModelAndRenderingSettings";
-constexpr auto UI_LAYER_SCENE_SETTINGS_WINDOW_NAME = "Scene setting";
-constexpr auto UI_WINDOW_UNKNOWN = "unknownWindow";
 	class UILayer
 	{
 	public:

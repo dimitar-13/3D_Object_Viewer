@@ -44,24 +44,28 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
 	auto& mousePos = e.GetMousePos();
 
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_1) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
 		m_EulerAngleHelper.calculateEulerAngles(mousePos);
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_1) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_1) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(mousePos);
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 		CalculatePositionVector();
 	}
 
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_2) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		//We update the previous x and y position.
 		m_lastMousePos = mousePos;
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_2) && m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_2) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
 		constexpr float movementSpeed = .005;
 		glm::mat3 viewSpaceOrthogonalVectors = glm::mat3(m_viewMatrix);

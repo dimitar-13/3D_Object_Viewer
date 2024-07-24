@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
-#include"Texture.h"
-#include"CommonAppData.h"
+#include "Texture.h"
+#include "Core/CommonAppData.h"
 
 namespace OBJ_Viewer {
 

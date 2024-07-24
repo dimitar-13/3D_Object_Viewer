@@ -14,9 +14,6 @@ OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path, LoadMode
 	const aiScene* scene = importer.ReadFile(path,
 		aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate );
-	//const float defaultObjScaleFactor = importer.GetPropertyFloat("#AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY");
-
-
 
 	if (nullptr == scene) {
 		std::cout << "Assimp failed to load the 3D model file at path:" << path << '\n';
@@ -79,6 +76,7 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 {
 	std::vector<Vertex> vertexData(assimpMesh->mNumVertices);
 	m_ModelData.vertexCount += assimpMesh->mNumVertices;
+	const glm::mat3 NormalMatrix = glm::mat3(glm::transpose(glm::inverse(MeshTransform)));
 	std::vector<unsigned int> indexData;
 
 	for (size_t i = 0; i < assimpMesh->mNumVertices;i++)
@@ -112,13 +110,15 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 			vertexData[i].normal.x = assimpMesh->mNormals[i].x;
 			vertexData[i].normal.y = assimpMesh->mNormals[i].y;
 			vertexData[i].normal.z = assimpMesh->mNormals[i].z;
-			vertexData[i].normal = glm::mat3(glm::transpose(MeshTransform)) * vertexData[i].normal;
+			vertexData[i].normal = NormalMatrix * vertexData[i].normal;
 		}
 		if (assimpMesh->mTangents != nullptr)
 		{
 			vertexData[i].tangent.x = assimpMesh->mTangents[i].x;
 			vertexData[i].tangent.y = assimpMesh->mTangents[i].y;
 			vertexData[i].tangent.z = assimpMesh->mTangents[i].z;
+			vertexData[i].tangent = NormalMatrix * vertexData[i].tangent;
+
 		}
 	}
 
@@ -139,16 +139,25 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 }
 void OBJ_Viewer::ModelLoader::PostProcessScene()
 {
-	//Get the difference between the biggest and smallest point
+	/* This method is run after we read all objects from the scene/file. */
+#pragma region Adjust scene size
+	/* Because we don't want the user to have to guess how to scale their object we "normalize" it and scale it by some
+	* app factor. Later I might make the app to work with some APP metric system so that when we import an object in out world/app world the
+	* object will be in normal size, internally the object might be scaled by 100 floating point number.
+	*/
+
+	//We aproximate a vector that covers our scene size. Like a box around out scene
 	glm::vec3 scaleDeltas = m_biggestComponents - m_smallestComponents;
 
 	constexpr float APP_SCALING_UNIT = 10.f;
 	float scaleFactor = glm::length(scaleDeltas);
 	
-	//Inverse it so for bigger objects we scale down and for smaller object we scale up.
+	//By inversing it we say ok if scaleFactor/(aproximated scene size) is small then scale it up if it's too big then scale it down.
+	//We also bring the scale factor to range [0:1].
 	scaleFactor = 1.0f / scaleFactor;
 
 	m_sceneScaleMatrix = glm::scale(m_sceneScaleMatrix,glm::vec3(APP_SCALING_UNIT*scaleFactor));
+#pragma endregion
 }
 
 std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetSceneMaterials(const aiScene* scene)

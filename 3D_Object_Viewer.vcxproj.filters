@@ -232,6 +232,7 @@
     <None Include="Shaders\UVShader.glsl" />
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\PostProcessShader.glsl" />
+    <None Include="Shaders\ClearColorMeshShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">

@@ -12,37 +12,6 @@
 namespace OBJ_Viewer
 {
 
-	struct TypeMaterialRepresentation
-	{
-		TypeMaterialRepresentation(LoadModelFileType typeOFModel)
-		{
-			switch (typeOFModel)
-			{
-			case OBJ_Viewer::MODEL_TYPE_UKNOWN:
-				break;
-			case OBJ_Viewer::MODEL_TYPE_OBJ:
-				colorTextureEnum = aiTextureType_DIFFUSE;
-				normalTextureEnum = aiTextureType_HEIGHT;
-				ambientOcclusionEnum = aiTextureType_AMBIENT_OCCLUSION;
-				specularRoughnessEnum = aiTextureType_SPECULAR;
-				break;
-			case OBJ_Viewer::MODEL_TYPE_FBX:
-				colorTextureEnum = aiTextureType_DIFFUSE;
-				normalTextureEnum = aiTextureType_NORMALS;
-				ambientOcclusionEnum = aiTextureType_AMBIENT_OCCLUSION;
-				specularRoughnessEnum = aiTextureType_METALNESS;
-				break;
-			default:
-				break;
-			}
-		}
-		aiTextureType colorTextureEnum;
-		aiTextureType normalTextureEnum;
-		aiTextureType ambientOcclusionEnum;
-		aiTextureType specularRoughnessEnum;
-	};
-
-
 	class ModelLoader
 	{
 	public:
@@ -56,6 +25,36 @@ namespace OBJ_Viewer
 		std::shared_ptr<OBJ_Viewer::Texture> ReadTexture(aiMaterial* mat, aiTextureType type);
 		std::string GetModelTexturePathAbsolute(aiString texturePath)const;
 		glm::mat4 AssimpToGlmMatrix4x4(const aiMatrix4x4& matrix);
+	private:
+		struct TypeMaterialRepresentation
+		{
+			TypeMaterialRepresentation(LoadModelFileType typeOFModel)
+			{
+				switch (typeOFModel)
+				{
+				case OBJ_Viewer::MODEL_TYPE_UKNOWN:
+					break;
+				case OBJ_Viewer::MODEL_TYPE_OBJ:
+					colorTextureEnum = aiTextureType_DIFFUSE;
+					normalTextureEnum = aiTextureType_HEIGHT;
+					ambientOcclusionEnum = aiTextureType_AMBIENT_OCCLUSION;
+					specularRoughnessEnum = aiTextureType_SPECULAR;
+					break;
+				case OBJ_Viewer::MODEL_TYPE_FBX:
+					colorTextureEnum = aiTextureType_DIFFUSE;
+					normalTextureEnum = aiTextureType_NORMALS;
+					ambientOcclusionEnum = aiTextureType_AMBIENT_OCCLUSION;
+					specularRoughnessEnum = aiTextureType_METALNESS;
+					break;
+				default:
+					break;
+				}
+			}
+			aiTextureType colorTextureEnum;
+			aiTextureType normalTextureEnum;
+			aiTextureType ambientOcclusionEnum;
+			aiTextureType specularRoughnessEnum;
+		};
 	private:
 		std::vector<aiMesh*> m_meshes;
 		std::vector<glm::mat4> m_meshTransforms;

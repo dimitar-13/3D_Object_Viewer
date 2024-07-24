@@ -13,6 +13,7 @@ layout(std140) uniform Matrices
 	mat4 ViewMatrix;
 	mat4 ProjectionMatrix;
 	mat4 ModelMatrix;
+	mat4 NormalMatrix;
 };
 
 vec3 unprojectPoint(vec4 point,mat4 viewMatrix,mat4 ProjectionMatrix)

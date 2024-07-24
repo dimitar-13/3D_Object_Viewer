@@ -18,14 +18,15 @@ layout(std140) uniform Matrices
 	mat4 ViewMatrix;
 	mat4 ProjectionMatrix;
 	mat4 ModelMatrix;
+	mat4 NormalMatrix;
 };
 void main()
 {
 	gl_Position =  ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);
 	vertex_out.FragUV =uvCoords;
 	vertex_out.FragPosition = (ModelMatrix* vec4(position,1.0)).xyz;
-	vec3 W_normals = normalize(mat3(ModelMatrix) * normals);
-	vec3 W_tangent = normalize(mat3(ModelMatrix) * tangent);
+	vec3 W_normals = normalize(mat3(NormalMatrix) * normals);
+	vec3 W_tangent = normalize(mat3(NormalMatrix) * tangent);
 	vertex_out.normals = W_normals;
 	vertex_out.TBN_Mat = mat3(W_tangent,normalize(cross(W_tangent,W_normals)),W_normals);
 }

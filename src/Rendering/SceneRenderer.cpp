@@ -7,6 +7,9 @@
 #include"ShaderPath.h"
 #include"MeshGeneratingMethods.h"
 
+constexpr uint8_t UBO_MATRIX_COUNT = 4;
+constexpr size_t UBO_MATRIX_BYTE_SIZE = UBO_MATRIX_COUNT * sizeof(glm::mat4);
+
 OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) :
 	m_multiSampleSceneFrameBuffer(app.GetSceneFrameBuffer().GetFramebufferSize(),FRAMEBUFFER_COLOR_ATTACHMENT,true,11),
 	m_intermidiateFramebuffer(app.GetSceneFrameBuffer().GetFramebufferSize(), FRAMEBUFFER_COLOR_ATTACHMENT),
@@ -15,7 +18,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 				{ 1.0f,  1.0f, 0.0 },
 				{ 1.0f, -1.0f, 0.0 } },
 				{ 0, 1, 2,2, 1, 3 }),
-	m_clearColorShader(GetConcatShaderPath("ColorShader.glsl").c_str()),
+	m_clearColorShader(GetConcatShaderPath("ClearColorMeshShader.glsl").c_str()),
 	m_gridShader(GetConcatShaderPath("GridShader.glsl").c_str()),
 	m_skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str()),
 	m_lightShader(GetConcatShaderPath("LightShader.glsl").c_str()),
@@ -27,7 +30,7 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	m_postProcessingShader(GetConcatShaderPath("PostProcessShader.glsl").c_str()),
 	m_app(app),
 	m_uniformLightBuffer("LightInfo", 1, MAX_LIGHT_COUNT * 2 * sizeof(glm::vec4), nullptr),
-	m_uniformMatrixBuffer("Matrices", 0, 3 * sizeof(glm::mat4), nullptr)
+	m_uniformMatrixBuffer("Matrices", 0, UBO_MATRIX_BYTE_SIZE, nullptr)
 {
 
 	InitShaders();
@@ -75,6 +78,7 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const RenderStateSettings& renderSet
 		case RENDER_MODE_SOLID_COLOR:
 			m_clearColorShader.UseShader();
 			m_clearColorShader.UniformSet3FloatVector("u_Color", renderSettings.m_colorRenderingColor);
+			//m_clearColorShader.UniformSet3FloatVector("u_cameraPos", m_sceneCamera->GetCameraPos());
 			m_mainRenderer.RenderMesh(m_clearColorShader, mesh->GetMeshVAO(), *m_sceneCamera);
 			break;
 
@@ -239,7 +243,7 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 {
 	
 
-	m_uniformMatrixBuffer.BindBufferRange(0, 3 * sizeof(glm::mat4));
+	m_uniformMatrixBuffer.BindBufferRange(0, UBO_MATRIX_BYTE_SIZE);
 
 	m_uniformLightBuffer.BindBufferRange(0, MAX_LIGHT_COUNT * 2 * sizeof(glm::vec4));
 
@@ -258,10 +262,11 @@ void OBJ_Viewer::SceneRenderer::InitShaders()
 
 void OBJ_Viewer::SceneRenderer::SetUniformMatrixBuffer()const
 {
-	glm::mat4 matrices[3] = {};
+	glm::mat4 matrices[UBO_MATRIX_COUNT] = {};
 	m_sceneCamera->GetViewAndProjectionSeparate(&matrices[0], &matrices[1]);
 	matrices[2] = m_sceneModel->GetModelMatrix();
-	m_uniformMatrixBuffer.SendBufferSubData(0, 3 * sizeof(glm::mat4), matrices);
+	matrices[3] = m_sceneModel->GetNormalMatrix();
+	m_uniformMatrixBuffer.SendBufferSubData(0, UBO_MATRIX_BYTE_SIZE, matrices);
 }
 
 glm::mat3 OBJ_Viewer::SceneRenderer::ConstructViewportMatrix() const

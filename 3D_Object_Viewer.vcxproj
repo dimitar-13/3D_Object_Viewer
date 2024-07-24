@@ -227,6 +227,7 @@
     <ClInclude Include="src\UniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\ClearColorMeshShader.glsl" />
     <None Include="Shaders\ColorShader.glsl" />
     <None Include="Shaders\GridShader.glsl" />
     <None Include="Shaders\LightShader.glsl" />

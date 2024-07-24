@@ -10,6 +10,7 @@ layout(std140) uniform Matrices
 	mat4 ViewMatrix;
 	mat4 ProjectionMatrix;
 	mat4 ModelMatrix;
+	mat4 NormalMatrix;
 };
 uniform mat3 viewportMatrix;
 void main()

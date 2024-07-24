@@ -20,7 +20,7 @@ namespace OBJ_Viewer {
 		void RenderMesh(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO, const Camera& mainCamera);
 		void RenderMeshMaterialWithLight(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO,
 			const Material& material, MaterialFlags renderMaterialFlags,const Camera& mainCamera);
-		void RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao, const Camera& mainCamera,const GridData gridInfo);
+		void RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao, const Camera& mainCamera,const APP_SETTINGS::GridData gridInfo);
 		void RenderSkybox(const ShaderClass& skyboxShader, const Skybox& skybox, const Camera& mainCamera);
 		void BindMaterialTexture(const ShaderClass& shaderToUse, std::shared_ptr<Texture> textureToBind, GLenum textureUnit, const char* textureName);
 	private:

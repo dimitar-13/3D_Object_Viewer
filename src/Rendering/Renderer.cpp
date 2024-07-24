@@ -1,4 +1,6 @@
+#include "pch.h"
 #include "Renderer.h"
+
 OBJ_Viewer::Renderer::Renderer()
 {
 	m_defaultWhiteTexture = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
@@ -62,16 +64,15 @@ void OBJ_Viewer::Renderer::RenderMeshMaterialWithLight(const ShaderClass& shader
 	meshVAO.UnBind();
 }
 
-void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao, const Camera& mainCamera, const GridData gridInfo)
+void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao,
+	const Camera& mainCamera,const APP_SETTINGS::GridData gridInfo)
 {
 	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
 	shaderToUse.UseShader();
-	glm::mat4 view, proj;
-	mainCamera.GetViewAndProjectionSeparate(&view, &proj);
-
+	shaderToUse.UniformSet3FloatVector("cameraPosition", mainCamera.GetCameraPos());
 	shaderToUse.UniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
 	shaderToUse.UniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
 	shaderToUse.UniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);

@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "Texture.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include<iostream>
+#include"Logging/App_Logger.h"
+
 OBJ_Viewer::Texture::Texture(const unsigned char* data, TextureInternalFormat textureInternalFormat, TextureFormat textureFormat,
 	Size2D textureSize, TexturePixelDataType dataType, TextureWrap textureWrapS, TextureWrap textureWrapT, bool isMultiSample,
 	uint8_t sampleCount)
@@ -63,7 +63,7 @@ OBJ_Viewer::TexturePixelDataWrapper::TexturePixelDataWrapper(const char* path, S
 	m_pixelData = stbi_load(path, &pTextureSize->width, &pTextureSize->height, pPresentChannelsCount, 0);
 	if (!m_pixelData)
 	{	
-		std::cout << "[ERROR]:STBI_IMAGE failed to read or allocate texture at path." << path << '\n';
+		LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", path);
 	}
 }
 

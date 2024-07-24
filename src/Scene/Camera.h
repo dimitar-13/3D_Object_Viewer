@@ -1,11 +1,9 @@
 #pragma once
-#include<glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
+#include "pch.h"
 #include"Events.h"
 #include"InputHandler.h"
 #include"WindowHandler.h"
 #include"AppEvent.h"
-#include<memory>
 namespace OBJ_Viewer
 {
 	struct EulerAngles {
@@ -29,8 +27,6 @@ namespace OBJ_Viewer
 		Position2D m_previousMousePosition;
 	};
 
-	//TODO:When the user presses button(button for reset) it will reset the camera to look at the starting position.
-	//TODO:When the user presses button(button for reset) it will reset the scroll to be at the starting value.
 	class Camera : public Listener
 	{
 	public:
@@ -48,7 +44,7 @@ namespace OBJ_Viewer
 
 		void onScrollChanged(ScrollPositionChanged& e);
 		void onMousePositionChanged(MousePositionEvent& e);
-		void onWinSizeChanged(FramebufferResizeEvent& e);
+		void onWinSizeChanged(SceneViewportResizeEvent& e);
 		void onKeyPressedEvent(KeyboardKeyEvent& e);
 		void RecalculateProjection(Size2D windowSize = {0,0});
 		void OnProjectionModeChanged(EventCameraProjectionChanged& e);

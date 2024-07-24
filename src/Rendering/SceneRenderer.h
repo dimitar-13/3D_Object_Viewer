@@ -1,9 +1,8 @@
 #pragma once
-#include<GL/glew.h>
+#include "pch.h"
 #include"Scene/Camera.h"
 #include"Scene/Model.h"
 #include"ShaderClass.h"
-#include<memory>
 #include"Scene/Skybox.h"
 #include"Application.h"
 #include"RenderingMediator.h"
@@ -20,12 +19,12 @@ namespace OBJ_Viewer {
 		/// </summary>
 		/// <param name="renderSettings">The instruction on how to render the scene. </param>
 		/// <param name="outputFrameBuffer">The output framebuffer if none provided is understood to be the default provided by GLFW.</param>
-		void RenderScene(const RenderStateSettings& renderSettings,Framebuffer* outputFrameBuffer = nullptr);
+		void RenderScene(const APP_SETTINGS::RenderStateSettings& renderSettings,Framebuffer* outputFrameBuffer = nullptr);
 		void SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with);
 		std::weak_ptr<Model> GetSceneModel() { return m_sceneModel; }
 		std::weak_ptr<Skybox> GetSkyboxModel() { return m_sceneSkybox; }
 	private:
-		void InitShaders();
+		void SetUpUniformBuffers();
 		void SetUniformMatrixBuffer()const;
 		glm::mat3 ConstructViewportMatrix()const;
 		// Inherited via AppEventListener
@@ -36,18 +35,25 @@ namespace OBJ_Viewer {
 		void LoadSkybox(std::vector<std::string>&);
 		void LoadModel(const std::string& path);
 
-		void RenderGrid(const GridData& appGridData);
-		void SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags, SceneLightInfo lightInfo);
-		void SetUpForWireframeRendering(const Mesh& mesh,const WireFrameSettings& wireframeAppSettings);
+		void SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags, APP_SETTINGS::SceneLightInfo lightInfo);
+		void SetUpForWireframeRendering(const Mesh& mesh,const APP_SETTINGS::WireFrameSettings& wireframeAppSettings);
 		void PostProcessScene(bool doFXAA = true);
 	private:
+#pragma region Scene render objects
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
 		std::shared_ptr<Skybox> m_sceneSkybox;
+		VertexAttributeObject m_screenQuad;
+#pragma endregion
+
+#pragma region Scene buffers
 		Framebuffer m_multiSampleSceneFrameBuffer;
 		Framebuffer m_intermidiateFramebuffer;
+		UniformBuffer m_uniformMatrixBuffer;
+		UniformBuffer m_uniformLightBuffer;	
+#pragma endregion
 
-		VertexAttributeObject m_screenQuad;
+#pragma region Scene shaders
 
 		ShaderClass m_clearColorShader;
 		ShaderClass m_gridShader;
@@ -59,12 +65,11 @@ namespace OBJ_Viewer {
 		ShaderClass m_UVShader;
 		ShaderClass m_singleTextureShader;
 		ShaderClass m_postProcessingShader;
+#pragma endregion
 
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;
 		Renderer m_mainRenderer;
-		UniformBuffer m_uniformMatrixBuffer;
-		UniformBuffer m_uniformLightBuffer;	
 	};
 }
 

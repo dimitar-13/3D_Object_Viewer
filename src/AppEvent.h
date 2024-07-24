@@ -1,6 +1,5 @@
 #pragma once
-#include<vector>
-#include<string>
+#include "pch.h"
 #include"Events.h"
 #include"WindowHandler.h"
 namespace OBJ_Viewer {

@@ -1,4 +1,4 @@
-#include <iostream>
+#include "pch.h"
 #include "Application.h"
 #include"InputHandler.h"
 #include"Rendering/RenderingCoordinator.h"

@@ -1,5 +1,6 @@
 #pragma once
-#include<GL/glew.h>
+#include "pch.h"
+
 namespace OBJ_Viewer {
 	enum BufferType
 	{

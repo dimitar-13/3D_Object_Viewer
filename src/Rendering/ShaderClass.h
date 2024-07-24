@@ -1,10 +1,5 @@
 #pragma once
-#include<GL/glew.h>
-#include<glm/glm.hpp>
-#include<unordered_map>
-#include<string>
-#include<GL/glew.h>
-#include<vector>
+#include "pch.h"
 #include"UniformBuffer.h"
 namespace OBJ_Viewer
 {

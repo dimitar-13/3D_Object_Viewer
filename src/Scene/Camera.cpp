@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "UI/UILayer.h"
 #include "Camera.h"
 
@@ -32,7 +33,7 @@ void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 
 	if (!m_isProjectionPerspective)
 	{
-		Size2D windowSize = m_app.GetSceneFrameBuffer().GetFramebufferSize();
+		Size2D windowSize = m_app.GetSceneViewport().GetViewportSize();
 		CalculateOthoProjection(windowSize);
 	}
 
@@ -86,7 +87,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 
 }
 
-void OBJ_Viewer::Camera::onWinSizeChanged(FramebufferResizeEvent& e)
+void OBJ_Viewer::Camera::onWinSizeChanged(SceneViewportResizeEvent& e)
 {
 	const Size2D winSize = e.GetNewFramebufferSize();
 	RecalculateProjection(winSize);
@@ -103,7 +104,7 @@ void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 
 void OBJ_Viewer::Camera::RecalculateProjection(Size2D windowSize)
 {
-	windowSize = (windowSize.width == 0 || windowSize.height == 0) ? m_app.GetSceneFrameBuffer().GetFramebufferSize() : windowSize;
+	windowSize = (windowSize.width == 0 || windowSize.height == 0) ? m_app.GetSceneViewport().GetViewportSize() : windowSize;
 
 	if (m_isProjectionPerspective)
 		m_projectionMatrix = glm::perspective(glm::radians(45.0f), (float)windowSize.width / (float)windowSize.height, 0.1f, 100.0f);
@@ -143,8 +144,8 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 {
 	switch (e.GetEventType())
 	{
-	case EVENT_FRAMEBUFFER_SIZE_CHANGED:
-		this->onWinSizeChanged(dynamic_cast<FramebufferResizeEvent&>(e));
+	case EVENT_SCENE_VIEWPORT_SIZE_CHANGED:
+		this->onWinSizeChanged(dynamic_cast<SceneViewportResizeEvent&>(e));
 		break;
 	case EVENT_MOUSE_POSITION_CHANGED:
 		this->onMousePositionChanged(dynamic_cast<MousePositionEvent&>(e));

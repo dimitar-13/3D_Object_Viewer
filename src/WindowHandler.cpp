@@ -1,8 +1,5 @@
+#include "pch.h"
 #include "WindowHandler.h"
-#include"WindowInputFuncs.h"
-#include<functional>
-#include"imgui.h"
-#include<iostream>
 #include"AppEvent.h"
 OBJ_Viewer::Window::Window(Size2D windowMetrics, const char* winTitle, std::function<void(Event&)> onEventFunc)
 {

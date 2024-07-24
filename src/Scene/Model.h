@@ -1,6 +1,7 @@
 #pragma once
-#include<iostream>
 #include"Mesh.h"
+#include "pch.h"
+
 namespace OBJ_Viewer {
 	struct ModelData
 	{

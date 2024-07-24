@@ -1,17 +1,12 @@
 ﻿#pragma once
-#include<iostream>
-#include<glm/glm.hpp>
-#include<vector>
+#include"pch.h"
 #include"Texture.h"
 #include"Scene/Material.h"
 #include"Scene/Model.h"
 #include"FileFromatStruct.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>     // Post processing flags
+
 namespace OBJ_Viewer
 {
-
 	class ModelLoader
 	{
 	public:
@@ -32,21 +27,25 @@ namespace OBJ_Viewer
 			{
 				switch (typeOFModel)
 				{
-				case OBJ_Viewer::MODEL_TYPE_UKNOWN:
-					break;
+			
 				case OBJ_Viewer::MODEL_TYPE_OBJ:
-					colorTextureEnum = aiTextureType_DIFFUSE;
-					normalTextureEnum = aiTextureType_HEIGHT;
-					ambientOcclusionEnum = aiTextureType_AMBIENT_OCCLUSION;
-					specularRoughnessEnum = aiTextureType_SPECULAR;
+					colorTextureEnum = aiTextureType::aiTextureType_DIFFUSE;
+					normalTextureEnum = aiTextureType::aiTextureType_HEIGHT;
+					ambientOcclusionEnum = aiTextureType::aiTextureType_AMBIENT_OCCLUSION;
+					specularRoughnessEnum = aiTextureType::aiTextureType_SPECULAR;
 					break;
 				case OBJ_Viewer::MODEL_TYPE_FBX:
-					colorTextureEnum = aiTextureType_DIFFUSE;
-					normalTextureEnum = aiTextureType_NORMALS;
-					ambientOcclusionEnum = aiTextureType_AMBIENT_OCCLUSION;
-					specularRoughnessEnum = aiTextureType_METALNESS;
+					colorTextureEnum = aiTextureType::aiTextureType_DIFFUSE;
+					normalTextureEnum = aiTextureType::aiTextureType_NORMALS;
+					ambientOcclusionEnum = aiTextureType::aiTextureType_AMBIENT_OCCLUSION;
+					specularRoughnessEnum = aiTextureType::aiTextureType_METALNESS;
 					break;
-				default:
+
+				case OBJ_Viewer::MODEL_TYPE_UKNOWN: default:
+					colorTextureEnum = aiTextureType::aiTextureType_UNKNOWN;
+					normalTextureEnum = aiTextureType::aiTextureType_UNKNOWN;
+					ambientOcclusionEnum = aiTextureType::aiTextureType_UNKNOWN;
+					specularRoughnessEnum = aiTextureType::aiTextureType_UNKNOWN;
 					break;
 				}
 			}

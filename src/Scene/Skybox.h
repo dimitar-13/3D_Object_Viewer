@@ -1,7 +1,5 @@
 #pragma once
-#include<array>
-#include<memory>
-#include<iostream>
+#include"pch.h"
 #include"VertexAttributeObject.h"
 #include"Texture.h"
 #include"Rendering/OpenGLBuffer.h"

@@ -1,11 +1,10 @@
 #pragma once
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
+#include "pch.h"
 #include"Application.h"
-#include<glm/glm.hpp>
 #include"Rendering/SceneRenderer.h"
 #include"RenderingMediator.h"
-#include<memory>
+
+
 
 namespace OBJ_Viewer {
 

@@ -102,10 +102,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;OBJ_VIEWER_LEVEL_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glfw\glfw\include;$(SolutionDir)Dependencies\glew\glew-2.2.0\include;$(SolutionDIr)Dependencies\glm\glm;$(SolutionDir)Dependencies\imgui\imgui;$(SolutionDir)Dependencies\imgui\imgui\backends;$(SolutionDir)src;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src\include;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src;$(SolutionDir)Dependencies\assimp\assimp\include;$(SolutionDir)Shaders;$(SolutionDir)Dependencies\stbi_image;$(SolutionDir)Dependencies\assimp\assimp\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glfw\glfw\include;$(SolutionDir)Dependencies\glew\glew-2.2.0\include;$(SolutionDIr)Dependencies\glm\glm;$(SolutionDir)Dependencies\imgui\imgui;$(SolutionDir)Dependencies\imgui\imgui\backends;$(SolutionDir)src;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src\include;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src;$(SolutionDir)Dependencies\assimp\assimp\include;$(SolutionDir)Shaders;$(SolutionDir)Dependencies\stbi_image;$(SolutionDir)Dependencies\assimp\assimp\build\include;$(SolutionDir)Dependencies\spdlog\spdlog\include;$(SolutionDir)src\pch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,8 +127,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glfw\glfw\include;$(SolutionDir)Dependencies\glew\glew-2.2.0\include;$(SolutionDIr)Dependencies\glm\glm;$(SolutionDir)Dependencies\imgui\imgui;$(SolutionDir)Dependencies\imgui\imgui\backends;$(SolutionDir)src;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src\include;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src;$(SolutionDir)Dependencies\assimp\assimp\include;$(SolutionDir)Shaders;$(SolutionDir)Dependencies\stbi_image;$(SolutionDir)Dependencies\assimp\assimp\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glfw\glfw\include;$(SolutionDir)Dependencies\glew\glew-2.2.0\include;$(SolutionDIr)Dependencies\glm\glm;$(SolutionDir)Dependencies\imgui\imgui;$(SolutionDir)Dependencies\imgui\imgui\backends;$(SolutionDir)src;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src\include;$(SolutionDir)Dependencies\nativefiledialog\nativefiledialog\src;$(SolutionDir)Dependencies\assimp\assimp\include;$(SolutionDir)Shaders;$(SolutionDir)Dependencies\stbi_image;$(SolutionDir)Dependencies\assimp\assimp\build\include;$(SolutionDir)Dependencies\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +148,13 @@
     <Text Include="Shaders\WireframeShader.glsl">
       <FileType>Document</FileType>
     </Text>
+    <ClCompile Include="Dependencies\stbi_image\stb_imp.cpp" />
+    <ClCompile Include="src\Logging\App_Logger.cpp" />
+    <ClCompile Include="src\pch\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Rendering\SceneRenderer.cpp" />
     <ClCompile Include="src\Rendering\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Scene\Skybox.cpp" />
@@ -167,7 +178,6 @@
     <ClCompile Include="Dependencies\imgui\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\3D_Object_Viewer.cpp" />
     <ClCompile Include="src\VertexAttributeObject.cpp" />
-    <ClCompile Include="src\WindowInputFuncs.cpp" />
     <ClCompile Include="src\WindowHandler.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\UI\UILayer.cpp" />
@@ -192,6 +202,8 @@
     <ClInclude Include="src\Controls\MouseKeys.h" />
     <ClInclude Include="src\Helpers\FileFromatStruct.h" />
     <ClInclude Include="src\Helpers\UnitTransformer.h" />
+    <ClInclude Include="src\Logging\App_Logger.h" />
+    <ClInclude Include="src\pch\pch.h" />
     <ClInclude Include="src\RenderingMediator.h" />
     <ClInclude Include="src\Rendering\SceneRenderer.h" />
     <ClInclude Include="src\Rendering\OpenGLBuffer.h" />
@@ -220,7 +232,6 @@
     <ClInclude Include="Dependencies\imgui\imgui\imstb_textedit.h" />
     <ClInclude Include="Dependencies\imgui\imgui\imstb_truetype.h" />
     <ClInclude Include="src\VertexAttributeObject.h" />
-    <ClInclude Include="src\WindowInputFuncs.h" />
     <ClInclude Include="src\WindowHandler.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\UI\UILayer.h" />

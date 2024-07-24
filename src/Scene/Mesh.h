@@ -1,7 +1,8 @@
 #pragma once
 #include "VertexAttributeObject.h"
 #include"Material.h"
-#include"glm/glm.hpp"
+#include "pch.h"
+
 namespace OBJ_Viewer
 {
 	class Mesh {

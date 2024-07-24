@@ -1,11 +1,5 @@
+#include"pch.h"
 #include "RenderingCoordinator.h"
-#include"imgui_internal.h"
-#include"imgui.h"
-#include <iostream>
-#include <nfd.h>
-#include<GL/glew.h>
-#include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
 #include"WindowHandler.h"
 #include"Framebuffer.h"
 
@@ -70,8 +64,3 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application)
 	m_UILayer = std::make_unique<UILayer>(m_application, mediator, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
 
 }
-
-
-
-
-

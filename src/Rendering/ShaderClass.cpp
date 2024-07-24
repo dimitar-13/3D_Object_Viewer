@@ -1,9 +1,6 @@
+#include "pch.h"
 #include "ShaderClass.h"
-#include<GL/glew.h>
-#include<fstream>
-#include<array>
-#include<iostream>
-#include<unordered_map>
+#include"Logging/App_Logger.h"
 OBJ_Viewer::ShaderClass::ShaderClass(const char* filePath)
 {
     std::vector<std::string> sources = readShaderSource(filePath);
@@ -67,7 +64,7 @@ std::vector<std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* p
     sourceFile.open(path);
     if (!sourceFile.is_open())
     {
-        std::cout << "Was not able to open file at path:" << path <<'\n';
+        LOGGER_LOG_WARN("Was not able to open file at path:{0}", path);
     }
     std::string line;
     std::vector<std::string>shaderSources;
@@ -108,7 +105,7 @@ bool OBJ_Viewer::ShaderClass::isShaderCompilerSuccessfully(const GLuint Shader)
         char infoLog[255];
         GLsizei length;
         glGetShaderInfoLog(Shader,sizeof(infoLog),&length,&infoLog[0]);
-        std::cout << "[ERROR]:Shader failed to compile with error:\n" << infoLog << '\n';
+        LOGGER_LOG_ERROR("Shader failed to compile with error:{0}", infoLog);
         return false;
     }
 
@@ -124,7 +121,7 @@ bool OBJ_Viewer::ShaderClass::isProgramLinkedSuccessfully()const
         char infoLog[255];
         GLsizei length;
         glGetProgramInfoLog(this->m_shaderHandle, sizeof(infoLog), &length, &infoLog[0]);
-        std::cout << "[ERROR]:Program failed to link with error:\n" << infoLog << '\n';
+        LOGGER_LOG_ERROR("Program failed to link with error:{0}", infoLog);
         return false;
     }
     return true;
@@ -151,5 +148,5 @@ GLint OBJ_Viewer::ShaderClass::findUniform(const char* name)const
        this->m_uniformHash[name]  = UniformID;
        return this->m_uniformHash[name];
     }
-    std::cout << "[WARNING]:Failed to find uniform with name: " << name << '\n';
+    LOGGER_LOG_WARN("Failed to find uniform with name '{0}'", name);
 }

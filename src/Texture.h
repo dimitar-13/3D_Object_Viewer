@@ -1,6 +1,5 @@
 #pragma once
-#include<GL/glew.h>
-#include<memory>
+#include "pch.h"
 #include"CommonAppData.h"
 namespace OBJ_Viewer {
 #pragma region TextureStructs

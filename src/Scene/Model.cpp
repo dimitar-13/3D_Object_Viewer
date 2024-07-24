@@ -1,5 +1,6 @@
+#include "pch.h"
 #include "Model.h"
-#include<glm/gtc/matrix_transform.hpp>
+
 OBJ_Viewer::Model::Model(std::vector<std::shared_ptr<Mesh>> meshes,const glm::mat4& modelMatrix,const ModelData& data):
 	m_ModelMatrix(modelMatrix), m_data(data)
 {

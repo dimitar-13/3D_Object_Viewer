@@ -1,8 +1,8 @@
 #pragma once
 #include"Texture.h"
 #include"Rendering/ShaderClass.h"
-#include <glm/glm.hpp>
-#include <memory>
+#include "pch.h"
+
 namespace OBJ_Viewer {
 	enum MaterialTextures
 	{

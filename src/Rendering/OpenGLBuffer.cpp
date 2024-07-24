@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "OpenGLBuffer.h"
 
 OBJ_Viewer::OpenGLBuffer::OpenGLBuffer(BufferData data):

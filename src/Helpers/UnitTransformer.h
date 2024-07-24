@@ -1,5 +1,6 @@
 #pragma once
-#include<glm/glm.hpp>
+#include "pch.h"
+
 namespace OBJ_Viewer {
 
 	/*struct UnitTransformer

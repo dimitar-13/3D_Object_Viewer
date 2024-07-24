@@ -1,19 +1,18 @@
+#include "pch.h"
 #include "Application.h"
-#include"imgui_internal.h"
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include<iostream>
 #include"Rendering/RenderingCoordinator.h"
-#include<iostream>
 #define STARTUP_WINDOW_WIDTH 1200
 #define STARTUP_WINDOW_HEIGHT 1500
 
 
-OBJ_Viewer::Application::Application()
+OBJ_Viewer::Application::Application():
+	m_sceneViewport(SceneViewport{ 0,0, STARTUP_WINDOW_WIDTH, STARTUP_WINDOW_HEIGHT })
 {
+	Logger::init();
+
 	if (glfwInit() == GLFW_FALSE)
 	{
-		std::cout << "[ERROR]:GLFW failed to initialize." << '\n';
+		LOGGER_LOG_FATAL("GLFW failed to initialize");
 	}
 	
 	Size2D metrics = { STARTUP_WINDOW_WIDTH,STARTUP_WINDOW_HEIGHT };
@@ -21,17 +20,21 @@ OBJ_Viewer::Application::Application()
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 	
 	this->m_window = std::make_unique <Window>(metrics, winTitle,std::bind(&Application::OnEvent,this,std::placeholders::_1));
+
+	LOGGER_LOG_INFO("Window was successfully with name:'{0}' and width:{1} and height:{2}", winTitle, metrics.width, metrics.height);
+
 	if (this->m_window->GetGLFW_Window() == NULL)
 	{
 		glfwTerminate();
-		std::cout << "[ERROR]:GLFW failed to create window." << '\n';
+		LOGGER_LOG_FATAL("GLFW failed to create window.");
 	}
 
 	if (glewInit() != GLEW_OK)
 	{
 		glfwTerminate();
-		std::cout << "[ERROR]:GLEW failed to initialize." << '\n';
+		LOGGER_LOG_FATAL("GLEW failed to initialize.");
 	}
+
 	glewExperimental = GL_TRUE;
 
 	glEnable(GL_DEBUG_OUTPUT);
@@ -46,6 +49,9 @@ OBJ_Viewer::Application::Application()
 	AddEventListener(m_inputHandler);
 	m_sceneFramebuffer = std::make_unique<Framebuffer>(Size2D{STARTUP_WINDOW_WIDTH,STARTUP_WINDOW_HEIGHT}, FRAMEBUFFER_COLOR_ATTACHMENT);
 	m_appRenderingCoordinator = std::make_unique<RenderingCoordinator>(*this);
+
+	LOGGER_LOG_INFO("App launched successfully");
+
 	m_appRenderingCoordinator->RenderLoop();
 }
 
@@ -54,30 +60,33 @@ void OBJ_Viewer::Application::glDebugOutput(GLenum source, GLenum type,
 {
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
+
+	constexpr size_t STRING_MESSAGE_RESERVED_SIZE = 50;
+
+	std::string errorString;
+	errorString.reserve(STRING_MESSAGE_RESERVED_SIZE);
+
 	switch (source)
 	{
-		case GL_DEBUG_SOURCE_API:             std::cout << "ERROR[API]:"; break;
-		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "ERROR[Window System]:"; break;
-		case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "ERROR[Shader Compiler]:"; break;
-		case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "ERROR[Third Party]:"; break;
-		case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "ERROR[Application]:"; break;
-		case GL_DEBUG_SOURCE_OTHER:           std::cout << "ERROR[Other]:"; break;
+	case GL_DEBUG_SOURCE_API:				  errorString +="ERROR[API]:"; break;
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   errorString +="ERROR[Window System]:"; break;
+		//case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "ERROR[Shader Compiler]:"; break;
+		case GL_DEBUG_SOURCE_THIRD_PARTY:     errorString += "ERROR[Third Party]:"; break;
+		case GL_DEBUG_SOURCE_APPLICATION:     errorString += "ERROR[Application]:"; break;
+		case GL_DEBUG_SOURCE_OTHER:           errorString += "ERROR[Other]:"; break;
 	}
+	
 	switch (type)
 	{
-		case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
-		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
-		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
-		case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
+		case GL_DEBUG_TYPE_ERROR:               errorString += "Type:[Error]";
+			
+			break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: errorString += "Type:[Deprecated Behaviour]"; break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  errorString += "Type:[Undefined Behaviour]"; break;
+		case GL_DEBUG_TYPE_PERFORMANCE:         errorString += "Type:[Performance]"; break;
 	}
-	std::cout << "Message:" << message << '\n';
-	/*switch (severity)
-	{
-		case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
-		case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
-		case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
-	}*/
+
+	LOGGER_LOG_ERROR("{0} message:{1}",errorString.c_str(), message);
 }
 
 void OBJ_Viewer::Application::ResizeBuffer(int newWidth, int newHeight)
@@ -90,7 +99,7 @@ void OBJ_Viewer::Application::ResizeBuffer(int newWidth, int newHeight)
 
 	this->m_sceneFramebuffer->ResizeFramebuffer({ newWidth,newHeight});
 
-	FramebufferResizeEvent e(Size2D{ newWidth, newHeight });
+	SceneViewportResizeEvent e(Size2D{ newWidth, newHeight });
 
 	OnEvent(e);
 

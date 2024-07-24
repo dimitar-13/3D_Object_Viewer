@@ -1,10 +1,8 @@
 #pragma once
-#include<unordered_map>
+#include "pch.h"
 #include"Controls/KeyboardKeys.h"
 #include"Controls/MouseKeys.h"
-#include<GLFW/glfw3.h>
 #include"Events.h"
-#include<iostream>
 namespace OBJ_Viewer
 {
 	class Application;

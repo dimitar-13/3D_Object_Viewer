@@ -1,5 +1,5 @@
 #pragma once
-#include<vector>
+#include "pch.h"
 #include"CommonAppData.h"
 #include"Controls/KeyboardKeys.h"
 #include"Controls/MouseKeys.h"
@@ -18,7 +18,7 @@ namespace OBJ_Viewer {
 		EVENT_ON_FOCUSED_WINDOW_CHANGED,
 		EVENT_WINDOW_STATE_CHANGED,
 		EVENT_CAMERA_PROJECTION_TYPE_CHANGED,
-		EVENT_FRAMEBUFFER_SIZE_CHANGED
+		EVENT_SCENE_VIEWPORT_SIZE_CHANGED
 	};
 
 	enum EventCategory
@@ -34,12 +34,6 @@ namespace OBJ_Viewer {
 		Event() = default;
 		virtual EventType GetEventType()const = 0;
 		virtual EventCategory GetEventCategory()const = 0;
-
-	private:
-
-		//EventType m_eventType;
-		//EventCategory m_eventCategory;
-
 	};
 
 	class Listener
@@ -120,12 +114,12 @@ namespace OBJ_Viewer {
 		Size2D m_windowNewSize;
 	};
 
-	class FramebufferResizeEvent : public Event
+	class SceneViewportResizeEvent : public Event
 	{
 	public:
-		FramebufferResizeEvent(Size2D newSize) :m_framebufferSize(newSize)
+		SceneViewportResizeEvent(Size2D newSize) :m_framebufferSize(newSize)
 		{ }
-		EventType GetEventType()const override { return EVENT_FRAMEBUFFER_SIZE_CHANGED; }
+		EventType GetEventType()const override { return EVENT_SCENE_VIEWPORT_SIZE_CHANGED; }
 		EventCategory GetEventCategory()const override { return APP_EVENT; }
 
 		Size2D GetNewFramebufferSize()const { return m_framebufferSize; }

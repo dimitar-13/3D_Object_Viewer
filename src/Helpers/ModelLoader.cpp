@@ -1,9 +1,6 @@
+#include "pch.h"
 #include "ModelLoader.h"
-#include <iostream>
-#include<numeric>
 #include"UnitTransformer.h"
-#include<filesystem>
-#include<glm/gtc/matrix_transform.hpp>
 
 OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path, LoadModelFileType modelFileType)
 {

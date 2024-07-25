@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include"Logging/App_Logger.h"
+#include "Logging/App_Logger.h"
 
 namespace OBJ_Viewer {
 	class DialogWrapper {

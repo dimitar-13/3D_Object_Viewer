@@ -5,7 +5,6 @@
 OBJ_Viewer::Framebuffer::Framebuffer(Size2D size, FramebufferAttachmentsFlags attachmentFlags, bool isMultiSampleBuffer, uint8_t sampleCount):
 m_framebufferSize(size),m_isMultiSample(isMultiSampleBuffer),m_sampleCount(sampleCount)
 {
-
 	glGenFramebuffers(1, &this->m_framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer);
 
@@ -19,6 +18,9 @@ m_framebufferSize(size),m_isMultiSample(isMultiSampleBuffer),m_sampleCount(sampl
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_isMultiSample? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D,
 		this->m_texture->GetTextureHandle(), 0);
 
+#pragma region Setup render buffer object
+
+
 	glGenRenderbuffers(1, &this->m_readBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, this->m_readBuffer);
 	if (!m_isMultiSample) {
@@ -29,6 +31,8 @@ m_framebufferSize(size),m_isMultiSample(isMultiSampleBuffer),m_sampleCount(sampl
 	}
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->m_readBuffer);
+#pragma endregion
+
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
 		LOGGER_LOG_ERROR("Failed to create valid framebuffer.");

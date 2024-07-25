@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
-
+#include "Helpers/TextureHelpers.h"
 OBJ_Viewer::Renderer::Renderer()
 {
 	m_defaultWhiteTexture = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
@@ -112,13 +112,12 @@ void OBJ_Viewer::Renderer::BindMaterialTexture(const ShaderClass& shaderToUse, s
 
 std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDefaultTexture(const std::string& path)
 {
+	TexturePixelReader reader(path.c_str());
 	TextureBuilder builder;
-	int channelCount;
-	Size2D textureSize;
-	TexturePixelDataWrapper reader(path.c_str(), &textureSize, &channelCount);
-	TextureFormat format = GetFormatByChannelCount(channelCount);
+	TextureFormat format = reader.GetTextureFormat();
+
 	return builder.SetTextureFormat(format).
-		SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(textureSize).
+		SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(reader.GetTextureSize()).
 		SetTexturePixelData(reader.GetTexturePixelData()).SetTextureWrapT(TEXTURE_WRAP_CLAMP_TO_EDGE).
 		SetTextureWrapS(TEXTURE_WRAP_CLAMP_TO_EDGE).buildTexture();
 }

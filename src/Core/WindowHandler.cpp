@@ -1,28 +1,14 @@
 #include "pch.h"
 #include "WindowHandler.h"
 #include"AppEvent.h"
-OBJ_Viewer::Window::Window(Size2D windowMetrics, const char* winTitle, std::function<void(Event&)> onEventFunc)
+OBJ_Viewer::Window::Window(Size2D windowMetrics, const char* winTitle)
 {
 	this->m_winTitle = winTitle;
 	this->m_windowSize = windowMetrics;
 	GLFWwindow* glfwWindow = glfwCreateWindow(windowMetrics.width, windowMetrics.height, winTitle, NULL, NULL);
 	glfwMakeContextCurrent(glfwWindow);
 	this->m_glfwWindow = glfwWindow;
-	m_onEvent = onEventFunc;
 	SetWindowCallback();
-}
-
-glm::mat4 OBJ_Viewer::Window::GetViewportMatrix()const
-{
-	glm::mat4 result(1);
-	Size2D winSize = m_windowSize;
-	result[0][0] = (float)winSize.width / 2;
-	result[1][1] = (float)winSize.height / 2;
-
-	result[2][0] = result[0][0];
-	result[2][1] = result[1][1];
-
-	return result;
 }
 
 void OBJ_Viewer::Window::SetWindowCallback()

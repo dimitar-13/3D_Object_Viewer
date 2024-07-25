@@ -9,14 +9,16 @@ namespace OBJ_Viewer
 	struct EulerAngles {
 		float m_yawAngle;
 		float m_pitchAngle;
-		void operator+=(EulerAngles other) {
+		EulerAngles& operator+=(const EulerAngles& other) {
 			this->m_yawAngle += other.m_yawAngle;
 			this->m_pitchAngle += other.m_pitchAngle;
+			return *this;
 		}
-		EulerAngles operator-(EulerAngles other)
+		EulerAngles& operator-(const EulerAngles& other)
 		{
-			return{this->m_yawAngle -= other.m_yawAngle,
-				   this->m_pitchAngle -= other.m_pitchAngle};
+			this->m_yawAngle -= other.m_yawAngle;
+			this->m_pitchAngle -= other.m_pitchAngle;
+			return *this;
 		}
 	};
 	class EulerAngleHelper {
@@ -31,16 +33,15 @@ namespace OBJ_Viewer
 	{
 	public:
 		Camera(float CameraZoom,Size2D screenSize, Application& app);
-		void CalculatePositionVector();
-		//void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj) { pView = &m_viewMatrix; pProj = &m_projectionMatrix; }
-		void GetViewAndProjectionSeparate(glm::mat4* pView, glm::mat4* pProj)const { *pView = m_viewMatrix; *pProj = m_projectionMatrix; }
+		void GetViewAndProjectionSeparate(glm::mat4& pView, glm::mat4& pProj)const { pView = m_viewMatrix; pProj = m_projectionMatrix; }
 		glm::mat4 GetViewProjMatrix()const { return m_projectionMatrix * m_viewMatrix; }
 		glm::mat4 GetViewProjNoTranslation()const { return m_projectionMatrix* glm::mat4(glm::mat3(m_viewMatrix)); };
 		glm::vec3 GetCameraPos()const { return this->m_position; }
 		void SetProjection(bool isProjectionPerspective = true) { m_isProjectionPerspective = isProjectionPerspective; RecalculateProjection(); }
 	private:
 		void RecalculateViewMatrix();
-
+		void CalculatePositionVector();
+#pragma region On Event
 		void onScrollChanged(ScrollPositionChanged& e);
 		void onMousePositionChanged(MousePositionEvent& e);
 		void onWinSizeChanged(SceneViewportResizeEvent& e);
@@ -48,6 +49,7 @@ namespace OBJ_Viewer
 		void RecalculateProjection(Size2D windowSize = {0,0});
 		void OnProjectionModeChanged(EventCameraProjectionChanged& e);
 		void CalculateOthoProjection(Size2D windowSize);
+#pragma endregion
 	private:
 		float m_zoom;
 		glm::mat4 m_projectionMatrix;

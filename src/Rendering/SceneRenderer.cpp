@@ -7,14 +7,14 @@
 #include "ShaderPath.h"
 #include "Helpers/MeshGeneratingMethods.h"
 
-
+#pragma region Constants
 constexpr uint8_t MATRIX_UBO_BINDING_POINT = 0;
 constexpr uint8_t LIGHT_UBO_BINDING_POINT = 1;
 
 constexpr uint8_t UBO_MATRIX_COUNT = 4;
 constexpr size_t UBO_MATRIX_BYTE_SIZE = UBO_MATRIX_COUNT * sizeof(glm::mat4);
 constexpr size_t UBO_LIGHT_BYTE_SIZE = OBJ_Viewer::APP_SETTINGS::MAX_LIGHT_COUNT * OBJ_Viewer::APP_SETTINGS::SIZE_OF_LIGHT_IN_BYTES;
-
+#pragma endregion
 OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) :
 #pragma region Buffer setup
 	m_multiSampleSceneFrameBuffer(app.GetSceneViewport().GetViewportSize(), FRAMEBUFFER_COLOR_ATTACHMENT, true, 11),
@@ -25,16 +25,16 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	//If this is causing problems see the comment where the definition of the 'GeneratePlaneVAOStack' is.
 	m_screenQuad(GeneratePlaneVAOStack()),
 #pragma region  Shader setup
-	m_clearColorShader(GetConcatShaderPath("ClearColorMeshShader.glsl").c_str()),
-	m_gridShader(GetConcatShaderPath("GridShader.glsl").c_str()),
-	m_skyboxShader(GetConcatShaderPath("SkyboxShader.glsl").c_str()),
-	m_lightShader(GetConcatShaderPath("LightShader.glsl").c_str()),
-	m_materialShader(GetConcatShaderPath("MaterialShader.glsl").c_str()),
-	m_wireframeShader(GetConcatShaderPath("WireframeShader.glsl").c_str()),
-	m_wireframePointShader(GetConcatShaderPath("WireframePointShader.glsl").c_str()),
-	m_UVShader(GetConcatShaderPath("UVShader.glsl").c_str()),
-	m_singleTextureShader(GetConcatShaderPath("SingleTextureInspectShader.glsl").c_str()),
-	m_postProcessingShader(GetConcatShaderPath("PostProcessShader.glsl").c_str()),
+	m_clearColorShader(ShaderAssetHelper::GetConcatShaderPath("ClearColorMeshShader.glsl").c_str()),
+	m_gridShader(ShaderAssetHelper::GetConcatShaderPath("GridShader.glsl").c_str()),
+	m_skyboxShader(ShaderAssetHelper::GetConcatShaderPath("SkyboxShader.glsl").c_str()),
+	m_lightShader(ShaderAssetHelper::GetConcatShaderPath("LightShader.glsl").c_str()),
+	m_materialShader(ShaderAssetHelper::GetConcatShaderPath("MaterialShader.glsl").c_str()),
+	m_wireframeShader(ShaderAssetHelper::GetConcatShaderPath("WireframeShader.glsl").c_str()),
+	m_wireframePointShader(ShaderAssetHelper::GetConcatShaderPath("WireframePointShader.glsl").c_str()),
+	m_UVShader(ShaderAssetHelper::GetConcatShaderPath("UVShader.glsl").c_str()),
+	m_singleTextureShader(ShaderAssetHelper::GetConcatShaderPath("SingleTextureInspectShader.glsl").c_str()),
+	m_postProcessingShader(ShaderAssetHelper::GetConcatShaderPath("PostProcessShader.glsl").c_str()),
 #pragma endregion
 	m_app(app)
 {
@@ -150,8 +150,10 @@ void OBJ_Viewer::SceneRenderer::PostProcessScene(bool doFXAA)
 	glActiveTexture(GL_TEXTURE1);
 	Texture& framebufferTexture = m_intermidiateFramebuffer.GetFramebufferTexture();
 
-	static SceneViewport sceneViewPort = m_app.GetSceneViewport();
-	glm::vec2 uRes = glm::vec2(sceneViewPort.width, sceneViewPort.height);
+	const SceneViewport& sceneViewPort = m_app.GetSceneViewport_ConstRef();
+
+	const Size2D viewportSize = sceneViewPort.GetViewportSize();
+	glm::vec2 uRes = glm::vec2(viewportSize.width, viewportSize.height);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -187,7 +189,10 @@ void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh, M
 
 void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,const APP_SETTINGS::WireFrameSettings& wireframeAppSettings)
 {
-	const glm::mat3 viewportTransform = ConstructViewportMatrix();
+	const SceneViewport& sceneViewPort = m_app.GetSceneViewport_ConstRef();
+
+	const glm::mat3& viewportTransform = sceneViewPort.GetViewportMatrix();
+
 	if (wireframeAppSettings.isPointRenderingOn)
 	{
 		constexpr static float pointSizeOffset = 1.;
@@ -210,10 +215,38 @@ void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,cons
 
 void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 {
-	if (!paths.empty())
+	//TODO: This can be async
+
+	if (paths.empty())
 	{
-		this->m_sceneSkybox.reset(new Skybox(paths));
+		LOGGER_LOG_ERROR("No paths provided for creating a skybox.");
+		return;
 	}
+	if(paths.size() < Skybox::SKYBOX_FACE_COUNT)
+	{
+		LOGGER_LOG_ERROR("Not enough paths were provided for skybox creation.Provided count was {0} when {1} was expected",
+			paths.size(), Skybox::SKYBOX_FACE_COUNT);
+		return;
+	}
+
+	std::array<TexturePixelReader,Skybox::SKYBOX_FACE_COUNT> readers = {
+		TexturePixelReader(paths[0].c_str()),
+		TexturePixelReader(paths[1].c_str()),
+		TexturePixelReader(paths[2].c_str()),
+		TexturePixelReader(paths[3].c_str()),
+		TexturePixelReader(paths[4].c_str()),
+		TexturePixelReader(paths[5].c_str())
+	};
+	for (const auto& reader : readers)
+	{
+		if (!reader.isTextureValid())
+		{
+			LOGGER_LOG_ERROR("One or more textures were invalid.Can't construct skybox with invalid textures.");
+			return;
+		}
+	}
+
+	this->m_sceneSkybox.reset(new Skybox(readers));
 }
 
 void OBJ_Viewer::SceneRenderer::SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with)
@@ -262,23 +295,10 @@ void OBJ_Viewer::SceneRenderer::SetUpUniformBuffers()
 void OBJ_Viewer::SceneRenderer::SetUniformMatrixBuffer()const
 {
 	glm::mat4 matrices[UBO_MATRIX_COUNT] = {};
-	m_sceneCamera->GetViewAndProjectionSeparate(&matrices[0], &matrices[1]);
+	m_sceneCamera->GetViewAndProjectionSeparate(matrices[0], matrices[1]);
 	matrices[2] = m_sceneModel->GetModelMatrix();
 	matrices[3] = m_sceneModel->GetNormalMatrix();
 	m_uniformMatrixBuffer.SendBufferSubData(0, UBO_MATRIX_BYTE_SIZE, matrices);
-}
-
-glm::mat3 OBJ_Viewer::SceneRenderer::ConstructViewportMatrix() const
-{
-	glm::mat3 result(1);
-	auto winSize = m_app.GetSceneViewport();
-	result[0][0] = (float)winSize.width / 2.f;
-	result[1][1] = (float)winSize.height / 2.f;
-
-	result[2][0] = result[0][0];
-	result[2][1] = result[1][1];
-
-	return result;
 }
 
 void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)

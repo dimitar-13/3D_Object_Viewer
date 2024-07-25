@@ -6,11 +6,12 @@ namespace OBJ_Viewer {
 	class EventOnSkyboxLoaded : public Event
 	{
 	public:
-		EventOnSkyboxLoaded(std::vector<std::string> paths):m_paths(paths)
+		EventOnSkyboxLoaded(const std::vector<std::string>& paths):m_paths(paths)
 		{}
 		EventType GetEventType()const override { return EVENT_ON_SKYBOX_LOAD; }
 		EventCategory GetEventCategory()const override { return APP_EVENT; }
 		std::vector<std::string>& GetSkyboxPaths() { return m_paths; }
+		const std::vector<std::string>& GetSkyboxPaths()const { return m_paths; }
 	private:
 		std::vector<std::string> m_paths;
 	};

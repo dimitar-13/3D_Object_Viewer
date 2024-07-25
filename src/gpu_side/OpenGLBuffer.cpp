@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "OpenGLBuffer.h"
 
-OBJ_Viewer::OpenGLBuffer::OpenGLBuffer(BufferData data):
+OBJ_Viewer::OpenGLBuffer::OpenGLBuffer(const BufferData& data):
 	m_bufferHandle(0),m_data(data)
 {
 	glGenBuffers(1, &this->m_bufferHandle);

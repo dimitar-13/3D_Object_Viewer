@@ -1,49 +1,9 @@
 #pragma once
 #include "pch.h"
 #include "Core/CommonAppData.h"
+#include "TextureEnums.h"
 namespace OBJ_Viewer {
-#pragma region TextureStructs
-	enum TextureFormat
-	{
-		TEXTURE_FORMAT_R = GL_RED,
-		TEXTURE_FORMAT_RG = GL_RG,
-		TEXTURE_FORMAT_RGB = GL_RGB,
-		TEXTURE_FORMAT_RGBA = GL_RGBA
-	};
-	enum TextureInternalFormat {
-		TEXTURE_INTERNAL_FORMAT_DEPTH = GL_DEPTH_COMPONENT,
-		TEXTURE_INTERNAL_FORMAT_DEPTH_STENCIL = GL_DEPTH_STENCIL,
-		TEXTURE_INTERNAL_FORMAT_R = GL_RED,
-		TEXTURE_INTERNAL_FORMAT_RG = GL_RG,
-		TEXTURE_INTERNAL_FORMAT_RGB = GL_RGB,
-		TEXTURE_INTERNAL_FORMAT_RGBA = GL_RGBA,
-	};
-	enum TextureFilter
-	{
-		TEXTURE_FILTER_LINEAR = GL_LINEAR,
-		TEXTURE_FILTER_NEAREST = GL_NEAREST
-	};
-	enum TextureWrap
-	{
-		TEXTURE_WRAP_REPEAT = GL_REPEAT,
-		TEXTURE_WRAP_MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
-		TEXTURE_WRAP_CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-
-		//TODO:Add more option
-	};
-	enum TexturePixelDataType
-	{
-		TEXTURE_PIXEL_DATA_UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
-		TEXTURE_PIXEL_DATA_BYTE = GL_BYTE,
-		TEXTURE_PIXEL_DATA_UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
-		TEXTURE_PIXEL_DATA_SHORT = GL_SHORT,
-		TEXTURE_PIXEL_DATA_UNSIGNED_INT = GL_UNSIGNED_INT,
-		TEXTURE_PIXEL_DATA_INT = GL_INT,
-		TEXTURE_PIXEL_DATA_HALF_FLOAT=GL_HALF_FLOAT,
-		TEXTURE_PIXEL_DATA_FLOAT=GL_FLOAT
-	};
-	
-	
+#pragma region TextureStructs	
 	struct TextureData
 	{
 		Size2D TextureSize;
@@ -51,34 +11,6 @@ namespace OBJ_Viewer {
 		TextureInternalFormat m_textureInternalFormat;
 	};
 #pragma endregion
-
-	inline TextureFormat GetFormatByChannelCount(int channelCount)
-	{
-		/* If the channel count is higher than 2 it means we have either RGB or RGBA format
-		* so far we will calculate those: because they are sequential.We can get the channel count 
-		* minus the lowest of the 2 counts witch is 3 and added to the smaller 'TEXTURE_FORMAT_RGB' 
-		* example:
-		* We receive 3 in this case 3 - 3 is 0 meaning we have RGB in other case we have 1 witch is RBGA
-		* If we have lower than 2 than we either have single R channel or a RG channel easiest way here
-		* to see if we have division by 2 (without decimal numbers).
-		* Have we made the enums increment in order we can avoid this ? Yes but openGL macros are not in order
-		* so either enum in order and fetch OPENGL macros or this. 
-		* Some might see that there is no big change here but for debugging and for future changes its better since atleast we can change 
-		* the render API if we want and the program will still work (maybe hypocritical considering in some places we use GL typedef data).
-		*/
-		return channelCount > 2 ? static_cast<TextureFormat>((channelCount - 3) + TEXTURE_FORMAT_RGB)
-			: channelCount % 2 == 0.0f ? TEXTURE_FORMAT_R: TEXTURE_FORMAT_RG;
-	}
-
-	struct TexturePixelDataWrapper
-	{
-	public:
-		TexturePixelDataWrapper(const char* path, Size2D* pTextureSize,int* pPresentChannelsCount);
-		~TexturePixelDataWrapper();
-		unsigned char* GetTexturePixelData()const { return m_pixelData; }
-	private:
-		unsigned char* m_pixelData;
-	};
 
 	class Texture
 	{

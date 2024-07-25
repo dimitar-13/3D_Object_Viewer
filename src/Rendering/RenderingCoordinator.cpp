@@ -56,7 +56,8 @@ void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)
 }
 
 
-OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):m_application(application)
+OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):
+	m_application(application)
 {
 	std::shared_ptr<RenderingMediator> mediator = std::make_shared<RenderingMediator>();
 	m_sceneRenderer = std::make_shared<SceneRenderer>(application, mediator);

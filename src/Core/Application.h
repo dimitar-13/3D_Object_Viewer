@@ -7,6 +7,7 @@
 #include "Scene/Material.h"
 #include "Controls/AppKeyBindings.h"
 #include "Logging/App_Logger.h"
+#include "Core/SceneViewport.h"
 namespace OBJ_Viewer {
 
 	namespace APP_SETTINGS {
@@ -38,7 +39,7 @@ namespace OBJ_Viewer {
 		};
 		struct DirectionalLight
 		{
-			glm::vec3 direction = glm::vec3(0, 0, 0);
+			glm::vec3 direction = glm::vec3(0);
 			float padding1;
 			glm::vec3 color = glm::vec3(0);
 			float padding2;
@@ -55,7 +56,12 @@ namespace OBJ_Viewer {
 		struct SceneLightInfo
 		{
 			int lightCount = 1;
-			std::array<DirectionalLight, MAX_LIGHT_COUNT>lights;
+			std::array<DirectionalLight, MAX_LIGHT_COUNT>lights = {
+				DirectionalLight{glm::vec3(1),0,glm::vec3(1),0},
+				DirectionalLight{glm::vec3(0),0,glm::vec3(0),0},
+				DirectionalLight{glm::vec3(0),0,glm::vec3(0),0},
+				DirectionalLight{glm::vec3(0),0,glm::vec3(0),0},
+			};
 			LightShadingModel currentLightModel = LIGHT_MODEL_BLIN_PHONG;
 		};
 		struct UV_ViewAppSetting
@@ -88,49 +94,39 @@ namespace OBJ_Viewer {
 		};
 	}
 
-	struct SceneViewport
-	{
-		int x;
-		int y;
-		int width;
-		int height;
-		Size2D GetViewportOffset()const { return Size2D{ x,y }; }
-		Size2D GetViewportSize()const { return Size2D{ width,height }; }
-	};
-
 	class RenderingCoordinator;
 	class Application
 	{
 	public:
-		Application();
-		static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
-			GLsizei length, const char* message, const void* userParam);
+		Application(Window& appWindow);
+		void AppStartRenderLoop();
 		APP_SETTINGS::RenderStateSettings& GetScene_RefSettings() { return m_appStetting; }
+		bool isAppInitStatusSuccess()const { return m_appInitStatusSuccsess; }
 		bool isUIHidden()const { return m_isUIHidden; }
 		InputHandler& GetGlobalInputHandler() { return *m_inputHandler; }
-		Window& GetGlobalAppWindow() { return *m_window; }
-		Framebuffer& GetSceneFrameBuffer() { return *m_sceneFramebuffer; }
+		Window& GetGlobalAppWindow() { return m_window; }
+		Framebuffer& GetSceneFrameBuffer() { return m_sceneFramebuffer; }
 		SceneViewport GetSceneViewport()const { return m_sceneViewport; }
 		const SceneViewport& GetSceneViewport_ConstRef()const { return m_sceneViewport; }
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
-		void UpdateSceneViewport(SceneViewport newViewport) { m_sceneViewport = newViewport; ResizeBuffer(newViewport.width, newViewport.height); }
+		void UpdateSceneViewport(const Viewport& newViewport) { m_sceneViewport.UpdateSceneViewport(newViewport); ResizeBuffer(m_sceneViewport.GetViewportSize()); }
 		std::function<void(Event&)> GetOnAppEventCallback() { return std::bind(&Application::OnEvent, this, std::placeholders::_1);}
 		~Application();
 	private:
 		void InitImGui();
-		void ResizeBuffer(int newWidht, int newHeight);
+		void ResizeBuffer(Size2D newSize);
 		void OnEvent(Event& winEvent);
 		void OnAppKeyBindPressed(KeyboardKeyEvent& e);
 	private:
 		APP_SETTINGS::RenderStateSettings m_appStetting;
 		bool m_isUIHidden = false;
-		std::unique_ptr<Window> m_window;
+		Window& m_window;
 		std::shared_ptr<InputHandler> m_inputHandler;
-		std::unique_ptr<Framebuffer> m_sceneFramebuffer;
+		Framebuffer m_sceneFramebuffer;
 		std::unique_ptr<RenderingCoordinator> m_appRenderingCoordinator;
 		std::vector<std::weak_ptr<Listener>> m_eventListeners;
-
 		SceneViewport m_sceneViewport;
+		bool m_appInitStatusSuccsess = false;
 	};
 }
 

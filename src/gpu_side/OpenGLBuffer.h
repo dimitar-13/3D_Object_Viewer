@@ -41,7 +41,7 @@ namespace OBJ_Viewer {
 	class OpenGLBuffer
 	{
 	public:
-		OpenGLBuffer(BufferData data);
+		OpenGLBuffer(const BufferData& data);
 		void BindBuffer()const{ glBindBuffer(m_data.type, this->m_bufferHandle); }
 		void UnbindBuffer()const { glBindBuffer(m_data.type,0); }
 		~OpenGLBuffer();

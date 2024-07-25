@@ -1,15 +1,24 @@
 #include "pch.h"
 #include "UI/UILayer.h"
 #include "Camera.h"
+#include "Controls/AppKeyBindings.h"
+
+#define IS_Y_VECTOR_FLIPPED(X) std::cos(glm::radians(X)) < 0
+#define ASPECT(X,Y) (float)X / (float)Y
+
+constexpr float Z_FAR = 100.0f;
+constexpr float Z_NEAR = 0.1f;
+constexpr float FOV = 45.0f;
 
 OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app):
 	m_app(app)
 {
 	this->m_zoom = CameraZoom;
-	m_projectionMatrix = glm::perspective(std::cos(90.0f), (float)screenSize.width / (float)screenSize.height, 0.1f, 100.0f);
-	//CameraZoom units from the origin or vec3(0,0,1) * CameraZoom;
-	this->m_EulerAngles.m_pitchAngle =0.0f;
+	m_projectionMatrix = glm::perspective(glm::radians(FOV), ASPECT(screenSize.width, screenSize.height), Z_NEAR, Z_FAR);
+
+	this->m_EulerAngles.m_pitchAngle = 0.0f;
 	this->m_EulerAngles.m_yawAngle = 90.0f;
+
 	//Use to set the x_previous and y_previous of the 'm_EulerAngleHelper' so we can avoid conditions;
 	m_EulerAngleHelper.calculateEulerAngles(Position2D{ this->m_EulerAngles.m_yawAngle,this->m_EulerAngles.m_pitchAngle });
 	CalculatePositionVector();
@@ -43,7 +52,7 @@ void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
 	auto& mousePos = e.GetMousePos();
-
+#pragma region Check for LMB
 	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_1) &&
 		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
@@ -57,7 +66,9 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 		CalculatePositionVector();
 	}
+#pragma endregion
 
+#pragma region  Check for RMB
 	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_2) &&
 		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
@@ -67,14 +78,14 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_2) &&
 		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
 	{
-		constexpr float movementSpeed = .005;
+		constexpr float CAMERA_SHIFTING_SPEED = .005;
 		glm::mat3 viewSpaceOrthogonalVectors = glm::mat3(m_viewMatrix);
 		glm::vec3 viewDirectionVector(0);
 		//We calculate the offset in camera/view space first.
 		Position2D delta = Position2D{ mousePos.x - m_lastMousePos.x,mousePos.y - m_lastMousePos.y};
-		viewDirectionVector.x = delta.x*movementSpeed;
+		viewDirectionVector.x = delta.x* CAMERA_SHIFTING_SPEED;
 		//We flip the y since opengl flips its y component 
-		viewDirectionVector.y = -delta.y*movementSpeed;
+		viewDirectionVector.y = -delta.y* CAMERA_SHIFTING_SPEED;
 		//TL;DR: We use transpose as a cheap inverse since the "viewSpaceOrthogonalVectors" is a 3 orthogonal vector matrix
 		//and then we bring our viewSpace delta into word space.
 		/*Why we do it like this ? 
@@ -88,6 +99,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		m_cameraCenter += viewDirectionVector;
 		RecalculateViewMatrix();
 	}
+#pragma endregion
 
 }
 
@@ -99,7 +111,7 @@ void OBJ_Viewer::Camera::onWinSizeChanged(SceneViewportResizeEvent& e)
 
 void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 {
-	if (e.GetKeyCode() == GLFW_KEY_Q)
+	if (e.GetKeyCode() == AppKeyBinding::KEY_BIND_RESET_CAMERA_PIVOT)
 	{
 		m_cameraCenter = glm::vec3(0);
 		RecalculateViewMatrix();
@@ -111,11 +123,9 @@ void OBJ_Viewer::Camera::RecalculateProjection(Size2D windowSize)
 	windowSize = (windowSize.width == 0 || windowSize.height == 0) ? m_app.GetSceneViewport().GetViewportSize() : windowSize;
 
 	if (m_isProjectionPerspective)
-		m_projectionMatrix = glm::perspective(glm::radians(45.0f), (float)windowSize.width / (float)windowSize.height, 0.1f, 100.0f);
+		m_projectionMatrix = glm::perspective(glm::radians(FOV), ASPECT(windowSize.width, windowSize.height) , Z_NEAR, Z_FAR);
 	else
-	{
 		CalculateOthoProjection(windowSize);
-	}
 }
 
 void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e)
@@ -126,13 +136,15 @@ void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e
 
 void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D windowSize)
 {
-	float orthoScale = this->m_zoom / 500;
+	constexpr float ORTHOGRAPHIC_SCALE_FACTOR = 500.0f;
+
+	float orthoScale = this->m_zoom / ORTHOGRAPHIC_SCALE_FACTOR;
 	/*Orthographic projection doesn't really have a zoom since all you see must stay true to its size so instead we shrink the
 	* box defined by the left,right,bottom,top planes so that smaller values will get bigger meaning that since ortho matrix
 	* is just a scale and translate we make the scale bigger by multiplying left,right,bottom,top with the 'orthoScale'.
 	*/
 	m_projectionMatrix = glm::ortho(-((float)windowSize.width / 2) * orthoScale, ((float)windowSize.width / 2) * orthoScale,
-		-((float)windowSize.height / 2) * orthoScale, ((float)windowSize.height / 2) * orthoScale, -1.f/ orthoScale, 100.f);
+		-((float)windowSize.height / 2) * orthoScale, ((float)windowSize.height / 2) * orthoScale, -1.f/ orthoScale, Z_FAR);
 }
 
 
@@ -140,7 +152,7 @@ void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D windowSize)
 void OBJ_Viewer::Camera::RecalculateViewMatrix()
 {
 	glm::vec3 upVec(0, 1, 0);
-	upVec.y *= std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) < 0 ? -1 : 1;
+	upVec.y *= IS_Y_VECTOR_FLIPPED(this->m_EulerAngles.m_pitchAngle) ? -1 : 1;
 	m_viewMatrix = glm::lookAt(m_position * m_zoom + m_cameraCenter, m_cameraCenter, upVec);
 }
 
@@ -171,7 +183,6 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 
 OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::calculateEulerAngles(Position2D newMousePosition)
 {
-	//Check if mouse button is held and then move;
 	EulerAngles result = {static_cast<float>(newMousePosition.x - m_previousMousePosition.x),
 		static_cast<float>(newMousePosition.y - m_previousMousePosition.y)};
 	m_previousMousePosition = newMousePosition;

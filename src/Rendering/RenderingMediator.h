@@ -1,6 +1,6 @@
 #pragma once
-#include"Scene/Skybox.h"
-#include"Scene/Model.h"
+#include "Scene/Skybox.h"
+#include "Scene/Model.h"
 #include "pch.h"
 
 namespace OBJ_Viewer {

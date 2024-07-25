@@ -26,7 +26,6 @@ namespace OBJ_Viewer {
 	private:
 		void SetUpUniformBuffers();
 		void SetUniformMatrixBuffer()const;
-		glm::mat3 ConstructViewportMatrix()const;
 		// Inherited via AppEventListener
 		void OnEvent(Event& e)override;
 		void OnSkyboxLoadEvent(EventOnSkyboxLoaded& e);

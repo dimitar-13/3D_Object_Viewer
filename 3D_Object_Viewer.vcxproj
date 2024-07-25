@@ -176,7 +176,10 @@
     <ClCompile Include="Dependencies\imgui\imgui\imgui_draw.cpp" />
     <ClCompile Include="Dependencies\imgui\imgui\imgui_tables.cpp" />
     <ClCompile Include="Dependencies\imgui\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\3D_Object_Viewer.cpp" />
+    <ClCompile Include="src\3D_Object_Viewer.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">GLEW_STATIC;OBJ_VIEWER_LEVEL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">GLEW_STATIC;OBJ_VIEWER_LEVEL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="src\gpu_side\VertexAttributeObject.cpp" />
     <ClCompile Include="src\Core\WindowHandler.cpp" />
     <ClCompile Include="src\gpu_side\Texture.cpp" />
@@ -200,7 +203,10 @@
     <ClInclude Include="src\Controls\AppKeyBindings.h" />
     <ClInclude Include="src\Controls\KeyboardKeys.h" />
     <ClInclude Include="src\Controls\MouseKeys.h" />
+    <ClInclude Include="src\Core\SceneViewport.h" />
+    <ClInclude Include="src\gpu_side\TextureEnums.h" />
     <ClInclude Include="src\Helpers\FileFromatStruct.h" />
+    <ClInclude Include="src\Helpers\TextureHelpers.h" />
     <ClInclude Include="src\Helpers\UnitTransformer.h" />
     <ClInclude Include="src\Logging\App_Logger.h" />
     <ClInclude Include="src\pch\pch.h" />

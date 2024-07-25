@@ -56,19 +56,3 @@ void OBJ_Viewer::Texture::SetTextureProperties(const unsigned char* data)
 	}
 	glBindTexture(m_target, 0);
 }
-
-OBJ_Viewer::TexturePixelDataWrapper::TexturePixelDataWrapper(const char* path, Size2D* pTextureSize, int* pPresentChannelsCount)
-{
-	stbi_set_flip_vertically_on_load(true);
-	m_pixelData = stbi_load(path, &pTextureSize->width, &pTextureSize->height, pPresentChannelsCount, 0);
-	if (!m_pixelData)
-	{	
-		LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", path);
-	}
-}
-
-OBJ_Viewer::TexturePixelDataWrapper::~TexturePixelDataWrapper()
-{
-	if (m_pixelData)
-		stbi_image_free(m_pixelData);
-}

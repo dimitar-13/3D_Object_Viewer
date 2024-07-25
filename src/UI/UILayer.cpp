@@ -373,7 +373,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 winPos = ImGui::GetWindowPos();
-		static SceneViewport sceneWinViewport{};
+		static Viewport sceneWinViewport{};
 		sceneWinViewport.x = winPos.x;
 		sceneWinViewport.y = winPos.y;
 		sceneWinViewport.width = winSize.x;

@@ -1,8 +1,7 @@
 #pragma once
-#include<GL/glew.h>
-#include"Texture.h"
-#include<iostream>
-#include"CommonAppData.h"
+#include "pch.h"
+#include "Texture.h"
+#include "Core/CommonAppData.h"
 
 namespace OBJ_Viewer {
 

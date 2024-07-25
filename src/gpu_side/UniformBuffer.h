@@ -1,6 +1,5 @@
 #pragma once
-#include<GL/glew.h>
-#include<iostream>
+#include "pch.h"
 namespace OBJ_Viewer {
 	class UniformBuffer
 	{

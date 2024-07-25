@@ -1,11 +1,6 @@
 #pragma once
-#include<GL/glew.h>
-#include<glm/glm.hpp>
-#include<unordered_map>
-#include<string>
-#include<GL/glew.h>
-#include<vector>
-#include"UniformBuffer.h"
+#include "pch.h"
+#include "gpu_side/UniformBuffer.h"
 namespace OBJ_Viewer
 {
 	enum ShaderIndex

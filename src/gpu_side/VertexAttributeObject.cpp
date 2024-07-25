@@ -1,6 +1,7 @@
+#include "pch.h"
 #include "VertexAttributeObject.h"
-#include<iostream>
-OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> vertexData, std::vector<unsigned int>indexData)
+
+OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> vertexData, std::vector<IndexDataType>indexData)
 {
 	glGenVertexArrays(1, &this->m_vertexAttributeObjHandle);
 	glBindVertexArray(this->m_vertexAttributeObjHandle);
@@ -13,7 +14,7 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> ver
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_indexBufferObjHandle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)* indexData.size(), indexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(IndexDataType)* indexData.size(), indexData.data(), GL_STATIC_DRAW);
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
@@ -32,7 +33,7 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> ver
 	m_vertexData.vertexCount = vertexData.size();
 }
 
-OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<glm::vec3> vertexData, std::vector<unsigned int>indexData)
+OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<glm::vec3> vertexData, std::vector<IndexDataType>indexData)
 {
 	glGenVertexArrays(1, &this->m_vertexAttributeObjHandle);
 	glBindVertexArray(this->m_vertexAttributeObjHandle);
@@ -46,7 +47,7 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<glm::vec3> 
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_indexBufferObjHandle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexData.size(), indexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(IndexDataType) * indexData.size(), indexData.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0,3, GL_FLOAT,GL_FALSE, sizeof(float)*3, (void*)0);
 	glEnableVertexAttribArray(0);

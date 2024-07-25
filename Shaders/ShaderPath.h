@@ -1,15 +1,20 @@
 #pragma once
 #include <filesystem>
 namespace OBJ_Viewer {
-	inline std::string path;
-	inline std::string& GetShaderPath()
-	{
-		if (path.empty())
-			path = std::filesystem::current_path().string() + "\\Shaders";
-		return path;
-	}
-	inline std::string GetConcatShaderPath(const char* shaderFileName)
-	{
-		return GetShaderPath() +'\\' + std::string(shaderFileName);
-	}
+	
+	class ShaderAssetHelper {
+	public:
+		static std::string& GetShaderPath()
+		{
+			if (s_path.empty())
+				s_path = std::filesystem::current_path().string() + "\\Shaders";
+			return s_path;
+		}
+		static std::string GetConcatShaderPath(const char* shaderFileName)
+		{
+			return GetShaderPath() + '\\' + std::string(shaderFileName);
+		}
+	private:
+		inline static std::string s_path;
+	};
 }

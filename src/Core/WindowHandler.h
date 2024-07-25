@@ -1,9 +1,7 @@
 #pragma once
-#include<GL/glew.h>
-#include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
-#include"Events.h"
-#include"CommonAppData.h"
+#include "pch.h"
+#include "Events.h"
+#include "CommonAppData.h"
 namespace OBJ_Viewer {
 
 	enum WindowState
@@ -13,19 +11,24 @@ namespace OBJ_Viewer {
 		WINDOW_STATE_FULL_SCREEN,
 		WINDOW_STATE_NORMAL
 	};
+	class Application;
 	class Window {
 	public:
-		Window(Size2D windowMetrics, const char* winTitle,std::function<void(Event&)> onEventFunc);
+		Window(Size2D windowMetrics, const char* winTitle);
 		~Window() { glfwDestroyWindow(m_glfwWindow); }
 		Size2D GetWindowSize()const { return this->m_windowSize; }
 		GLFWwindow* GetGLFW_Window()const { return this->m_glfwWindow; }
-		glm::mat4 GetViewportMatrix()const;
+		bool isWinContextInitialized() { return  m_glfwWindow != nullptr;}
 	private:
 		Size2D m_windowSize;
 		GLFWwindow* m_glfwWindow = nullptr;
 		const char* m_winTitle;
 		std::function<void(Event&)> m_onEvent;
 		WindowState windowState = WINDOW_STATE_NORMAL;
+	private:
+		
+		friend class Application;
+		void SetOnEventCallback(const std::function<void(Event&)>& onEventFunc){ m_onEvent = onEventFunc; }
  	private:
 		void SetWindowCallback();
 		void glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos);

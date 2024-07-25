@@ -1,6 +1,7 @@
 #pragma once
-#include<nfd.h>
-#include<iostream>
+#include "pch.h"
+#include "Logging/App_Logger.h"
+
 namespace OBJ_Viewer {
 	class DialogWrapper {
 	public:
@@ -20,7 +21,7 @@ namespace OBJ_Viewer {
 		nfdresult_t result = NFD_OpenDialog(filterLIst.c_str(), NULL, &outPaths[0]);
 		if (result != NFD_OKAY) {
 			if (result == NFD_ERROR)
-				std::cout << "[ERROR]:NFD:" << NFD_GetError() << '\n';
+				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
 			isDialogAborted = true;
 			return;
 		}
@@ -31,7 +32,7 @@ namespace OBJ_Viewer {
 		nfdresult_t result = NFD_OpenDialogMultiple(filterList.c_str(), NULL, &paths);
 		if (result != NFD_OKAY) {
 			if(result == NFD_ERROR)
-				std::cout << "[ERROR]:NFD:" << NFD_GetError() << '\n';
+				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
 			isDialogAborted = true;
 			return;
 		}

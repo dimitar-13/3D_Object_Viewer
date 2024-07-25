@@ -1,5 +1,6 @@
+#include "pch.h"
 #include "InputHandler.h"
-#include<iostream>
+
 OBJ_Viewer::KeyState OBJ_Viewer::KeyboardInputStateManager::GetKeyState(KeyboardKey key)
 {
 	if (m_keyHashes.find(key) == m_keyHashes.end())

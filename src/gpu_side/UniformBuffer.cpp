@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "UniformBuffer.h"
 
 OBJ_Viewer::UniformBuffer::UniformBuffer(std::string bufferName,GLuint bindPoint, const uint32_t buffSize,void* data)

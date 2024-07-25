@@ -1,9 +1,7 @@
+#include "pch.h"
 #include "UILayer.h"
 #include"Helpers/DialogWrapper.h"
-#include<algorithm>
-#include <iostream>
-#include<GL/glew.h>
-#include<GLFW/glfw3.h>
+
 inline std::vector<std::string> itemsLabel = { "Right face" ,"Left face","Top face","Bottom face","Front face","Back face" };
 inline std::vector<OBJ_Viewer::SkyboxFace> itemsFaces = {
 		OBJ_Viewer::SKYBOX_FACE_RIGHT,
@@ -42,7 +40,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
 	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
-	const char* currentlyActiveWindow = UI_WINDOW_UNKNOWN;
+	const char* currentlyActiveWindow = APP_FOCUS_REGIONS::UI_WINDOW_UNKNOWN;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();	
@@ -74,10 +72,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 
 	//Right panel for model and rendering settings.
-	if (ImGui::Begin(UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)? 
-			UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
 
 		ImGui::Text("Model view settings");
 		ImGui::InputFloat3("Position", &position[0]);
@@ -95,37 +93,47 @@ void OBJ_Viewer::UILayer::RenderUI()
 		{
 			ImGui::Text("Model rendering modes.");
 			static bool renderingModeContainer;
-			ImGui::Checkbox("Wireframe", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_WIREFRAME));
+			ImGui::Checkbox("Wireframe",
+				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME));
 			ImGui::SetItemTooltip("Renders wireframe of the 3D model.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_WIREFRAME : pSettings.m_currentRenderingMode;
+			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME :
+				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Clear color rendering.", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_SOLID_COLOR));
+			ImGui::Checkbox("Clear color rendering.",
+				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR));
 			ImGui::SetItemTooltip("Renders the mesh using a single color.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_SOLID_COLOR : pSettings.m_currentRenderingMode;
+			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR :
+				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Individual textures", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_INDIVIDUAL_TEXTURES));
+			ImGui::Checkbox("Individual textures",
+				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES));
 			ImGui::SetItemTooltip("Renders only single selected texture.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_INDIVIDUAL_TEXTURES : pSettings.m_currentRenderingMode;
+			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES :
+				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Uv mode", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_UV));
+			ImGui::Checkbox("Uv mode",
+				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_UV));
 			ImGui::SetItemTooltip("Renders checkerboard texture for UV inspection.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_UV : pSettings.m_currentRenderingMode;
+			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_UV :
+				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Light rendering", &(renderingModeContainer = pSettings.m_currentRenderingMode == RENDER_MODE_LIGHT));
+			ImGui::Checkbox("Light rendering",
+				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT));
 			ImGui::SetItemTooltip("Render the 3D object with light calculations.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? RENDER_MODE_LIGHT : pSettings.m_currentRenderingMode;
+			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT :
+				pSettings.m_currentRenderingMode;
 
 			ImGui::Separator();
 			ImGui::Text("Mode settings.");
 			switch (pSettings.m_currentRenderingMode)
 			{
-			case RENDER_MODE_WIREFRAME:
+			case APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME:
 				ImGui::InputFloat("Wire line Thickness", &pSettings.wireframeSettings.lineThickness);
 				ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
 				ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
 				break;
 	
-			case RENDER_MODE_LIGHT:
+			case APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT:
 				static bool isAlbedoOn = pSettings.m_MaterialFlags & IS_ALBEDO_ON;
 				static bool isNormalOn = pSettings.m_MaterialFlags & IS_CUSTOM_SPECULAR_ON;
 				static bool isRoughnessOn = pSettings.m_MaterialFlags & IS_CUSTOM_NORMALS_ON;
@@ -151,7 +159,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 				pSettings.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_AMBIENT_OCCLUSION_ON) : pSettings.m_MaterialFlags;
 				break;
 
-			case RENDER_MODE_INDIVIDUAL_TEXTURES:
+			case APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES:
 				static bool selectedTexture;
 
 				ImGui::Checkbox("Color texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ALBEDO));
@@ -167,11 +175,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_AMBIENT_OCCLUSION : pSettings.m_curentIndividualTexture;
 				break;
 
-			case RENDER_MODE_UV:
+			case APP_SETTINGS::RenderingMode::RENDER_MODE_UV:
 				ImGui::SliderFloat("Uv scale", &pSettings.m_uvViewSettings.UV_scaleFactor, 1.f, 150.f);
 				break;
 
-			case RENDER_MODE_SOLID_COLOR:
+			case APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR:
 				//TODO:Implement
 				ImGui::ColorPicker3("Mesh color", &pSettings.m_colorRenderingColor[0]);
 				break;
@@ -185,10 +193,10 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Scene settings
 
 
-	if (ImGui::Begin(UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
 		ModelData currentModelData = SceneModel->GetModelData();
 #pragma region Object info
 
@@ -238,7 +246,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 					if (ImGui::Selectable(shadingModes[n], is_selected))
 					{
 						currentShadingModel = shadingModes[n];
-						pSettings.lightInfo.currentLightModel = static_cast<LightShadingModel>(n);
+						pSettings.lightInfo.currentLightModel = static_cast<APP_SETTINGS::LightShadingModel>(n);
 						break;
 					}
 				}
@@ -255,8 +263,8 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 			pSettings.lightInfo.lightCount =
 				pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount) :
-				pSettings.lightInfo.lightCount + std::min(0, MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
-			for (uint32_t i = 0; i < MAX_LIGHT_COUNT; i++)
+				pSettings.lightInfo.lightCount + std::min(0, APP_SETTINGS::MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
+			for (uint32_t i = 0; i < APP_SETTINGS::MAX_LIGHT_COUNT; i++)
 			{
 				if (i < pSettings.lightInfo.lightCount)
 				{
@@ -305,17 +313,17 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Loading object info
 
 
-	if(ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
+	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
 	ImGui::Text("Loading stuff here.");
 	}ImGui::End();
 	
-	if (ImGui::Begin(UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
 
 		if (ImGui::Button("Import 3D model."))
 		{
@@ -358,14 +366,14 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Scene window
 
 
-	if(ImGui::Begin(UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
+	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
 		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
+			APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
 
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 winPos = ImGui::GetWindowPos();
-		static SceneViewport sceneWinViewport{};
+		static Viewport sceneWinViewport{};
 		sceneWinViewport.x = winPos.x;
 		sceneWinViewport.y = winPos.y;
 		sceneWinViewport.width = winSize.x;

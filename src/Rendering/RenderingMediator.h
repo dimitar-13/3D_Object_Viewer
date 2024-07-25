@@ -1,7 +1,8 @@
 #pragma once
-#include"Scene/Skybox.h"
-#include"Scene/Model.h"
-#include<memory>
+#include "Scene/Skybox.h"
+#include "Scene/Model.h"
+#include "pch.h"
+
 namespace OBJ_Viewer {
 	class RenderingMediator
 	{

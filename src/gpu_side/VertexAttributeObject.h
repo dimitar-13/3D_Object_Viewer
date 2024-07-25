@@ -1,7 +1,5 @@
 #pragma once
-#include<GL/glew.h>
-#include<glm/glm.hpp>
-#include<vector>
+#include "pch.h"
 namespace OBJ_Viewer
 {
 	struct Vertex
@@ -17,16 +15,14 @@ namespace OBJ_Viewer
 		size_t indexCount;
 		size_t vertexCount;
 	};
-	//struct VertexSolidColor
-	//{
-	//	glm::vec3 position;
-	//	glm::vec3 normal;
-	//};
+
 	class VertexAttributeObject
 	{
 	public:
-		VertexAttributeObject(std::vector<Vertex> vertexData,std::vector<unsigned int>indexData);
-		VertexAttributeObject(std::vector<glm::vec3> vertexData,std::vector<unsigned int>indexData);
+		using IndexDataType = unsigned int;
+
+		VertexAttributeObject(std::vector<Vertex> vertexData,std::vector<IndexDataType>indexData);
+		VertexAttributeObject(std::vector<glm::vec3> vertexData,std::vector<IndexDataType>indexData);
 		size_t GetIndexCount()const { return this->m_vertexData.indexCount; }
 		size_t GetVertexCount()const { return this->m_vertexData.vertexCount; }
 		void BindBuffer()const{ glBindVertexArray(this->m_vertexAttributeObjHandle); }

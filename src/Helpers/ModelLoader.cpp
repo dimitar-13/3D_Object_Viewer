@@ -1,10 +1,7 @@
+#include "pch.h"
 #include "ModelLoader.h"
-#include <iostream>
-#include<numeric>
-#include"UnitTransformer.h"
-#include<filesystem>
-#include<glm/gtc/matrix_transform.hpp>
-
+#include "UnitTransformer.h"
+#include "Helpers/TextureHelpers.h"
 OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path, LoadModelFileType modelFileType)
 {
 	m_currentlyLoadingType = modelFileType;
@@ -224,15 +221,13 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 		mat->GetTexture(type, i, &TexturePath);
 		std::string fullPath = GetModelTexturePathAbsolute(TexturePath);
 
-		Size2D textureSize;
-		int presentChannelCount;
 
-		TexturePixelDataWrapper textureReader(fullPath.c_str(), &textureSize, &presentChannelCount);
+		TexturePixelReader textureReader(fullPath.c_str());
 
-		TextureFormat format = GetFormatByChannelCount(presentChannelCount);
+		TextureFormat format = textureReader.GetTextureFormat();
 
 		//TODO:return vector of textures.
-		return builder.SetTextureSize(textureSize).
+		return builder.SetTextureSize(textureReader.GetTextureSize()).
 			SetTexturePixelData(textureReader.GetTexturePixelData()).
 			SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).
 			SetTextureFormat(format).buildTexture();

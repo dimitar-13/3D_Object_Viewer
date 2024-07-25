@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "Texture.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include<iostream>
+#include"Logging/App_Logger.h"
+
 OBJ_Viewer::Texture::Texture(const unsigned char* data, TextureInternalFormat textureInternalFormat, TextureFormat textureFormat,
 	Size2D textureSize, TexturePixelDataType dataType, TextureWrap textureWrapS, TextureWrap textureWrapT, bool isMultiSample,
 	uint8_t sampleCount)
@@ -55,20 +55,4 @@ void OBJ_Viewer::Texture::SetTextureProperties(const unsigned char* data)
 			m_textureSize.width, m_textureSize.height, GL_TRUE);
 	}
 	glBindTexture(m_target, 0);
-}
-
-OBJ_Viewer::TexturePixelDataWrapper::TexturePixelDataWrapper(const char* path, Size2D* pTextureSize, int* pPresentChannelsCount)
-{
-	stbi_set_flip_vertically_on_load(true);
-	m_pixelData = stbi_load(path, &pTextureSize->width, &pTextureSize->height, pPresentChannelsCount, 0);
-	if (!m_pixelData)
-	{	
-		std::cout << "[ERROR]:STBI_IMAGE failed to read or allocate texture at path." << path << '\n';
-	}
-}
-
-OBJ_Viewer::TexturePixelDataWrapper::~TexturePixelDataWrapper()
-{
-	if (m_pixelData)
-		stbi_image_free(m_pixelData);
 }

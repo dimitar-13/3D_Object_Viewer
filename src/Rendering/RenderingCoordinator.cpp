@@ -1,13 +1,7 @@
+#include "pch.h"
 #include "RenderingCoordinator.h"
-#include"imgui_internal.h"
-#include"imgui.h"
-#include <iostream>
-#include <nfd.h>
-#include<GL/glew.h>
-#include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
-#include"WindowHandler.h"
-#include"Framebuffer.h"
+#include "Core/WindowHandler.h"
+#include "gpu_side/Framebuffer.h"
 
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
@@ -62,7 +56,8 @@ void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)
 }
 
 
-OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):m_application(application)
+OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):
+	m_application(application)
 {
 	std::shared_ptr<RenderingMediator> mediator = std::make_shared<RenderingMediator>();
 	m_sceneRenderer = std::make_shared<SceneRenderer>(application, mediator);
@@ -70,8 +65,3 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application)
 	m_UILayer = std::make_unique<UILayer>(m_application, mediator, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
 
 }
-
-
-
-
-

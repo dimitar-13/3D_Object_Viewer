@@ -1,5 +1,6 @@
 #pragma once
-#include<string>
+#include "pch.h"
+
 namespace OBJ_Viewer {
 
 	enum LoadModelFileType

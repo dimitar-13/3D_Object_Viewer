@@ -1,4 +1,6 @@
+#include "pch.h"
 #include "Renderer.h"
+#include "Helpers/TextureHelpers.h"
 OBJ_Viewer::Renderer::Renderer()
 {
 	m_defaultWhiteTexture = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
@@ -62,16 +64,15 @@ void OBJ_Viewer::Renderer::RenderMeshMaterialWithLight(const ShaderClass& shader
 	meshVAO.UnBind();
 }
 
-void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao, const Camera& mainCamera, const GridData gridInfo)
+void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& vao,
+	const Camera& mainCamera,const APP_SETTINGS::GridData gridInfo)
 {
 	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
 	shaderToUse.UseShader();
-	glm::mat4 view, proj;
-	mainCamera.GetViewAndProjectionSeparate(&view, &proj);
-
+	shaderToUse.UniformSet3FloatVector("cameraPosition", mainCamera.GetCameraPos());
 	shaderToUse.UniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
 	shaderToUse.UniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
 	shaderToUse.UniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);
@@ -111,13 +112,12 @@ void OBJ_Viewer::Renderer::BindMaterialTexture(const ShaderClass& shaderToUse, s
 
 std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDefaultTexture(const std::string& path)
 {
+	TexturePixelReader reader(path.c_str());
 	TextureBuilder builder;
-	int channelCount;
-	Size2D textureSize;
-	TexturePixelDataWrapper reader(path.c_str(), &textureSize, &channelCount);
-	TextureFormat format = GetFormatByChannelCount(channelCount);
+	TextureFormat format = reader.GetTextureFormat();
+
 	return builder.SetTextureFormat(format).
-		SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(textureSize).
+		SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(reader.GetTextureSize()).
 		SetTexturePixelData(reader.GetTexturePixelData()).SetTextureWrapT(TEXTURE_WRAP_CLAMP_TO_EDGE).
 		SetTextureWrapS(TEXTURE_WRAP_CLAMP_TO_EDGE).buildTexture();
 }

@@ -6,6 +6,7 @@
 #include "Scene/Skybox.h"
 #include "ShaderPath.h"
 #include "Helpers/MeshGeneratingMethods.h"
+#include "Profiling/AppProfiler.h"
 
 #pragma region Constants
 constexpr uint8_t MATRIX_UBO_BINDING_POINT = 0;
@@ -265,7 +266,11 @@ void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 	}
 
 	ModelLoader loader;
-	Model* newModel = loader.LoadModel(path.c_str(), modelFileFormat);
+
+	
+		Model* newModel = loader.LoadModel(path.c_str(), modelFileFormat);
+	
+
 	if (newModel == nullptr)
 	{
 		LOGGER_LOG_WARN("Failed to load model at path {0}", path);

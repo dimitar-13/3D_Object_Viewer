@@ -2,7 +2,7 @@
 #include "RenderingCoordinator.h"
 #include "Core/WindowHandler.h"
 #include "gpu_side/Framebuffer.h"
-
+#include "Profiling/AppProfiler.h"
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
 	GLFWwindow* window = this->m_application.GetGlobalAppWindow().GetGLFW_Window();
@@ -23,6 +23,8 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 			glfwSwapBuffers(window);
 		}
 		glfwPollEvents();
+
+		FPSLogger::log();
 	}
 
 }

@@ -2,8 +2,11 @@
 #include "ModelLoader.h"
 #include "UnitTransformer.h"
 #include "Helpers/TextureHelpers.h"
+#include "Profiling/AppProfiler.h"
 OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path, LoadModelFileType modelFileType)
 {
+	Timer timer;
+
 	m_currentlyLoadingType = modelFileType;
 
 	Assimp::Importer importer;

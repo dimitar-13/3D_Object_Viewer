@@ -105,6 +105,9 @@
     <ClCompile Include="Dependencies\stbi_image\stb_imp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Profiling\AppProfiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h">
@@ -237,6 +240,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\gpu_side\TextureEnums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Profiling\AppProfiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

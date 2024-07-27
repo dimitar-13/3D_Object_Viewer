@@ -31,13 +31,15 @@ namespace OBJ_Viewer {
 	class Material
 	{
 	public:
-		Material(MaterialData data = {}): m_materialInfo(data)
+		Material(const std::string& materialName, MaterialData data = {}):
+			m_materialInfo(data),m_materialName(materialName)
 		{}
 		const MaterialData& GetMaterialData()const { return m_materialInfo; }
 		std::weak_ptr<Texture> GetMaterialTexture(MaterialTextures texture)const;
-
+		const std::string& GetMaterialName()const { return m_materialName; }
 	private:
 		MaterialData m_materialInfo;
+		std::string m_materialName;
 	};
 }
 

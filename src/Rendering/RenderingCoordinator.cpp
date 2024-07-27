@@ -24,7 +24,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 		}
 		glfwPollEvents();
 
-		FPSLogger::log();
+		//FPSLogger::log();
 	}
 
 }

@@ -2,7 +2,6 @@
 #include "Mesh.h"
 
 OBJ_Viewer::Mesh::Mesh(std::unique_ptr<VertexAttributeObject> meshVAo, std::shared_ptr<Material> material)
-	: m_vao(std::move(meshVAo))
+	: m_vao(std::move(meshVAo)), m_Material( material)
 {
-	m_Material = material.get() != nullptr ? material : std::make_shared<Material>();
 }

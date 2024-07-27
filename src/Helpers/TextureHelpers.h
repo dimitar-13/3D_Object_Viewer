@@ -5,24 +5,47 @@
 #include "Logging/App_Logger.h"
 namespace OBJ_Viewer {
 
+	//Not a good aproach switch case in this case will be more efficiant.
+	// Letf this here as a showcase of misktaes and how to not let ur ego write functions like this 
+	
+	//inline TextureFormat GetFormatByChannelCount(int channelCount)
+	//{
+	//	/* If the channel count is higher than 2 it means we have either RGB or RGBA format
+	//	* so far we will calculate those: because they are sequential.We can get the channel count
+	//	* minus the lowest of the 2 counts witch is 3 and added to the smaller 'TEXTURE_FORMAT_RGB'
+	//	* example:
+	//	* We receive 3 in this case 3 - 3 is 0 meaning we have RGB in other case we have 1 witch is RBGA
+	//	* If we have lower than 2 than we either have single R channel or a RG channel easiest way here
+	//	* to see if we have division by 2 (without decimal numbers).
+	//	* Have we made the enums increment in order we can avoid this ? Yes but openGL macros are not in order
+	//	* so either enum in order and fetch OPENGL macros or this.
+	//	* Some might see that there is no big change here but for debugging and for future changes its better since atleast we can change
+	//	* the render API if we want and the program will still work (maybe hypocritical considering in some places we use GL typedef data).
+	//	*/
+	//	return channelCount > 2 ? static_cast<TextureFormat>((channelCount - 3) + TEXTURE_FORMAT_RGB)
+	//		: channelCount % 2 == 0.0f ? TEXTURE_FORMAT_R : TEXTURE_FORMAT_RG;
+	//}
+
 	inline TextureFormat GetFormatByChannelCount(int channelCount)
 	{
-		/* If the channel count is higher than 2 it means we have either RGB or RGBA format
-		* so far we will calculate those: because they are sequential.We can get the channel count
-		* minus the lowest of the 2 counts witch is 3 and added to the smaller 'TEXTURE_FORMAT_RGB'
-		* example:
-		* We receive 3 in this case 3 - 3 is 0 meaning we have RGB in other case we have 1 witch is RBGA
-		* If we have lower than 2 than we either have single R channel or a RG channel easiest way here
-		* to see if we have division by 2 (without decimal numbers).
-		* Have we made the enums increment in order we can avoid this ? Yes but openGL macros are not in order
-		* so either enum in order and fetch OPENGL macros or this.
-		* Some might see that there is no big change here but for debugging and for future changes its better since atleast we can change
-		* the render API if we want and the program will still work (maybe hypocritical considering in some places we use GL typedef data).
-		*/
-		return channelCount > 2 ? static_cast<TextureFormat>((channelCount - 3) + TEXTURE_FORMAT_RGB)
-			: channelCount % 2 == 0.0f ? TEXTURE_FORMAT_R : TEXTURE_FORMAT_RG;
+		switch (channelCount)
+		{
+		case 1 :
+			return TEXTURE_FORMAT_R;
+			break;
+		case 2:
+			return TEXTURE_FORMAT_RG;
+			break;
+		case 3:
+			return TEXTURE_FORMAT_RGB;
+			break;
+		case 4:
+			return TEXTURE_FORMAT_RGBA;
+			break;
+		default:
+			break;
+		}
 	}
-
 	struct TexturePixelReader
 	{
 	public:

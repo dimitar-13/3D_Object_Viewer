@@ -148,6 +148,7 @@
     <Text Include="Shaders\WireframeShader.glsl">
       <FileType>Document</FileType>
     </Text>
+    <ClCompile Include="src\Scene\MaterialRegistry.cpp" />
     <ClCompile Include="src\Profiling\AppProfiler.cpp" />
     <ClCompile Include="Dependencies\stbi_image\stb_imp.cpp" />
     <ClCompile Include="src\Logging\App_Logger.cpp" />
@@ -199,6 +200,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\MaterialRegistry.h" />
     <ClInclude Include="src\Profiling\AppProfiler.h" />
     <ClInclude Include="src\Core\AppEvent.h" />
     <ClInclude Include="src\Core\CommonAppData.h" />

@@ -32,6 +32,11 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,
 	if (this->m_imgGuiDockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBackground;
 }
+void OBJ_Viewer::UILayer::isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID windowID)
+{
+	m_currentlyFocusedWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
+		windowID : m_currentlyFocusedWindow;
+}
 
 void OBJ_Viewer::UILayer::RenderUI()
 {
@@ -40,7 +45,6 @@ void OBJ_Viewer::UILayer::RenderUI()
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
 	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
-	const char* currentlyActiveWindow = APP_FOCUS_REGIONS::UI_WINDOW_UNKNOWN;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();	
@@ -74,8 +78,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 	//Right panel for model and rendering settings.
 	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
 	{
-		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)? 
-			APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME);
 
 		ImGui::Text("Model view settings");
 		ImGui::InputFloat3("Position", &position[0]);
@@ -195,171 +198,194 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
 	{
-		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME : currentlyActiveWindow;
+		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME);
+		
 		ModelData currentModelData = SceneModel->GetModelData();
-#pragma region Object info
 
+		if (ImGui::BeginTabBar("Tab Scene materials"))
+		{
 
-		ImGui::Text("Object triangle count:%d", currentModelData.triangleCount);
-		ImGui::Text("Object vertex count:%d", currentModelData.vertexCount);
-		ImGui::Text("Object face count:%d", currentModelData.faceCount);
-		ImGui::Text("Texture count:%d", currentModelData.textureCount);
-
-		ImGui::Text("File path %s", currentModelData.modelPath.c_str());
-		ImGui::SetItemTooltip("Path:%s", currentModelData.modelPath.c_str());
-
-		ImGui::Separator();
-#pragma endregion
-
+			if (ImGui::BeginTabItem("Scene settings"))
+			{
+				ImGui::Text("Scene settings.");
+				ImGui::Separator();
 #pragma region Grid settings
-
-
-		ImGui::Text("Scene settings.");
-		ImGui::Separator();
-		if (ImGui::CollapsingHeader("World grid settings."))
-		{
-			ImGui::Checkbox("UseWorldGrid?", &pSettings.m_isWireGridOn);
-			if (pSettings.m_isWireGridOn)
-			{
-				ImGui::SliderFloat("Grid scale", &pSettings.m_gridData.gridScale, 1.f, 10.f);
-				ImGui::ColorPicker4("Grid color", &pSettings.m_gridData.gridLineColor[0]);
-				ImGui::Checkbox("Shade axis.", &pSettings.m_gridData.isAxisShaded);
-			}
-		}
-		ImGui::Separator();
-#pragma endregion
-
-#pragma region  Light settings
-
-
-		if (ImGui::CollapsingHeader("Light settings."))
-		{
-	
-			static std::vector<const char*> shadingModes = {"Bling-Phong light shading","Toon light shading", "Rim light shading","Rim + toon shading"};
-			static const char* currentShadingModel = shadingModes[pSettings.lightInfo.currentLightModel];
-			if (ImGui::BeginCombo("Shading mode", currentShadingModel)) 
-			{
-				for (int n = 0; n < shadingModes.size(); n++)
+				if (ImGui::CollapsingHeader("World grid settings."))
 				{
-					bool is_selected = (currentShadingModel == shadingModes[n]);
-					if (ImGui::Selectable(shadingModes[n], is_selected))
+					ImGui::Checkbox("UseWorldGrid?", &pSettings.m_isWireGridOn);
+					if (pSettings.m_isWireGridOn)
 					{
-						currentShadingModel = shadingModes[n];
-						pSettings.lightInfo.currentLightModel = static_cast<APP_SETTINGS::LightShadingModel>(n);
-						break;
+						ImGui::SliderFloat("Grid scale", &pSettings.m_gridData.gridScale, 1.f, 10.f);
+						ImGui::ColorPicker4("Grid color", &pSettings.m_gridData.gridLineColor[0]);
+						ImGui::Checkbox("Shade axis.", &pSettings.m_gridData.isAxisShaded);
 					}
 				}
-				ImGui::EndCombo();
-			}
-			
-			ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
-			//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
-			/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
-				will return negative value, a value that we can use to get the closest valid number in cases of 7 we get 7 += 4 - 7 <=> 7+=-3
-				and we use the min function in cases that we are within our range.We do it this way to avoid branching.
-				UPDATE: Added this for values below 0 as well by checking the value of 'lightCount' if its below zero we gonna add the positive version of it.
-				*/
-
-			pSettings.lightInfo.lightCount =
-				pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount) :
-				pSettings.lightInfo.lightCount + std::min(0, APP_SETTINGS::MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
-			for (uint32_t i = 0; i < APP_SETTINGS::MAX_LIGHT_COUNT; i++)
-			{
-				if (i < pSettings.lightInfo.lightCount)
-				{
-					if (ImGui::CollapsingHeader(std::string("Light " + std::to_string(i+1)).c_str()))
-					{
-						RenderLightSettingsPanel(i,
-							&pSettings.lightInfo.lights[i].color,
-							&pSettings.lightInfo.lights[i].direction);
-					}
-				}
-				else
-				{
-					pSettings.lightInfo.lights[i].color = glm::vec3(0);
-				}
-			}	
-		}
-		ImGui::Separator();
 #pragma endregion
 
-#pragma region Rest of settings
+				ImGui::Separator();
+#pragma region Light settings
+				if (ImGui::CollapsingHeader("Light settings."))
+				{
 
+					static std::vector<const char*> shadingModes = { "Bling-Phong light shading","Toon light shading", "Rim light shading","Rim + toon shading" };
+					static const char* currentShadingModel = shadingModes[pSettings.lightInfo.currentLightModel];
+					if (ImGui::BeginCombo("Shading mode", currentShadingModel))
+					{
+						for (int n = 0; n < shadingModes.size(); n++)
+						{
+							bool is_selected = (currentShadingModel == shadingModes[n]);
+							if (ImGui::Selectable(shadingModes[n], is_selected))
+							{
+								currentShadingModel = shadingModes[n];
+								pSettings.lightInfo.currentLightModel = static_cast<APP_SETTINGS::LightShadingModel>(n);
+								break;
+							}
+						}
+						ImGui::EndCombo();
+					}
 
-		if (ImGui::CollapsingHeader("Skybox settings."))
-		{
-			ImGui::Checkbox("Enable skybox?", &pSettings.m_isSkyboxOn);
-			if (pSettings.m_isSkyboxOn)
-			{
-				RenderSkyboxSettings();
+					ImGui::InputInt("Light count", &pSettings.lightInfo.lightCount);
+					//If user go beyond 'MAX_LIGHT_COUNT' we use this formula to restrict it.
+					/*Basically we have 4(as an example) as out max if we overshoot and go to 5 the expresion "MAX_LIGHT_COUNT - pSettings->lightInfo.lightCount"
+						will return negative value, a value that we can use to get the closest valid number in cases of 7 we get 7 += 4 - 7 <=> 7+=-3
+						and we use the min function in cases that we are within our range.We do it this way to avoid branching.
+						UPDATE: Added this for values below 0 as well by checking the value of 'lightCount' if its below zero we gonna add the positive version of it.
+						*/
+
+					pSettings.lightInfo.lightCount =
+						pSettings.lightInfo.lightCount < 0 ? (pSettings.lightInfo.lightCount - pSettings.lightInfo.lightCount) :
+						pSettings.lightInfo.lightCount + std::min(0, APP_SETTINGS::MAX_LIGHT_COUNT - pSettings.lightInfo.lightCount);
+					for (uint32_t i = 0; i < APP_SETTINGS::MAX_LIGHT_COUNT; i++)
+					{
+						if (i < pSettings.lightInfo.lightCount)
+						{
+							if (ImGui::CollapsingHeader(std::string("Light " + std::to_string(i + 1)).c_str()))
+							{
+								RenderLightSettingsPanel(i,
+									&pSettings.lightInfo.lights[i].color,
+									&pSettings.lightInfo.lights[i].direction);
+							}
+						}
+						else
+						{
+							pSettings.lightInfo.lights[i].color = glm::vec3(0);
+						}
+					}
+				}
+#pragma endregion
+
+				ImGui::Separator();
+
+#pragma region Skybox settings
+				if (ImGui::CollapsingHeader("Skybox settings."))
+				{
+					ImGui::Checkbox("Enable skybox?", &pSettings.m_isSkyboxOn);
+					if (pSettings.m_isSkyboxOn)
+					{
+						RenderSkyboxSettings();
+					}
+				}
+#pragma endregion
+
+				ImGui::Separator();
+
+#pragma region Camera projection and AA settings
+
+				if (ImGui::Button("Switch camera projection"))
+				{
+					pSettings.isCurrentProjectionPerspective = !pSettings.isCurrentProjectionPerspective;
+					EventCameraProjectionChanged e(pSettings.isCurrentProjectionPerspective);
+					m_appEventCallback(e);
+				}
+
+				ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
+				ImGui::Checkbox("Enable AA", &pSettings.m_EnableAA);
+				ImGui::SetItemTooltip("Enable scene Anti-aliasing(AA).The scene AA is using MSAA + FXAA");
+#pragma endregion
+
+				ImGui::EndTabItem();
 			}
-		}
-		ImGui::Separator();
-		if (ImGui::Button("Switch camera projection"))
-		{
-			pSettings.isCurrentProjectionPerspective = !pSettings.isCurrentProjectionPerspective;
-			EventCameraProjectionChanged e(pSettings.isCurrentProjectionPerspective);
-			m_appEventCallback(e);
-		}
-		ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
-		ImGui::Checkbox("Enable AA", &pSettings.m_EnableAA);
-		ImGui::SetItemTooltip("Enable scene Anti-aliasing(AA).The scene AA is using MSAA + FXAA");
+
+
+			if (ImGui::BeginTabItem("Scene/Model info"))
+			{
+#pragma region Scene mesh info
+				ImGui::Text("Model info");
+				ImGui::Text("Object triangle count:%d", currentModelData.triangleCount);
+				ImGui::Text("Object vertex count:%d", currentModelData.vertexCount);
+				ImGui::Text("Object face count:%d", currentModelData.faceCount);
+				ImGui::Text("Texture count:%d", currentModelData.textureCount);
+
+				ImGui::Text("File path %s", currentModelData.modelPath.c_str());
+				ImGui::SetItemTooltip("Path:%s", currentModelData.modelPath.c_str());
+
+				ImGui::Separator();
+#pragma endregion
+
+#pragma region Render scene materials
+				if (const auto registry = m_mediator->GetMaterialRegistry().lock())
+				{
+					ImGui::Text("Scene materials");
+
+					for (size_t i = 0; i < registry->GetRegistrySize(); i++)
+					{
+						if (const auto& material = registry->GetMaterialAtIndex(i).lock())
+						{
+							if (ImGui::CollapsingHeader(material->GetMaterialName().c_str()))
+							{
+								//Add imported textures preview
+
+								RenderMaterial_LabelTexturePair(material, MaterialTextures::MATERIAL_TEXTURE_ALBEDO, "Albedo");
+
+								RenderMaterial_LabelTexturePair(material, MaterialTextures::MATERIAL_TEXTURE_NORMAL, "Normal");
+
+								RenderMaterial_LabelTexturePair(material, MaterialTextures::MATERIAL_TEXTURE_ROUGHNESS_METALLIC, "Specular");
+
+								RenderMaterial_LabelTexturePair(material, MaterialTextures::MATERIAL_TEXTURE_AMBIENT_OCCLUSION,
+									"Ambient occlusion");
+							}
+						}
+					}
+					ImGui::Separator();
+				}
+#pragma endregion
+
+#pragma region  Render scene hierarchy
+				ImGui::Text("Scene hierarchy");
+				constexpr size_t SCENE_OBJECT_COUNT_TEST = 5;
+				for (size_t i = 0; i < SCENE_OBJECT_COUNT_TEST; i++)
+				{
+					ImGui::Text("Name of mesh");
+					ImGui::SameLine();
+					ImGui::PushItemWidth(-1);
+					if (ImGui::RadioButton(std::string("##" + std::to_string(i + 1)).c_str(), true))
+					{
+						LOGGER_LOG_INFO("OBJECT_VISIBILITY IS CHANGED");
+					}
+					ImGui::PopItemWidth();
+				}
+				ImGui::EndTabItem();
+			}
+#pragma endregion
+
+		}ImGui::EndTabBar();
 	}ImGui::End();
-#pragma endregion
 
 #pragma endregion
 
 #pragma region Loading object info
-
-
-	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
-	{
-		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
-	ImGui::Text("Loading stuff here.");
-	}ImGui::End();
-	
 	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
-		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME : currentlyActiveWindow;
+		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME);
 
 		if (ImGui::Button("Import 3D model."))
 		{
 			LoadModel();
 		}
 		ImGui::SameLine();
-		ImGui::Checkbox("Disable fbx file imports",&pSettings.m_disableFBXLoading);
+		ImGui::Checkbox("Disable fbx file imports", &pSettings.m_disableFBXLoading);
 		ImGui::SetItemTooltip("Due to security vulnerability fbx files are disabled. Enable them on you own risk or if the model is from trusted source");
 		ImGui::Separator();
-
-		ImGui::Text("Scene material textures.");
-		//Add imported textures preview
-		
-		static constexpr float spacing = 50.f;
-		static const ImVec2 textSize = { 70,70 };
-		ImGui::Text("Albedo");
-		ImGui::SameLine(0, spacing);
-		ImGui::Text("Normal");
-		ImGui::SameLine(0, spacing);
-		ImGui::Text("Specular");
-		ImGui::SameLine(0, spacing);
-		ImGui::Text("Ambient Occlusion");
-		
-		ImGui::Image(0,
-			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine(0, spacing);
-		ImGui::Image(0,
-			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine(0, spacing);
-		ImGui::Image(0,
-			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine(0, spacing);
-		ImGui::Image(0,
-			textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine(0, spacing);
-
 	}ImGui::End();
 #pragma endregion
 
@@ -368,8 +394,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
-		currentlyActiveWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-			APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME : currentlyActiveWindow;
+		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
 
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 winPos = ImGui::GetWindowPos();
@@ -393,9 +418,31 @@ void OBJ_Viewer::UILayer::RenderUI()
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #pragma endregion
-	m_application.GetGlobalInputHandler().SetCurrentlyFocusedWindow(currentlyActiveWindow);
+
+	m_application.GetGlobalInputHandler().SetCurrentlyFocusedWindow(m_currentlyFocusedWindow);
 
 	SceneModel->ApplyTransformation(position, scale, glm::vec3(1), 0);
+}
+
+void OBJ_Viewer::UILayer::RenderMaterial_LabelTexturePair(const std::shared_ptr<OBJ_Viewer::Material>& material,
+	MaterialTextures textureType,const char* textureLabelName)
+{
+#pragma region Style settings
+	static constexpr float spacing = 100.f;
+	constexpr uint8_t RIGHT_SIDE_IMAGE_MARGIN = 10;
+	static constexpr GLuint TEXTURE_HANDLE_ID_NONE = 0;
+	static constexpr ImVec2 textSize = { 70,70 };
+	const ImVec2 currentWindowSize = ImGui::GetWindowSize();
+	const float IMAGE_TEXT_INDEPENDENT_POSITION = currentWindowSize.x - textSize.x - RIGHT_SIDE_IMAGE_MARGIN;
+#pragma endregion
+
+	ImGui::Text(textureLabelName);
+	ImGui::SameLine(IMAGE_TEXT_INDEPENDENT_POSITION);
+	GLuint textureID =
+		material->GetMaterialTexture(textureType).expired() ? TEXTURE_HANDLE_ID_NONE :
+		material->GetMaterialTexture(textureType).lock()->GetTextureHandle();
+
+	ImGui::Image((ImTextureID)textureID, textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 }
 
 void OBJ_Viewer::UILayer::RenderSkyboxSettings()

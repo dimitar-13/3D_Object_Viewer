@@ -11,15 +11,18 @@ namespace OBJ_Viewer {
 	public:
 		UILayer(Application& appState, std::shared_ptr<RenderingMediator> renderingMediator,ImGuiWindowFlags imGuiWindowFlags,
 			ImGuiDockNodeFlags imGuiDockSpaceFlags);
-		void RenderUI();
+		void RenderUI();	
 	private:
 		void LoadModel();
 		void LoadSkybox();
 		void RenderComboBox(std::string comboLabel, int index);
 		void RenderSkyboxSettings();
 		void RenderLightSettingsPanel(uint32_t lightIndex, glm::vec3* pColor, glm::vec3* pPosition);
+		void RenderMaterial_LabelTexturePair(const std::shared_ptr<OBJ_Viewer::Material>& material,
+			MaterialTextures textureType, const char* textureLabelName);
+		void isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID windowID);
 	private:
-	
+		APP_FOCUS_REGIONS::AppWindowID m_currentlyFocusedWindow;
 		Application& m_application;
 		std::shared_ptr<RenderingMediator> m_mediator;
 		ImGuiWindowFlags m_imGuiWindowFlags;

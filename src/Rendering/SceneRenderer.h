@@ -31,7 +31,7 @@ namespace OBJ_Viewer {
 		void OnSkyboxLoadEvent(EventOnSkyboxLoaded& e);
 		void OnModelLoadEvent(EventOnModelLoaded& e);
 
-		void LoadSkybox(std::vector<std::string>&);
+		void LoadSkybox(std::vector<std::string>& skyboxTextrePaths);
 		void LoadModel(const std::string& path);
 
 		void SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags, APP_SETTINGS::SceneLightInfo lightInfo);
@@ -42,6 +42,7 @@ namespace OBJ_Viewer {
 		std::shared_ptr<Camera> m_sceneCamera;
 		std::shared_ptr<Model> m_sceneModel;
 		std::shared_ptr<Skybox> m_sceneSkybox;
+		std::shared_ptr<MaterialRegistry> m_sceneRegistry;
 		VertexAttributeObject m_screenQuad;
 #pragma endregion
 

@@ -90,8 +90,11 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES:
 			m_singleTextureShader.UseShader();
-			if (auto texture = mesh->GetMaterial().GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
-				m_mainRenderer.BindMaterialTexture(m_singleTextureShader, texture, GL_TEXTURE1, "textureToInspect");
+			if (auto material = mesh->GetMaterial().lock())
+			{
+				if(auto texture = material->GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
+					m_mainRenderer.BindMaterialTexture(m_singleTextureShader, texture, GL_TEXTURE1, "textureToInspect");
+			}
 			m_mainRenderer.RenderMesh(m_singleTextureShader, mesh->GetMeshVAO(), *m_sceneCamera);
 			break;
 
@@ -184,7 +187,7 @@ void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh, M
 		lightInfo.currentLightModel == APP_SETTINGS::LightShadingModel::LIGHT_MODEL_RIM_AND_TOON_SHADING);
 
 	m_lightShader.UniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
-	m_mainRenderer.RenderMeshMaterialWithLight(m_lightShader, mesh.GetMeshVAO(), mesh.GetMaterial(), materialFlags, *m_sceneCamera);
+	m_mainRenderer.RenderMeshMaterialWithLight(m_lightShader, mesh.GetMeshVAO(), *mesh.GetMaterial().lock(), materialFlags, *m_sceneCamera);
 
 }
 
@@ -265,18 +268,16 @@ void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 		return;
 	}
 
-	ModelLoader loader;
-
-	
-		Model* newModel = loader.LoadModel(path.c_str(), modelFileFormat);
+	ModelLoader loader(path.c_str(), modelFileFormat);
 	
 
-	if (newModel == nullptr)
+	if (!loader.isFiledLoadedSuccessfully())
 	{
 		LOGGER_LOG_WARN("Failed to load model at path {0}", path);
 		return;
 	}
-	m_sceneModel.reset(newModel);
+	m_sceneModel = std::move(loader.GetLoadedModel());
+	m_sceneRegistry = std::move(loader.GetLoadedMaterialRegistry());
 }
 
 void OBJ_Viewer::SceneRenderer::SetUpUniformBuffers()
@@ -330,4 +331,5 @@ void OBJ_Viewer::SceneRenderer::OnModelLoadEvent(EventOnModelLoaded& e)
 {
 	LoadModel(e.GetModelPath());
 	m_renderingMediator->SetSceneModel(m_sceneModel);
+	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
 }

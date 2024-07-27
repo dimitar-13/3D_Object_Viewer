@@ -3,25 +3,26 @@
 #include "UnitTransformer.h"
 #include "Helpers/TextureHelpers.h"
 #include "Profiling/AppProfiler.h"
-OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path, LoadModelFileType modelFileType)
+
+
+OBJ_Viewer::ModelLoader::ModelLoader(const char* path, LoadModelFileType modelFileType)
 {
 	Timer timer;
 
 	m_currentlyLoadingType = modelFileType;
 
 	Assimp::Importer importer;
-	
+
 	const aiScene* scene = importer.ReadFile(path,
 		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate );
+		aiProcess_Triangulate      |
+		aiProcess_RemoveRedundantMaterials);
 
-	if (nullptr == scene) {
-		std::cout << "Assimp failed to load the 3D model file at path:" << path << '\n';
-		return nullptr;
-	}
+	if (scene == nullptr) 
+		return;
 
 	m_biggestComponents = glm::vec3(-std::numeric_limits<float>::min());
-	m_smallestComponents =  glm::vec3(std::numeric_limits<float>::max());
+	m_smallestComponents = glm::vec3(std::numeric_limits<float>::max());
 	m_sceneScaleMatrix = glm::mat4(1);
 
 	m_ModelData.modelPath = std::string(path);
@@ -32,14 +33,12 @@ OBJ_Viewer::Model* OBJ_Viewer::ModelLoader::LoadModel(const char* path, LoadMode
 	m_modelPath += '/';
 
 	this->ReadNode(scene->mRootNode, scene);
-	m_SceneMaterials = GetSceneMaterials(scene);
+	LoadSceneMaterials(scene);
 
 	auto meshArray = CreateMeshArray();
 
 	PostProcessScene();
-	Model* result = new Model(meshArray, AssimpToGlmMatrix4x4(scene->mRootNode->mTransformation)* m_sceneScaleMatrix, m_ModelData);
-	
-	return result;
+	m_loadedScene = new Model(meshArray, AssimpToGlmMatrix4x4(scene->mRootNode->mTransformation) * m_sceneScaleMatrix, m_ModelData);
 }
 
 void OBJ_Viewer::ModelLoader::ReadNode(aiNode *node, const aiScene *scene)
@@ -135,7 +134,7 @@ std::shared_ptr<OBJ_Viewer::Mesh >OBJ_Viewer::ModelLoader::ReadMesh(aiMesh* assi
 	std::unique_ptr<VertexAttributeObject> meshVAO = 
 		std::make_unique<VertexAttributeObject>(vertexData, indexData);
 
-	return  std::make_shared<Mesh>(std::move(meshVAO), m_SceneMaterials[assimpMesh->mMaterialIndex]);
+	return  std::make_shared<Mesh>(std::move(meshVAO), m_materialRegistry->GetMaterialAtIndex(assimpMesh->mMaterialIndex).lock());
 }
 void OBJ_Viewer::ModelLoader::PostProcessScene()
 {
@@ -146,13 +145,13 @@ void OBJ_Viewer::ModelLoader::PostProcessScene()
 	* object will be in normal size, internally the object might be scaled by 100 floating point number.
 	*/
 
-	//We aproximate a vector that covers our scene size. Like a box around out scene
+	//We approximate a vector that covers our scene size. Like a box around out scene
 	glm::vec3 scaleDeltas = m_biggestComponents - m_smallestComponents;
 
 	constexpr float APP_SCALING_UNIT = 10.f;
 	float scaleFactor = glm::length(scaleDeltas);
 	
-	//By inversing it we say ok if scaleFactor/(aproximated scene size) is small then scale it up if it's too big then scale it down.
+	//By inversing it we say ok if scaleFactor/(approximated scene size) is small then scale it up if it's too big then scale it down.
 	//We also bring the scale factor to range [0:1].
 	scaleFactor = 1.0f / scaleFactor;
 
@@ -160,11 +159,11 @@ void OBJ_Viewer::ModelLoader::PostProcessScene()
 #pragma endregion
 }
 
-std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetSceneMaterials(const aiScene* scene)
+void OBJ_Viewer::ModelLoader::LoadSceneMaterials(const aiScene* scene)
 {
-	std::vector<std::shared_ptr<Material>> result(scene->mNumMaterials);
-
-	for (size_t i =0; i < result.size();i++)
+	std::vector<std::shared_ptr<Material>> result;
+	result.reserve(scene->mNumMaterials);
+	for (size_t i =0; i < scene->mNumMaterials;i++)
 	{
 		
 		TypeMaterialRepresentation matRepresentation(m_currentlyLoadingType);
@@ -173,11 +172,10 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::GetS
 		data.m_materialTextures[MATERIAL_TEXTURE_AMBIENT_OCCLUSION] = ReadTexture(scene->mMaterials[i], matRepresentation.ambientOcclusionEnum);
 		data.m_materialTextures[MATERIAL_TEXTURE_NORMAL] = ReadTexture(scene->mMaterials[i], matRepresentation.normalTextureEnum);
 		data.m_materialTextures[MATERIAL_TEXTURE_ROUGHNESS_METALLIC] = ReadTexture(scene->mMaterials[i], matRepresentation.specularRoughnessEnum);
-
-		result[i] = std::make_shared<Material>(data);
+		result.emplace_back(std::make_shared<Material>(scene->mMaterials[i]->GetName().C_Str(), data));
+		//result[i] = std::make_shared<Material>();
 	}
-
-	return result;
+	m_materialRegistry = new MaterialRegistry(result);
 }
 std::string OBJ_Viewer::ModelLoader::GetModelTexturePathAbsolute(aiString texturePath)const
 {
@@ -223,7 +221,6 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 		aiString TexturePath;
 		mat->GetTexture(type, i, &TexturePath);
 		std::string fullPath = GetModelTexturePathAbsolute(TexturePath);
-
 
 		TexturePixelReader textureReader(fullPath.c_str());
 

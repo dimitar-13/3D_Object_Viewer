@@ -13,10 +13,21 @@ layout(std140) uniform Matrices
 	mat4 NormalMatrix;
 };
 out vec2 FragUV;
+
+out VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}vs_out_studioData;
+
 void main()
 {
-	gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);
+	vec4 vertexViewSpace = ViewMatrix*ModelMatrix*vec4(position,1);
+	gl_Position = ProjectionMatrix*vertexViewSpace;
 	FragUV = uvCoords;
+
+	vs_out_studioData.FractLightSpacePos = vertexViewSpace.xyz;
+	vs_out_studioData.FractLightSpaceNormal = mat3(ViewMatrix)*mat3(NormalMatrix) * normals;
+	vs_out_studioData.FractLightSpaceNormal = normalize(vs_out_studioData.FractLightSpaceNormal);
 }
 
 #Shader:fragment
@@ -28,6 +39,13 @@ in vec2 FragUV;
 const vec3 GrayCol = vec3(.45);
 const vec3 WhiteCol = vec3(.92);
 uniform float uvScale;
+
+in VS_OUT_STUDIO_DATA{
+    vec3 FractLightSpacePos;
+    vec3 FractLightSpaceNormal;
+}fs_in_studioData;
+
+vec3 GetStudioLightShading(vec3 color);
 
 void main()
 {
@@ -41,7 +59,21 @@ void main()
     float v = uv.x*uv.y;
     v = clamp( .5+.5* v/fwidth(v) ,0.,1. );
 
-	FragColor = vec4(mix( GrayCol, WhiteCol, v) , 1.0);
+	vec3 AACheckerboardCol = mix( GrayCol, WhiteCol, v);
+
+	vec3 ApplyStudioLightShading = GetStudioLightShading(AACheckerboardCol);
+
+	FragColor = vec4(ApplyStudioLightShading, 1.0);
+}
+
+vec3 GetStudioLightShading(vec3 color)
+{
+    const float LIGHT_POW_FACTOR = 2.f; 
+
+	vec3 fragToCamDir = normalize(-fs_in_studioData.FractLightSpacePos);
+	float lightFactor = pow(max(dot(fragToCamDir,fs_in_studioData.FractLightSpaceNormal),0),LIGHT_POW_FACTOR);
+
+    return vec3(color*lightFactor);
 }
 
 

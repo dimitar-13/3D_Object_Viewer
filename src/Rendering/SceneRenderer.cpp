@@ -55,6 +55,8 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ mesh }, glm::mat4(1), data);
 
 	m_renderingMediator->SetSceneModel(m_sceneModel);
+	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
+
 	//TODO:Get this somewhere else
 	
 

@@ -12,9 +12,19 @@ layout(std140) uniform Matrices
 	mat4 ModelMatrix;
 	mat4 NormalMatrix;
 };
+out VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}vs_out_studioData;
+
 void main()
 {
-	gl_Position =  ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);
+    vec4 vertexLightSpace = ViewMatrix*ModelMatrix*vec4(position,1);
+	gl_Position = ProjectionMatrix*vertexLightSpace;
+    vs_out_studioData.FractLightSpacePos = vertexLightSpace.xyz;
+
+   	vs_out_studioData.FractLightSpaceNormal = mat3(ViewMatrix)*mat3(NormalMatrix) * normals;
+	vs_out_studioData.FractLightSpaceNormal = normalize(vs_out_studioData.FractLightSpaceNormal);
 }
 
 #Shader:fragment
@@ -23,14 +33,32 @@ void main()
 out vec4 FragColor;
 noperspective in vec3 distance;
 
+in VS_OUT_STUDIO_DATA{
+    vec3 FractLightSpacePos;
+    vec3 FractLightSpaceNormal;
+}fs_in_studioData;
+
+
 uniform vec3 u_frameColor;
 uniform float frameThickness;
+
+vec3 GetStudioLightShading();
+
 void main()
 {
     float minDist = min(distance.x,min(distance.y,distance.z));
     float mixVal = smoothstep(frameThickness - 1, frameThickness + 1, minDist );
-    vec3 FinalColor = vec3(mix( u_frameColor, vec3(1), mixVal ));
+    vec3 FinalColor = vec3(mix( u_frameColor, GetStudioLightShading(), mixVal ));
     FragColor = vec4(FinalColor,1);
+}
+vec3 GetStudioLightShading()
+{
+    const float LIGHT_POW_FACTOR = 2.f; 
+
+	vec3 fragToCamDir = normalize(-fs_in_studioData.FractLightSpacePos);
+	float lightFactor = pow(max(dot(fragToCamDir,fs_in_studioData.FractLightSpaceNormal),0),LIGHT_POW_FACTOR);
+
+    return vec3(vec3(1)*lightFactor);
 }
 
 #Shader:geometry
@@ -40,6 +68,17 @@ layout(triangle_strip,max_vertices = 3) out;
 
 uniform mat3 viewportMatrix;
 noperspective out vec3 distance;
+
+in VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}geo_in_studioData[];
+
+out VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}geo_out_studioData;
+
 void main()
 {
     //Transform from homogenous to NDC and from NDC to viewport(only the x and y values)
@@ -62,14 +101,22 @@ void main()
     //On enim every out variable is outputted                                       
 	gl_Position = gl_in[0].gl_Position; 
     distance = vec3( ha, 0, 0 );
+
+    geo_out_studioData.FractLightSpacePos = geo_in_studioData[0].FractLightSpacePos;
+    geo_out_studioData.FractLightSpaceNormal = geo_in_studioData[0].FractLightSpaceNormal;
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position;
     distance = vec3( 0, hb, 0 );
+    geo_out_studioData.FractLightSpacePos = geo_in_studioData[1].FractLightSpacePos;
+    geo_out_studioData.FractLightSpaceNormal = geo_in_studioData[1].FractLightSpaceNormal;
+
     EmitVertex();
 
     gl_Position = gl_in[2].gl_Position;
     distance = vec3( 0, 0, hc );
+    geo_out_studioData.FractLightSpacePos = geo_in_studioData[2].FractLightSpacePos;
+    geo_out_studioData.FractLightSpaceNormal = geo_in_studioData[2].FractLightSpaceNormal;
     EmitVertex();
 
     EndPrimitive();

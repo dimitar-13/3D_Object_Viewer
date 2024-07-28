@@ -13,9 +13,20 @@ layout(std140) uniform Matrices
 	mat4 NormalMatrix;
 };
 uniform mat3 viewportMatrix;
+
+out VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}vs_out_studioData;
+
 void main()
 {
-	gl_Position = ProjectionMatrix*ViewMatrix*ModelMatrix*vec4(position,1);
+    vec4 vertexLightSpace = ViewMatrix*ModelMatrix*vec4(position,1);
+	gl_Position = ProjectionMatrix*vertexLightSpace;
+    vs_out_studioData.FractLightSpacePos = vertexLightSpace.xyz;
+
+   	vs_out_studioData.FractLightSpaceNormal = mat3(ViewMatrix)*mat3(NormalMatrix) * normals;
+	vs_out_studioData.FractLightSpaceNormal = normalize(vs_out_studioData.FractLightSpaceNormal);
 }
 
 #Shader:fragment
@@ -25,18 +36,36 @@ out vec4 FragColor;
 uniform vec3 u_Color;
 uniform float pointSize;
 noperspective in vec3 pointDist;
+
+in VS_OUT_STUDIO_DATA{
+    vec3 FractLightSpacePos;
+    vec3 FractLightSpaceNormal;
+}fs_in_studioData;
+
 flat in vec3 vertex0;
 flat in vec3 vertex1;
 flat in vec3 vertex2;
 const float smoothness = 1.;
+
+vec3 GetStudioLightShading();
+
 void main()
 {
     float maxFactor = min(smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex0)),
     min(smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex1)),
     smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex2))));
 
-    vec3 FinalColor = vec3(mix( u_Color, vec3(1), maxFactor ));
+    vec3 FinalColor = vec3(mix( u_Color, GetStudioLightShading() , maxFactor ));
 	FragColor = vec4(FinalColor,1);
+}
+vec3 GetStudioLightShading()
+{
+    const float LIGHT_POW_FACTOR = 2.f; 
+
+	vec3 fragToCamDir = normalize(-fs_in_studioData.FractLightSpacePos);
+	float lightFactor = pow(max(dot(fragToCamDir,fs_in_studioData.FractLightSpaceNormal),0),LIGHT_POW_FACTOR);
+
+    return vec3(vec3(1)*lightFactor);
 }
 
 
@@ -49,6 +78,17 @@ noperspective out vec3 pointDist;
 flat out vec3 vertex0;
 flat out vec3 vertex1;
 flat out vec3 vertex2;
+
+in VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}geo_in_studioData[];
+
+out VS_OUT_STUDIO_DATA{
+     vec3 FractLightSpacePos;
+     vec3 FractLightSpaceNormal;
+}geo_out_studioData;
+
 void main()
 {     
 
@@ -61,6 +101,9 @@ void main()
     vertex0 = p1;
     vertex1 = p2;
     vertex2 = p3;
+    geo_out_studioData.FractLightSpacePos = geo_in_studioData[0].FractLightSpacePos;
+    geo_out_studioData.FractLightSpaceNormal = geo_in_studioData[0].FractLightSpaceNormal;
+
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position;
@@ -68,6 +111,8 @@ void main()
     vertex0 = p1;
     vertex1 = p2;
     vertex2 = p3;
+       geo_out_studioData.FractLightSpacePos = geo_in_studioData[1].FractLightSpacePos;
+    geo_out_studioData.FractLightSpaceNormal = geo_in_studioData[1].FractLightSpaceNormal;
     EmitVertex();
 
     gl_Position = gl_in[2].gl_Position;
@@ -75,6 +120,8 @@ void main()
     vertex0 = p1;
     vertex1 = p2;
     vertex2 = p3;
+       geo_out_studioData.FractLightSpacePos = geo_in_studioData[2].FractLightSpacePos;
+    geo_out_studioData.FractLightSpaceNormal = geo_in_studioData[2].FractLightSpaceNormal;
     EmitVertex();
 
     EndPrimitive();

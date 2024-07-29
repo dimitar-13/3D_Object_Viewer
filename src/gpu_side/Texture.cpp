@@ -25,15 +25,6 @@ void OBJ_Viewer::Texture::ResizeTexture(Size2D newSize)
 	SetTextureProperties(nullptr);
 }
 
-std::shared_ptr<unsigned char[]> OBJ_Viewer::Texture::GetPixelData()
-{
-	//Should be based on the type of pixel data;
-	const int ArrSize = this->m_textureSize.height * this->m_textureSize.height * sizeof(unsigned char);
-	std::shared_ptr<unsigned char[]> my_array(new unsigned char[ArrSize]);
-	glGetTexImage(m_target, 0, this->m_textureFormat, this->m_texturePixelDataType, my_array.get());
-	return my_array;
-}
-
 void OBJ_Viewer::Texture::SetTextureProperties(const unsigned char* data)
 {
 	glBindTexture(m_target, this->m_textureHandle);

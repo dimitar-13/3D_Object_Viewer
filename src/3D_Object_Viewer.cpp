@@ -60,6 +60,8 @@ int main()
 	glewExperimental = GL_TRUE;
 
 	stbi_set_flip_vertically_on_load(true);
+	stbi_flip_vertically_on_write(true);
+
 
 #ifdef OBJ_VIEWER_LEVEL_DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);

@@ -14,7 +14,8 @@ OBJ_Viewer::Application::Application(Window& appWindow):
 
 	m_inputHandler = std::shared_ptr<InputHandler>(new InputHandler());
 	AddEventListener(m_inputHandler);
-	m_appRenderingCoordinator = std::make_unique<RenderingCoordinator>(*this);
+	m_appRenderingCoordinator = std::make_shared<RenderingCoordinator>(*this);
+	AddEventListener(m_appRenderingCoordinator);
 
 	m_appInitStatusSuccsess = true;
 }

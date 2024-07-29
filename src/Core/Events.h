@@ -1,8 +1,9 @@
 #pragma once
 #include "pch.h"
-#include"CommonAppData.h"
-#include"Controls/KeyboardKeys.h"
-#include"Controls/MouseKeys.h"
+#include "CommonAppData.h"
+#include "Controls/KeyboardKeys.h"
+#include "Controls/MouseKeys.h"
+#include "Helpers/TextureHelpers.h"
 
 namespace OBJ_Viewer {
 	enum EventType
@@ -18,7 +19,8 @@ namespace OBJ_Viewer {
 		EVENT_ON_FOCUSED_WINDOW_CHANGED,
 		EVENT_WINDOW_STATE_CHANGED,
 		EVENT_CAMERA_PROJECTION_TYPE_CHANGED,
-		EVENT_SCENE_VIEWPORT_SIZE_CHANGED
+		EVENT_SCENE_VIEWPORT_SIZE_CHANGED,
+		EVENT_SCREENSHOT_BUTTON_PRESSED
 	};
 
 	enum EventCategory
@@ -139,5 +141,33 @@ namespace OBJ_Viewer {
 		Position2D& GetScrollPosition() { return m_mousePos; }
 	private:
 		Position2D m_mousePos;
+	};
+
+	struct ImgOutputData
+	{
+		Size2D imgSize;
+		std::string outPath;
+		ImageFileFormat outImgFormat;
+		bool renderObjectOnly;
+		bool allowTransparency;
+	};
+
+	class ScreenshotEvent : public Event
+	{
+	public:
+		ScreenshotEvent(const ImgOutputData& imgOutputData) :
+			m_outputData(imgOutputData)
+		{
+			std::string_view formatString = TextureFileEnumConverter::GetStringTextureFileExtensionFormatFromEnum(m_outputData.outImgFormat);
+			m_outputData.outPath.append(formatString.data());
+			
+		}
+		EventType GetEventType()const override { return EVENT_SCREENSHOT_BUTTON_PRESSED; }
+		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		const ImgOutputData& ImgData()const { return m_outputData; }
+		Size2D GetImageSize()const { return m_outputData.imgSize; }
+		const ImgOutputData& GetOutputData() { return m_outputData; }
+	private:
+		ImgOutputData m_outputData;
 	};
 }

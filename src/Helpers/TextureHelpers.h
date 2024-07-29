@@ -3,6 +3,8 @@
 #include "gpu_side/TextureEnums.h"
 #include "Core/CommonAppData.h"
 #include "Logging/App_Logger.h"
+#include "Enums/FIleImageEnums.h"
+
 namespace OBJ_Viewer {
 
 	//Not a good aproach switch case in this case will be more efficiant.
@@ -26,54 +28,43 @@ namespace OBJ_Viewer {
 	//		: channelCount % 2 == 0.0f ? TEXTURE_FORMAT_R : TEXTURE_FORMAT_RG;
 	//}
 
-	inline TextureFormat GetFormatByChannelCount(int channelCount)
+	struct TextureFormatEnumConverter
 	{
-		switch (channelCount)
-		{
-		case 1 :
-			return TEXTURE_FORMAT_R;
-			break;
-		case 2:
-			return TEXTURE_FORMAT_RG;
-			break;
-		case 3:
-			return TEXTURE_FORMAT_RGB;
-			break;
-		case 4:
-			return TEXTURE_FORMAT_RGBA;
-			break;
-		default:
-			break;
-		}
-	}
-	struct TexturePixelReader
+		static constexpr TextureFormat GetFormatByChannelCount(int channelCount);
+		static constexpr uint8_t GetChannelCountByFormat(TextureFormat format);
+	};
+	struct TextureFileEnumConverter
+	{
+		static std::string_view GetStringTextureFormatFromEnum(ImageFileFormat val);
+		static std::string_view GetStringTextureFileExtensionFormatFromEnum(ImageFileFormat val);
+	};
+
+
+	class TexturePixelSaver
+	{	
+	public:
+		static int SavePicture(const char* filePath_name, Size2D imageSize,
+			TextureFormat textureChanelFormat, void* pixelDataToSave,ImageFileFormat imageSaveFormat);
+	private:
+		static int SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);
+		static int SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);
+		static int SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);
+	};
+
+	class TexturePixelReader
 	{
 	public:
-		TexturePixelReader(const char* path)
-		{
-			int channelCount;
-			m_pixelData = stbi_load(path, &m_textureSize.width, &m_textureSize.height, &channelCount, 0);
-			if (!m_pixelData)
-			{
-				LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", path);
-				m_textureFormat = TEXTURE_FORMAT_UKNOWN;
-				m_textureSize = { 0,0 };
-				return;
-			}
-			m_channelCount = static_cast<uint8_t>(channelCount);
-			m_textureFormat = GetFormatByChannelCount(channelCount);
-		}
+		TexturePixelReader(const char* path);
 		~TexturePixelReader(){ stbi_image_free(m_pixelData); }
 		unsigned char* GetTexturePixelData()const { return m_pixelData; }
 		Size2D GetTextureSize()const { return m_textureSize; }
 		TextureFormat GetTextureFormat()const { return m_textureFormat; }
 		bool isTextureValid()const { return m_pixelData != nullptr; }
-		uint8_t GetChannelCount()const { return m_channelCount; }
+		uint8_t GetChannelCount()const { return TextureFormatEnumConverter::GetFormatByChannelCount(m_textureFormat); }
 	private:
 		unsigned char* m_pixelData = nullptr;
 		Size2D m_textureSize {};
 		TextureFormat m_textureFormat{};
-		uint8_t m_channelCount {};
 	};
 	
 }

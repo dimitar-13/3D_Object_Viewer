@@ -8,9 +8,10 @@ namespace OBJ_Viewer {
 		DialogWrapper() = default;
 		void OpenDialog(const std::string& filterLIst);
 		void OpenDialogMultiple(const std::string& filterList);
+		void OpenDialogSavePath(const std::string& filterLIst);
 		bool isDialogClosed()const { return isDialogAborted; }
 		~DialogWrapper();
-		const std::vector<nfdchar_t*> GetDialogResult() const { return outPaths; }
+		const std::vector<nfdchar_t*>& GetDialogResult() const { return outPaths; }
 	private:
 		std::vector<nfdchar_t*> outPaths;
 		bool isDialogAborted = false;
@@ -19,6 +20,18 @@ namespace OBJ_Viewer {
 	{
 		outPaths.push_back(nullptr);
 		nfdresult_t result = NFD_OpenDialog(filterLIst.c_str(), NULL, &outPaths[0]);
+		if (result != NFD_OKAY) {
+			if (result == NFD_ERROR)
+				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
+			isDialogAborted = true;
+			return;
+		}
+	}
+	inline void DialogWrapper::OpenDialogSavePath(const std::string& filterLIst)
+	{
+		outPaths.push_back(nullptr);
+		
+		nfdresult_t result = NFD_SaveDialog(filterLIst.c_str() , NULL, &outPaths[0]);
 		if (result != NFD_OKAY) {
 			if (result == NFD_ERROR)
 				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());

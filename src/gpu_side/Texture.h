@@ -22,9 +22,8 @@ namespace OBJ_Viewer {
 		void BindTexture()const {glBindTexture(m_target, this->m_textureHandle);}
 		void UnbindTexture()const {glBindTexture(m_target, 0);}
 		GLuint GetTextureHandle()const { return m_textureHandle; }
+		TextureFormat GetTextureFormat()const { return m_textureFormat; }
 		void ResizeTexture(Size2D newSize);
-		//Not tested;
-		std::shared_ptr<unsigned char[]> GetPixelData();
 	private:
 		void SetTextureProperties(const unsigned char* data);
 	private:

@@ -20,7 +20,7 @@ namespace OBJ_Viewer {
 		Size2D GetViewportSize()const { return Size2D{ m_viewport.width,m_viewport.height }; }
 		glm::mat3& GetViewportMatrix() { return viewPortMatrix; }
 		const glm::mat3& GetViewportMatrix()const { return viewPortMatrix; }
-
+		const Viewport& GetViewport()const { return m_viewport; }
 		void UpdateSceneViewport(const Viewport& newViewport)
 		{
 			assert(!(newViewport.x < 0 || newViewport.y < 0 || newViewport.width < 0 || newViewport.height < 0));

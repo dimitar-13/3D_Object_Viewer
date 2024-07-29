@@ -16,6 +16,7 @@ namespace OBJ_Viewer {
 	class Framebuffer
 	{
 	public:
+		using pixel_component = unsigned char;
 		//FramebufferAttachmentsFlags currently not used
 		Framebuffer(Size2D size, FramebufferAttachmentsFlags attachmentFlags,bool isMultiSampleBuffer = false,uint8_t sampleCount = 4);
 		GLuint GetFramebufferHandle()const { return this->m_framebuffer; }
@@ -27,6 +28,7 @@ namespace OBJ_Viewer {
 		Size2D GetFramebufferSize()const { return m_framebufferSize; }
 		void ResizeFramebuffer(Size2D newSize);
 		void CopyFramebufferContent(const Framebuffer& framebufferToCopy);
+		std::vector<pixel_component> GetFramebufferPixels(TextureFormat retrieveFormat);
 		~Framebuffer();
 	private:
 		GLuint m_framebuffer;

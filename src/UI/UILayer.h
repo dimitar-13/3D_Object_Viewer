@@ -15,7 +15,8 @@ namespace OBJ_Viewer {
 	private:
 		void LoadModel();
 		void LoadSkybox();
-		void RenderComboBox(std::string comboLabel, int index);
+		template<typename T>
+		T RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items, const T& previewItem);
 		void RenderSkyboxSettings();
 		void RenderLightSettingsPanel(uint32_t lightIndex, glm::vec3* pColor, glm::vec3* pPosition);
 		void RenderMaterial_LabelTexturePair(const std::shared_ptr<OBJ_Viewer::Material>& material,
@@ -29,5 +30,25 @@ namespace OBJ_Viewer {
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
 		std::function<void(Event&)> m_appEventCallback;
 	};
+	template<typename T>
+	inline T UILayer::RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items,
+		const T& previewItem)
+	{
+		if (ImGui::BeginCombo(comboLabel.c_str(), items.at(previewItem))) // The second parameter is the label previewed before opening the combo.
+		{
+			for (const auto [key, value] : items)
+			{
+				bool is_selected = (items.at(previewItem) == value); // You can store your selection however you want, outside or inside your objects
+				if (ImGui::Selectable(value, is_selected))
+				{
+					ImGui::EndCombo();
+					return key;
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		return previewItem;
+	}
 }
 

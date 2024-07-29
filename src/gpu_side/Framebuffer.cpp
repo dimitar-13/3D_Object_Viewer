@@ -2,6 +2,8 @@
 #include "Framebuffer.h"
 #include"Logging/App_Logger.h"
 
+constexpr uint8_t FRAMEBUFFER_TEXTURE_COMPONENT_COUNT = 4;
+
 OBJ_Viewer::Framebuffer::Framebuffer(Size2D size, FramebufferAttachmentsFlags attachmentFlags, bool isMultiSampleBuffer, uint8_t sampleCount):
 m_framebufferSize(size),m_isMultiSample(isMultiSampleBuffer),m_sampleCount(sampleCount)
 {
@@ -76,6 +78,18 @@ void OBJ_Viewer::Framebuffer::CopyFramebufferContent(const Framebuffer& framebuf
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer);
 	glBlitFramebuffer(0, 0, m_framebufferSize.width, m_framebufferSize.height, 0, 0,
 		m_framebufferSize.width, m_framebufferSize.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
+std::vector<OBJ_Viewer::Framebuffer::pixel_component> OBJ_Viewer::Framebuffer::GetFramebufferPixels(TextureFormat retrieveFormat)
+{
+	const size_t FRAMEBUFFER_TEXTURE_BUFFER_SIZE = m_framebufferSize.width * m_framebufferSize.height * FRAMEBUFFER_TEXTURE_COMPONENT_COUNT;
+	std::vector<pixel_component> result(FRAMEBUFFER_TEXTURE_BUFFER_SIZE);
+	BindFramebuffer();
+
+	glReadPixels(0, 0, m_framebufferSize.width, m_framebufferSize.height, retrieveFormat, GL_UNSIGNED_BYTE, result.data());
+	UnbindFramebuffer();
+
+	return result;
 }
 
 OBJ_Viewer::Framebuffer::~Framebuffer()

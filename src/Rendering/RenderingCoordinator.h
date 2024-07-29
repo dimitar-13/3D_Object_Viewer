@@ -11,6 +11,8 @@ namespace OBJ_Viewer
 		void RenderLoop();
 	private:
 		void RenderScene();
+		void onEventTakeScreenshot(const ScreenshotEvent& e);
+		void OnEvent(Event& e) override;
 	private:
 		Application& m_application;
 		std::unique_ptr<UILayer> m_UILayer;
@@ -18,7 +20,7 @@ namespace OBJ_Viewer
 		WindowState m_currentWindowState;
 
 		// Inherited via Listener
-		void OnEvent(Event& e) override;
+		
 	};
 }
 

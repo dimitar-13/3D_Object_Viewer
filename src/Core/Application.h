@@ -123,7 +123,7 @@ namespace OBJ_Viewer {
 		Window& m_window;
 		std::shared_ptr<InputHandler> m_inputHandler;
 		Framebuffer m_sceneFramebuffer;
-		std::unique_ptr<RenderingCoordinator> m_appRenderingCoordinator;
+		std::shared_ptr<RenderingCoordinator> m_appRenderingCoordinator;
 		std::vector<std::weak_ptr<Listener>> m_eventListeners;
 		SceneViewport m_sceneViewport;
 		bool m_appInitStatusSuccsess = false;

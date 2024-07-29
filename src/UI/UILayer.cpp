@@ -1,15 +1,48 @@
 #include "pch.h"
 #include "UILayer.h"
-#include"Helpers/DialogWrapper.h"
+#include "Helpers/DialogWrapper.h"
+#include "Profiling/AppProfiler.h"
+#include "Enums/FIleImageEnums.h"
+#include "Helpers/TextureHelpers.h"
 
-inline std::vector<std::string> itemsLabel = { "Right face" ,"Left face","Top face","Bottom face","Front face","Back face" };
-inline std::vector<OBJ_Viewer::SkyboxFace> itemsFaces = {
-		OBJ_Viewer::SKYBOX_FACE_RIGHT,
-		OBJ_Viewer::SKYBOX_FACE_LEFT,
-		OBJ_Viewer::SKYBOX_FACE_TOP,
-		OBJ_Viewer::SKYBOX_FACE_BOTTOM,
-		OBJ_Viewer::SKYBOX_FACE_FRONT,
-		OBJ_Viewer::SKYBOX_FACE_BACK};
+enum ImageResolutionEnum
+{
+	IMAGE_RESOLUTION_640_X_480 = 0,
+	IMAGE_RESOLUTION_1280_X_720 = 1,
+	IMAGE_RESOLUTION_2560_X_1440 = 2,
+	IMAGE_RESOLUTION_3840_X_2160 = 3,
+	IMAGE_RESOLUTION_CUSTOM = 4,
+};
+
+
+#pragma region KEY_UI_LABEL_MAPS
+inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> UI_SKYBOX_FACE_LABEL_MAP =
+{
+	{OBJ_Viewer::SKYBOX_FACE_RIGHT, "Right face"},
+	{OBJ_Viewer::SKYBOX_FACE_LEFT ,"Left face"},
+	{OBJ_Viewer::SKYBOX_FACE_TOP,"Top face"},
+	{OBJ_Viewer::SKYBOX_FACE_BOTTOM,"Bottom face"},
+	{OBJ_Viewer::SKYBOX_FACE_FRONT,"Front face"},
+	{OBJ_Viewer::SKYBOX_FACE_BACK,"Back face"}
+};
+
+inline const std::unordered_map<ImageResolutionEnum, const char *> UI_RESOLUTION_OPTION_ENUM_LABEL_MAP =
+{
+	 {ImageResolutionEnum::IMAGE_RESOLUTION_640_X_480, "SD 640 x 480"},
+	 {ImageResolutionEnum::IMAGE_RESOLUTION_1280_X_720, "HD 1280 x 720"},
+	 {ImageResolutionEnum::IMAGE_RESOLUTION_2560_X_1440,"2K 2560 x 1440"},
+	 {ImageResolutionEnum::IMAGE_RESOLUTION_3840_X_2160,"4K 3840 x 2160"},
+	 {ImageResolutionEnum::IMAGE_RESOLUTION_CUSTOM,"Custom"},
+
+};
+inline const std::unordered_map<OBJ_Viewer::ImageFileFormat, const char*> UI_IMAGE_FORMAT_ENUM_LABEL_MAP =
+{
+	{OBJ_Viewer::ImageFileFormat::IMAGE_FORMAT_PNG, "PNG"},
+	{OBJ_Viewer::ImageFileFormat::IMAGE_FORMAT_JPEG ,"JPEG"},
+	{OBJ_Viewer::ImageFileFormat::IMAGE_FORMAT_BMP ,"BMP"},
+
+};
+#pragma endregion
 
 OBJ_Viewer::UILayer::UILayer(Application& appState,
 	std::shared_ptr<RenderingMediator> renderingMediator,
@@ -27,7 +60,7 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,
 	ImGui::SetNextWindowSize(viewport->WorkSize);
 	ImGui::SetNextWindowViewport(viewport->ID);
 	this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-	this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_MenuBar;
 
 	if (this->m_imgGuiDockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBackground;
@@ -69,6 +102,110 @@ void OBJ_Viewer::UILayer::RenderUI()
 	{
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), m_imgGuiDockSpaceFlags);
+	}
+#pragma endregion
+
+#pragma region Menu bar
+	static bool isScreenshotSettingsWindowOpen = false;
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Open file"))
+			{
+
+			}
+			if (ImGui::MenuItem("Take screenshot"))
+			{
+				isScreenshotSettingsWindowOpen = true;
+				//Enter a screenshot UI state.
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("Edit"))
+		{
+			static bool test{};
+			ImGui::Checkbox("Enable FBX", &test);
+			
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+#pragma endregion
+
+#pragma region Screenshot window
+	if (isScreenshotSettingsWindowOpen) {
+		if (ImGui::Begin(APP_FOCUS_REGIONS::UI_WINDOW_SCREENSHOT_SETTINGS,&isScreenshotSettingsWindowOpen,ImGuiWindowFlags_NoDocking))
+		{
+			isAppWindowFocused(APP_FOCUS_REGIONS::UI_WINDOW_SCREENSHOT_SETTINGS);
+			static bool renderWithGrid{};
+			static bool renderWithTransparency{};
+			static ImageFileFormat currentlySelectedFormat = ImageFileFormat::IMAGE_FORMAT_PNG;
+			static ImageResolutionEnum currentResolution = ImageResolutionEnum::IMAGE_RESOLUTION_2560_X_1440;
+			Size2D imageSize;
+
+			constexpr auto GetResolutionFromEnum = [](ImageResolutionEnum val)
+				{
+					switch (val)
+					{
+					case IMAGE_RESOLUTION_640_X_480:
+						return Size2D{ 640,480 };
+						break;
+					case IMAGE_RESOLUTION_1280_X_720:
+						return Size2D{ 1280,720 };
+						break;
+					case IMAGE_RESOLUTION_2560_X_1440:
+						return Size2D{ 2560,1440 };
+						break;
+					case IMAGE_RESOLUTION_3840_X_2160:
+						return Size2D{ 3840,2160 };
+						break;
+					case IMAGE_RESOLUTION_CUSTOM:
+						return Size2D{ 0,0 };
+						break;
+					default:
+						return Size2D{ 0,0 };
+						break;
+					}
+				};
+
+			currentlySelectedFormat = RenderComboBox("Format", UI_IMAGE_FORMAT_ENUM_LABEL_MAP, currentlySelectedFormat);
+			currentResolution = RenderComboBox("Image resolution", UI_RESOLUTION_OPTION_ENUM_LABEL_MAP, currentResolution);
+
+			imageSize = GetResolutionFromEnum(currentResolution);
+			if (currentResolution == ImageResolutionEnum::IMAGE_RESOLUTION_CUSTOM)
+			{
+				static Size2D tempResolution{};
+				ImGui::Text("Custom resolution");
+				ImGui::SameLine();
+				ImGui::InputInt2("## Texture Size", &tempResolution[0]);
+				imageSize = tempResolution;
+			}
+
+			ImGui::Checkbox("Render object only", &renderWithGrid);
+			ImGui::SetItemTooltip("Don't render the grid and/or skybox.");
+
+			ImGui::Checkbox("Export with transparency", &renderWithTransparency);
+			ImGui::SetItemTooltip("If the file format support it will export the scene with transparency.");
+
+			if(ImGui::Button("Take screenshot"))
+			{
+				DialogWrapper dialogFolderPath;
+				dialogFolderPath.OpenDialogSavePath(TextureFileEnumConverter::GetStringTextureFormatFromEnum(currentlySelectedFormat).data());
+				if (!dialogFolderPath.isDialogClosed())
+				{
+					ImgOutputData eventData{};
+					eventData.imgSize = imageSize;
+					eventData.outPath = dialogFolderPath.GetDialogResult().at(0);
+					eventData.renderObjectOnly = renderWithGrid;
+					eventData.outImgFormat = currentlySelectedFormat;
+					eventData.allowTransparency = renderWithTransparency;
+					ScreenshotEvent e(eventData);
+					m_appEventCallback(e);
+				}
+			}
+		}ImGui::End();
 	}
 #pragma endregion
 
@@ -453,53 +590,26 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 	
 	if (ImGui::Button("Load skybox textures."))
 	{
-		LoadSkybox();
-		itemsFaces = {
-		OBJ_Viewer::SKYBOX_FACE_RIGHT,
-		OBJ_Viewer::SKYBOX_FACE_LEFT,
-		OBJ_Viewer::SKYBOX_FACE_TOP,
-		OBJ_Viewer::SKYBOX_FACE_BOTTOM,
-		OBJ_Viewer::SKYBOX_FACE_FRONT,
-		OBJ_Viewer::SKYBOX_FACE_BACK };
+		LoadSkybox();	
 	}
-	std::shared_ptr<Skybox> sceneSkybox;
-	bool isSkyboxExpired = m_mediator->GetSkybox().expired();
-	if (!isSkyboxExpired)
+	if (auto sceneSkybox = m_mediator->GetSkybox().lock())
 	{
-		sceneSkybox = m_mediator->GetSkybox().lock();
 		std::vector <std::shared_ptr<Texture>> skyboxTextures = sceneSkybox->GetSkyboxFaceTextures();
 
 		int noTextureLoaded = 0;
-		//Replace this with checkerboard texture.
-		ImGui::Image(!isSkyboxExpired ? (ImTextureID)skyboxTextures[0]->GetTextureHandle() : (ImTextureID)noTextureLoaded,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
-		RenderComboBox("0", 0);
+		static SkyboxFace comboResult{};
+		static std::string index_to_string = "## ";
+		for (uint8_t i = 0; i < Skybox::SKYBOX_FACE_COUNT; i++)
+		{
+			ImGui::Image((ImTextureID)skyboxTextures[i]->GetTextureHandle(),{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+			ImGui::SameLine();
+			index_to_string[index_to_string.size() - 1] = '0' + i;
+			comboResult = RenderComboBox<SkyboxFace>(index_to_string, UI_SKYBOX_FACE_LABEL_MAP,
+				static_cast<SkyboxFace>(i));
 
-		ImGui::Image(!isSkyboxExpired ? (ImTextureID)skyboxTextures[1]->GetTextureHandle() : (ImTextureID)noTextureLoaded,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
-		RenderComboBox("1", 1);
-
-		ImGui::Image(!isSkyboxExpired ? (ImTextureID)skyboxTextures[2]->GetTextureHandle() : (ImTextureID)noTextureLoaded,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
-		RenderComboBox("2", 2);
-
-		ImGui::Image(!isSkyboxExpired ? (ImTextureID)skyboxTextures[3]->GetTextureHandle() : (ImTextureID)noTextureLoaded
-			, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
-		RenderComboBox("3", 3);
-
-		ImGui::Image(!isSkyboxExpired ? (ImTextureID)skyboxTextures[4]->GetTextureHandle() : (ImTextureID)noTextureLoaded
-			, { 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
-		RenderComboBox("4", 4);
-
-		ImGui::Image(!isSkyboxExpired ? (ImTextureID)skyboxTextures[5]->GetTextureHandle() : (ImTextureID)noTextureLoaded,
-			{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-		ImGui::SameLine();
-		RenderComboBox("5", 5);
+			if(i != comboResult)
+				m_mediator->GetSkybox().lock()->SwapSkyboxFaceTextures(static_cast<SkyboxFace>(i), comboResult);
+		}
 
 		//TODO:Add texture preview;
 		ImGui::Separator();
@@ -516,22 +626,24 @@ void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3
 
 }
 
-void OBJ_Viewer::UILayer::RenderComboBox(std::string comboLabel, int index)
-{	
-	if (ImGui::BeginCombo(comboLabel.c_str(), itemsLabel[index].c_str())) // The second parameter is the label previewed before opening the combo.
-	{
-		for (int n = 0; n < itemsLabel.size(); n++)
-		{
-			bool is_selected = (itemsLabel[index] == itemsLabel[n]); // You can store your selection however you want, outside or inside your objects
-			if (ImGui::Selectable(itemsLabel[n].c_str(), is_selected))
-			{	
-				m_mediator->GetSkybox().lock()->SwapSkyboxFaceTextures(itemsFaces[index], itemsFaces[n]);
-				break;
-			}
-		}
-		ImGui::EndCombo();
-	}
-}
+//int OBJ_Viewer::UILayer::RenderComboBox(const std::string& comboLabel,const std::vector<std::string>& items, int index)
+//{	
+//	if (ImGui::BeginCombo(comboLabel.c_str(), items[index].c_str())) // The second parameter is the label previewed before opening the combo.
+//	{
+//		for (int n = 0; n < items.size(); n++)
+//		{
+//			bool is_selected = (items[index] == items[n]); // You can store your selection however you want, outside or inside your objects
+//			if (ImGui::Selectable(items[n].c_str(), is_selected))
+//			{				
+//				ImGui::EndCombo();
+//				return n;
+//			}
+//		}
+//		ImGui::EndCombo();
+//	}
+//
+//	return index;
+//}
 
 void OBJ_Viewer::UILayer::LoadModel()
 {
@@ -546,7 +658,7 @@ void OBJ_Viewer::UILayer::LoadModel()
 	if (dialog.isDialogClosed())
 		return;
 
-	auto VecPaths = dialog.GetDialogResult();
+	auto& VecPaths = dialog.GetDialogResult();
 	EventOnModelLoaded e(std::string(VecPaths.at(0)));
 	m_appEventCallback(e);
 }
@@ -560,7 +672,7 @@ void OBJ_Viewer::UILayer::LoadSkybox()
 	if (dialog.isDialogClosed())
 		return;
 
-	auto VecPaths = dialog.GetDialogResult();
+	auto& VecPaths = dialog.GetDialogResult();
 	std::vector<std::string> m_stringVector(VecPaths.size());
 	for (uint32_t i = 0; i < VecPaths.size(); i++)
 	{

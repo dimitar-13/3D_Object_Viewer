@@ -4,8 +4,7 @@
 
 OBJ_Viewer::Application::Application(Window& appWindow):
 	m_window(appWindow),
-	m_sceneViewport(Viewport{ 0,0, appWindow.GetWindowSize().width, appWindow.GetWindowSize().height}),
-	m_sceneFramebuffer(appWindow.GetWindowSize(), FRAMEBUFFER_COLOR_ATTACHMENT)
+	m_sceneViewport(Viewport{ 0,0, appWindow.GetWindowSize().width, appWindow.GetWindowSize().height})
 {
 	m_window.SetOnEventCallback(std::bind(&Application::OnEvent,this, std::placeholders::_1));
 
@@ -25,20 +24,17 @@ void OBJ_Viewer::Application::AppStartRenderLoop()
 	m_appRenderingCoordinator->RenderLoop();
 }
 
-void OBJ_Viewer::Application::ResizeBuffer(Size2D newSize)
+void OBJ_Viewer::Application::SubmitSceneViewportSize(const Viewport& newViewport)
 {
-	Size2D size = m_sceneFramebuffer.GetFramebufferSize();
-	
-	if ((size.width == newSize.width && size.height == newSize.height))
+	if (m_sceneViewport.GetViewport() == newViewport)
 		return;
-	glViewport(0, 0, newSize.width, newSize.height);
 
-	this->m_sceneFramebuffer.ResizeFramebuffer(newSize);
+	m_sceneViewport.UpdateSceneViewport(newViewport);
 
-	SceneViewportResizeEvent e(newSize);
+	glViewport(0, 0, newViewport.width, newViewport.height);
 
+	SceneViewportResizeEvent e(m_sceneViewport.GetViewport());
 	OnEvent(e);
-
 }
 
 OBJ_Viewer::Application::~Application()
@@ -84,7 +80,7 @@ void OBJ_Viewer::Application::OnEvent(Event& winEvent)
 		viewport.y = 0;
 		viewport.width = winSize.width;
 		viewport.height = winSize.height;
-		UpdateSceneViewport(viewport);
+		SubmitSceneViewportSize(viewport);
 	}
 }
 
@@ -103,7 +99,7 @@ void OBJ_Viewer::Application::OnAppKeyBindPressed(KeyboardKeyEvent& e)
 		viewport.y = 0;
 		viewport.width = winSize.width;
 		viewport.height = winSize.height;
-		UpdateSceneViewport(viewport);
+		SubmitSceneViewportSize(viewport);
 
 		m_inputHandler->SetCurrentlyFocusedWindow(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
 	}

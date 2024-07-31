@@ -28,7 +28,8 @@ namespace OBJ_Viewer {
 			RENDER_MODE_SOLID_COLOR,
 			RENDER_MODE_LIGHT,
 			RENDER_MODE_UV,
-			RENDER_MODE_INDIVIDUAL_TEXTURES
+			RENDER_MODE_INDIVIDUAL_TEXTURES,
+			RENDER_MODE_NORMAL_ORIENTATION
 		};
 
 		struct GridData
@@ -101,20 +102,19 @@ namespace OBJ_Viewer {
 		Application(Window& appWindow);
 		void AppStartRenderLoop();
 		APP_SETTINGS::RenderStateSettings& GetScene_RefSettings() { return m_appStetting; }
+		bool isFBXLoadingDisabled()const { return m_appStetting.m_disableFBXLoading; }
 		bool isAppInitStatusSuccess()const { return m_appInitStatusSuccsess; }
 		bool isUIHidden()const { return m_isUIHidden; }
 		InputHandler& GetGlobalInputHandler() { return *m_inputHandler; }
 		Window& GetGlobalAppWindow() { return m_window; }
-		Framebuffer& GetSceneFrameBuffer() { return m_sceneFramebuffer; }
 		SceneViewport GetSceneViewport()const { return m_sceneViewport; }
 		const SceneViewport& GetSceneViewport_ConstRef()const { return m_sceneViewport; }
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
-		void UpdateSceneViewport(const Viewport& newViewport) { m_sceneViewport.UpdateSceneViewport(newViewport); ResizeBuffer(m_sceneViewport.GetViewportSize()); }
-		std::function<void(Event&)> GetOnAppEventCallback() { return std::bind(&Application::OnEvent, this, std::placeholders::_1);}
+		void SubmitSceneViewportSize(const Viewport& newViewport);
+		void SubmitEvent(Event& event) { OnEvent(event); }
 		~Application();
 	private:
 		void InitImGui();
-		void ResizeBuffer(Size2D newSize);
 		void OnEvent(Event& winEvent);
 		void OnAppKeyBindPressed(KeyboardKeyEvent& e);
 	private:
@@ -122,7 +122,6 @@ namespace OBJ_Viewer {
 		bool m_isUIHidden = false;
 		Window& m_window;
 		std::shared_ptr<InputHandler> m_inputHandler;
-		Framebuffer m_sceneFramebuffer;
 		std::shared_ptr<RenderingCoordinator> m_appRenderingCoordinator;
 		std::vector<std::weak_ptr<Listener>> m_eventListeners;
 		SceneViewport m_sceneViewport;

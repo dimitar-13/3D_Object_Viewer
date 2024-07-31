@@ -54,6 +54,9 @@ bool OBJ_Viewer::Framebuffer::isFramebufferValid() const
 
 void OBJ_Viewer::Framebuffer::ResizeFramebuffer(Size2D newSize)
 {
+	if (newSize.width == m_framebufferSize.width && newSize.height == m_framebufferSize.height)
+		return;
+
 	m_framebufferSize = newSize;
 
 	BindFramebuffer();

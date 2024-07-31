@@ -13,7 +13,7 @@ enum ImageResolutionEnum
 	IMAGE_RESOLUTION_3840_X_2160 = 3,
 	IMAGE_RESOLUTION_CUSTOM = 4,
 };
-
+constexpr ImGuiWindowFlags_ APP_WINDOW_STYLE_FLAGS = ImGuiWindowFlags_NoMove;
 
 #pragma region KEY_UI_LABEL_MAPS
 inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> UI_SKYBOX_FACE_LABEL_MAP =
@@ -44,15 +44,15 @@ inline const std::unordered_map<OBJ_Viewer::ImageFileFormat, const char*> UI_IMA
 };
 #pragma endregion
 
-OBJ_Viewer::UILayer::UILayer(Application& appState,
-	std::shared_ptr<RenderingMediator> renderingMediator,
-	ImGuiWindowFlags imGuiWindowFlags,
-	ImGuiDockNodeFlags imGuiDockSpaceFlags):m_application(appState)
+OBJ_Viewer::UILayer::UILayer(Application& appState,std::shared_ptr<RenderingMediator> renderingMediator):
+	m_application(appState),
+	m_UI_inputFramebuffer(appState.GetSceneViewport().GetViewportSize(), FRAMEBUFFER_COLOR_ATTACHMENT)
 {
-	m_appEventCallback = m_application.GetOnAppEventCallback();
+	//m_appEventCallback = m_application.GetOnAppEventCallback();
 
-	this->m_imgGuiDockSpaceFlags = imGuiDockSpaceFlags;
-	this->m_imGuiWindowFlags = imGuiWindowFlags;
+	this->m_imgGuiDockSpaceFlags = ImGuiDockNodeFlags_None;
+	this->m_imGuiWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration;
+
 	m_mediator = renderingMediator;
 
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -65,6 +65,7 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,
 	if (this->m_imgGuiDockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBackground;
 }
+
 void OBJ_Viewer::UILayer::isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID windowID)
 {
 	m_currentlyFocusedWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
@@ -77,11 +78,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
-	const Framebuffer& sceneFrameBuffer = m_application.GetSceneFrameBuffer();
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();	
-	
+
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::vec3 rotation = { 0,0,0 };
@@ -90,11 +87,14 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	uint32_t vertexCount = 4050, triangleCount = 2323, faceCount = 23232;
 
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
 	ImGui::SetNextWindowViewport(viewport->ID);
-
 
 	ImGui::Begin("DockSpace Demo", (bool*)true, m_imGuiWindowFlags);
 	ImGuiIO& io = ImGui::GetIO();
@@ -113,7 +113,8 @@ void OBJ_Viewer::UILayer::RenderUI()
 		{
 			if (ImGui::MenuItem("Open file"))
 			{
-
+				EventOnModelLoaded e;
+				m_application.SubmitEvent(e);
 			}
 			if (ImGui::MenuItem("Take screenshot"))
 			{
@@ -125,9 +126,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 		}
 		if (ImGui::BeginMenu("Edit"))
 		{
-			static bool test{};
-			ImGui::Checkbox("Enable FBX", &test);
-			
+			ImGui::SameLine();
+			ImGui::Checkbox("Disable fbx file imports", &pSettings.m_disableFBXLoading);
+			ImGui::SetItemTooltip("Due to security vulnerability fbx files are disabled. Enable them on you own risk or if the model is from trusted source");
+			ImGui::Separator();
+
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
@@ -202,7 +205,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 					eventData.outImgFormat = currentlySelectedFormat;
 					eventData.allowTransparency = renderWithTransparency;
 					ScreenshotEvent e(eventData);
-					m_appEventCallback(e);
+					m_application.SubmitEvent(e);
 				}
 			}
 		}ImGui::End();
@@ -210,10 +213,8 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma endregion
 
 #pragma region ModelAndRenderingSettings
-
-
 	//Right panel for model and rendering settings.
-	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME, (bool*)0, APP_WINDOW_STYLE_FLAGS))
 	{
 		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME);
 
@@ -222,49 +223,65 @@ void OBJ_Viewer::UILayer::RenderUI()
 		ImGui::InputFloat3("Rotation", &rotation[0]);
 		ImGui::InputFloat3("Scale", &scale[0]);
 		ImGui::Checkbox("Use uniform scale", &pSettings.m_isUniformScale);
+
 		if (pSettings.m_isUniformScale)
 		{
-			float scaleValue = scale.x != previousScale.x ? scale.x:
+			float scaleValue = scale.x != previousScale.x ? scale.x :
 				scale.y != previousScale.y ? scale.y : scale.z;
 			scale = glm::vec3(scaleValue);
 		}
+
 		ImGui::Separator();
 		if (ImGui::BeginChild("Rendering modes"))
 		{
-			ImGui::Text("Model rendering modes.");
-			static bool renderingModeContainer;
-			ImGui::Checkbox("Wireframe",
-				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME));
+#pragma region Rendering Modes 
+
+			if (ImGui::RadioButton("Wireframe",
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME))
+			{
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME;
+			}
 			ImGui::SetItemTooltip("Renders wireframe of the 3D model.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME :
-				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Clear color rendering.",
-				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR));
+			if (ImGui::RadioButton("Normal orientation",
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_NORMAL_ORIENTATION))
+			{
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_NORMAL_ORIENTATION;
+			}
+			ImGui::SetItemTooltip("Color each face based on the orientation of the normal red if its inwards and blue if outwards.");
+
+			if (ImGui::RadioButton("Clear color rendering",
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR))
+			{
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR;
+			}
 			ImGui::SetItemTooltip("Renders the mesh using a single color.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR :
-				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Individual textures",
-				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES));
+			if (ImGui::RadioButton("Individual textures",
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES))
+			{
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES;
+			}
 			ImGui::SetItemTooltip("Renders only single selected texture.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES :
-				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Uv mode",
-				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_UV));
+			if (ImGui::RadioButton("Uv mode",
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_UV))
+			{
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_UV;
+			}
 			ImGui::SetItemTooltip("Renders checkerboard texture for UV inspection.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_UV :
-				pSettings.m_currentRenderingMode;
 
-			ImGui::Checkbox("Light rendering",
-				&(renderingModeContainer = pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT));
+			if (ImGui::RadioButton("Light rendering",
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT))
+			{
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT;
+			}
 			ImGui::SetItemTooltip("Render the 3D object with light calculations.");
-			pSettings.m_currentRenderingMode = renderingModeContainer ? APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT :
-				pSettings.m_currentRenderingMode;
+#pragma endregion
 
 			ImGui::Separator();
 			ImGui::Text("Mode settings.");
+
 			switch (pSettings.m_currentRenderingMode)
 			{
 			case APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME:
@@ -272,13 +289,12 @@ void OBJ_Viewer::UILayer::RenderUI()
 				ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
 				ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
 				break;
-	
+
 			case APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT:
 				static bool isAlbedoOn = pSettings.m_MaterialFlags & IS_ALBEDO_ON;
 				static bool isNormalOn = pSettings.m_MaterialFlags & IS_CUSTOM_SPECULAR_ON;
 				static bool isRoughnessOn = pSettings.m_MaterialFlags & IS_CUSTOM_NORMALS_ON;
 				static bool isAmbientOcclusionOn = pSettings.m_MaterialFlags & IS_AMBIENT_OCCLUSION_ON;
-
 
 				ImGui::Checkbox("Albedo?", &isAlbedoOn);
 				ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
@@ -294,7 +310,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 				pSettings.m_MaterialFlags = FLAGS_NONE;
 				pSettings.m_MaterialFlags = isAlbedoOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_ALBEDO_ON) : pSettings.m_MaterialFlags;
-				pSettings.m_MaterialFlags = isNormalOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_CUSTOM_NORMALS_ON): pSettings.m_MaterialFlags;
+				pSettings.m_MaterialFlags = isNormalOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_CUSTOM_NORMALS_ON) : pSettings.m_MaterialFlags;
 				pSettings.m_MaterialFlags = isRoughnessOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_CUSTOM_SPECULAR_ON) : pSettings.m_MaterialFlags;
 				pSettings.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_AMBIENT_OCCLUSION_ON) : pSettings.m_MaterialFlags;
 				break;
@@ -302,17 +318,27 @@ void OBJ_Viewer::UILayer::RenderUI()
 			case APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES:
 				static bool selectedTexture;
 
-				ImGui::Checkbox("Color texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ALBEDO));
-				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_ALBEDO : pSettings.m_curentIndividualTexture;
+				if (ImGui::RadioButton("Color texture",
+					pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ALBEDO))
+				{
+					pSettings.m_curentIndividualTexture = MATERIAL_TEXTURE_ALBEDO;
+				}
+				if (ImGui::RadioButton("Normal texture",
+					pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_NORMAL))
+				{
+					pSettings.m_curentIndividualTexture = MATERIAL_TEXTURE_NORMAL;
+				}
+				if (ImGui::RadioButton("Specular/Metallic texture",
+					pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ROUGHNESS_METALLIC))
+				{
+					pSettings.m_curentIndividualTexture = MATERIAL_TEXTURE_ROUGHNESS_METALLIC;
+				}
+				if (ImGui::RadioButton("Ambient occlusion",
+					pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_AMBIENT_OCCLUSION))
+				{
+					pSettings.m_curentIndividualTexture = MATERIAL_TEXTURE_AMBIENT_OCCLUSION;
+				}
 
-				ImGui::Checkbox("Normal texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_NORMAL));
-				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_NORMAL : pSettings.m_curentIndividualTexture;
-
-				ImGui::Checkbox("Specular/Metallic texture", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_ROUGHNESS_METALLIC));
-				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_ROUGHNESS_METALLIC : pSettings.m_curentIndividualTexture;
-
-				ImGui::Checkbox("Ambient occlusion", &(selectedTexture = pSettings.m_curentIndividualTexture == MATERIAL_TEXTURE_AMBIENT_OCCLUSION));
-				pSettings.m_curentIndividualTexture = selectedTexture ? MATERIAL_TEXTURE_AMBIENT_OCCLUSION : pSettings.m_curentIndividualTexture;
 				break;
 
 			case APP_SETTINGS::RenderingMode::RENDER_MODE_UV:
@@ -320,8 +346,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 				break;
 
 			case APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR:
-				//TODO:Implement
 				ImGui::ColorPicker3("Mesh color", &pSettings.m_colorRenderingColor[0]);
+				break;
+
+			case APP_SETTINGS::RenderingMode::RENDER_MODE_NORMAL_ORIENTATION:
+
 				break;
 			default:
 				break;
@@ -432,7 +461,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 				{
 					pSettings.isCurrentProjectionPerspective = !pSettings.isCurrentProjectionPerspective;
 					EventCameraProjectionChanged e(pSettings.isCurrentProjectionPerspective);
-					m_appEventCallback(e);
+					m_application.SubmitEvent(e);
 				}
 
 				ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
@@ -511,39 +540,28 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma endregion
 
 #pragma region Loading object info
-	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
+	/*if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME))
 	{
 		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_OBJECT_LOADING_WINDOW_NAME);
-
-		if (ImGui::Button("Import 3D model."))
-		{
-			LoadModel();
-		}
-		ImGui::SameLine();
-		ImGui::Checkbox("Disable fbx file imports", &pSettings.m_disableFBXLoading);
-		ImGui::SetItemTooltip("Due to security vulnerability fbx files are disabled. Enable them on you own risk or if the model is from trusted source");
-		ImGui::Separator();
-	}ImGui::End();
+	}ImGui::End();*/
 #pragma endregion
 
 #pragma region Scene window
-
 
 	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
 		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
 
 		ImVec2 winSize = ImGui::GetWindowSize();
-		ImVec2 winPos = ImGui::GetWindowPos();
 		static Viewport sceneWinViewport{};
-		sceneWinViewport.x = winPos.x;
-		sceneWinViewport.y = winPos.y;
 		sceneWinViewport.width = winSize.x;
 		sceneWinViewport.height = winSize.y;
 
-		m_application.UpdateSceneViewport(sceneWinViewport);
+		m_UI_inputFramebuffer.ResizeFramebuffer(Size2D{ sceneWinViewport.width,sceneWinViewport.height });
+		m_application.SubmitSceneViewportSize(sceneWinViewport);
+
 		ImGui::BeginChild("GameRender", winSize,ImGuiChildFlags_None, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
-		ImGui::Image((ImTextureID)sceneFrameBuffer.GetFramebufferHandle(), winSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+		ImGui::Image((ImTextureID)m_UI_inputFramebuffer.GetFramebufferTexture().GetTextureHandle(), winSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 		ImGui::EndChild();
 
 	}ImGui::End();
@@ -590,7 +608,9 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 	
 	if (ImGui::Button("Load skybox textures."))
 	{
-		LoadSkybox();	
+		
+		EventOnSkyboxLoaded e;
+		m_application.SubmitEvent(e);		
 	}
 	if (auto sceneSkybox = m_mediator->GetSkybox().lock())
 	{
@@ -624,60 +644,4 @@ void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3
 	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->y), -1.f, 1.f);
 	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->z), -1.f, 1.f);
 
-}
-
-//int OBJ_Viewer::UILayer::RenderComboBox(const std::string& comboLabel,const std::vector<std::string>& items, int index)
-//{	
-//	if (ImGui::BeginCombo(comboLabel.c_str(), items[index].c_str())) // The second parameter is the label previewed before opening the combo.
-//	{
-//		for (int n = 0; n < items.size(); n++)
-//		{
-//			bool is_selected = (items[index] == items[n]); // You can store your selection however you want, outside or inside your objects
-//			if (ImGui::Selectable(items[n].c_str(), is_selected))
-//			{				
-//				ImGui::EndCombo();
-//				return n;
-//			}
-//		}
-//		ImGui::EndCombo();
-//	}
-//
-//	return index;
-//}
-
-void OBJ_Viewer::UILayer::LoadModel()
-{
-	DialogWrapper dialog;
-	std::string filterList = "obj";
-
-	if (!m_application.GetScene_RefSettings().m_disableFBXLoading)
-		filterList += ",fbx";
-
-	dialog.OpenDialog(filterList);
-	//If error occurs or the user change their mind we wont send an event;
-	if (dialog.isDialogClosed())
-		return;
-
-	auto& VecPaths = dialog.GetDialogResult();
-	EventOnModelLoaded e(std::string(VecPaths.at(0)));
-	m_appEventCallback(e);
-}
-
-void OBJ_Viewer::UILayer::LoadSkybox()
-{
-	DialogWrapper dialog;
-	dialog.OpenDialogMultiple("png,jpeg,jpg");
-
-	//If error occurs or the user change their mind we wont send an event;
-	if (dialog.isDialogClosed())
-		return;
-
-	auto& VecPaths = dialog.GetDialogResult();
-	std::vector<std::string> m_stringVector(VecPaths.size());
-	for (uint32_t i = 0; i < VecPaths.size(); i++)
-	{
-		m_stringVector[i] = std::string(VecPaths.at(i));
-	}
-	EventOnSkyboxLoaded e(m_stringVector);
-	m_appEventCallback(e);
 }

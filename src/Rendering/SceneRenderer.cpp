@@ -7,6 +7,7 @@
 #include "ShaderPath.h"
 #include "Helpers/MeshGeneratingMethods.h"
 #include "Profiling/AppProfiler.h"
+#include "Helpers/DialogWrapper.h"
 
 #pragma region Constants
 constexpr uint8_t MATRIX_UBO_BINDING_POINT = 0;
@@ -69,7 +70,7 @@ OBJ_Viewer::SceneRenderer::~SceneRenderer()
 void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSettings& renderSettings, Framebuffer* outputFrameBuffer)
 {
 	SetUniformMatrixBuffer();
-
+	
 	if (renderSettings.m_EnableAA)
 		m_multiSampleSceneFrameBuffer.BindFramebuffer();
 	else
@@ -317,21 +318,49 @@ void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
 		OnSkyboxLoadEvent(dynamic_cast<EventOnSkyboxLoaded&>(e));
 	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_SCENE_VIEWPORT_SIZE_CHANGED)
 	{
-		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(m_app.GetSceneViewport().GetViewportSize());
-		m_intermidiateFramebuffer.ResizeFramebuffer(m_app.GetSceneViewport().GetViewportSize());
+		auto& sceneViewportEvent = dynamic_cast<SceneViewportResizeEvent&>(e);
+		const Viewport& newViewport = sceneViewportEvent.GetViewport();
+		glViewport(newViewport.x, newViewport.y, newViewport.width, newViewport.height);
+
+		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());
+		m_intermidiateFramebuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());
 	}
 }
 
 void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
 {
-	LoadSkybox(e.GetSkyboxPaths());
-	m_renderingMediator->SetSkybox(m_sceneSkybox);
+	DialogWrapper dialog;
+	dialog.OpenDialogMultiple("png,jpeg,jpg");
 
+	if (dialog.isDialogClosed())
+		return;
+
+	auto& VecPaths = dialog.GetDialogResult();
+	std::vector<std::string> m_stringVector(VecPaths.size());
+	for (uint32_t i = 0; i < VecPaths.size(); i++)
+	{
+		m_stringVector[i] = std::string(VecPaths.at(i));
+	}
+
+	LoadSkybox(m_stringVector);
+	m_renderingMediator->SetSkybox(m_sceneSkybox);
 }
 
 void OBJ_Viewer::SceneRenderer::OnModelLoadEvent(EventOnModelLoaded& e)
 {
-	LoadModel(e.GetModelPath());
+	DialogWrapper loadModelDialog;
+	std::string_view filterList = "obj";
+
+	if (!m_app.isFBXLoadingDisabled())
+		filterList = "obj,fbx";
+
+	loadModelDialog.OpenDialog(filterList);
+
+	if (loadModelDialog.isDialogClosed())
+		return;
+
+	LoadModel(loadModelDialog.GetFirstDialogResult());
+
 	m_renderingMediator->SetSceneModel(m_sceneModel);
 	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
 }

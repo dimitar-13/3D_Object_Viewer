@@ -9,12 +9,10 @@ namespace OBJ_Viewer {
 	class UILayer
 	{
 	public:
-		UILayer(Application& appState, std::shared_ptr<RenderingMediator> renderingMediator,ImGuiWindowFlags imGuiWindowFlags,
-			ImGuiDockNodeFlags imGuiDockSpaceFlags);
-		void RenderUI();	
+		UILayer(Application& appState, std::shared_ptr<RenderingMediator> renderingMediator);
+		void RenderUI();
+		Framebuffer& GetInputFramebuffer() { return m_UI_inputFramebuffer; }
 	private:
-		void LoadModel();
-		void LoadSkybox();
 		template<typename T>
 		T RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items, const T& previewItem);
 		void RenderSkyboxSettings();
@@ -25,10 +23,10 @@ namespace OBJ_Viewer {
 	private:
 		APP_FOCUS_REGIONS::AppWindowID m_currentlyFocusedWindow;
 		Application& m_application;
+		Framebuffer m_UI_inputFramebuffer;
 		std::shared_ptr<RenderingMediator> m_mediator;
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
-		std::function<void(Event&)> m_appEventCallback;
 	};
 	template<typename T>
 	inline T UILayer::RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items,

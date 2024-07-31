@@ -4,7 +4,7 @@
 #include "Controls/KeyboardKeys.h"
 #include "Controls/MouseKeys.h"
 #include "Helpers/TextureHelpers.h"
-
+#include "Core/SceneViewport.h"
 namespace OBJ_Viewer {
 	enum EventType
 	{
@@ -119,14 +119,16 @@ namespace OBJ_Viewer {
 	class SceneViewportResizeEvent : public Event
 	{
 	public:
-		SceneViewportResizeEvent(Size2D newSize) :m_framebufferSize(newSize)
+		SceneViewportResizeEvent(const Viewport& newSize) :m_viewport(newSize)
 		{ }
 		EventType GetEventType()const override { return EVENT_SCENE_VIEWPORT_SIZE_CHANGED; }
 		EventCategory GetEventCategory()const override { return APP_EVENT; }
 
-		Size2D GetNewFramebufferSize()const { return m_framebufferSize; }
+		Size2D GetViewportSize()const { return Size2D{ m_viewport.width,m_viewport.height}; }
+		Size2D GetViewportOffset()const { return Size2D{ m_viewport.x,m_viewport.y }; }
+		const Viewport& GetViewport()const { return m_viewport; }
 	private:
-		Size2D m_framebufferSize;
+		Viewport m_viewport;
 	};
 
 	class ScrollPositionChanged : public Event

@@ -8,6 +8,17 @@ namespace OBJ_Viewer {
 		int y;
 		int width;
 		int height;
+		bool operator ==(const Viewport& other)const
+		{
+			return this->x == other.x         &&
+				   this->y == other.y		  &&
+				   this->width == other.width &&
+				   this->height == other.height;
+		}
+		bool operator !=(const Viewport& other)const
+		{
+			return !Viewport::operator==(other);
+		}
 	};
 
 	class SceneViewport

@@ -104,9 +104,9 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 
 }
 
-void OBJ_Viewer::Camera::onWinSizeChanged(SceneViewportResizeEvent& e)
+void OBJ_Viewer::Camera::onViewportChanged(SceneViewportResizeEvent& e)
 {
-	const Size2D winSize = e.GetNewFramebufferSize();
+	const Size2D winSize = e.GetViewportSize();
 	RecalculateProjection(winSize);
 }
 
@@ -162,7 +162,7 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 	switch (e.GetEventType())
 	{
 	case EVENT_SCENE_VIEWPORT_SIZE_CHANGED:
-		this->onWinSizeChanged(dynamic_cast<SceneViewportResizeEvent&>(e));
+		this->onViewportChanged(dynamic_cast<SceneViewportResizeEvent&>(e));
 		break;
 	case EVENT_MOUSE_POSITION_CHANGED:
 		this->onMousePositionChanged(dynamic_cast<MousePositionEvent&>(e));

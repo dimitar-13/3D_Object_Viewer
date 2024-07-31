@@ -3,11 +3,12 @@
 #include "gpu_side/UniformBuffer.h"
 namespace OBJ_Viewer
 {
-	enum ShaderIndex
+	enum ShaderSourceType_
 	{
-		VERTEX_SHADER = 0,
-		FRAGMENT_SHADER =1,
-		GEOMETRY_SHADER =2 
+		ShaderSourceType_Uknown,
+		ShaderSourceType_Vertex = GL_VERTEX_SHADER,
+		ShaderSourceType_Fragment = GL_FRAGMENT_SHADER,
+		ShaderSourceType_Geometry = GL_GEOMETRY_SHADER
 	};
 	class ShaderClass
 	{
@@ -24,10 +25,11 @@ namespace OBJ_Viewer
 		std::vector<std::string> GetShaderUniformList()const;
 		void UseShader()const { glUseProgram(this->m_shaderHandle); }
 	private:
-		std::vector<std::string>readShaderSource(const char* path);
+		std::unordered_map<ShaderSourceType_,std::string>readShaderSource(const char* path);
+		std::string ReadIncludeFile(const std::string& path);
 		bool isShaderCompilerSuccessfully(const GLuint Shader);
 		bool isProgramLinkedSuccessfully()const;
-		GLuint compileShader(const GLenum shaderType, const std::string* shaderSource);
+		GLuint compileShader(const GLenum shaderType, const std::string& shaderSource);
 		GLint findUniform(const char* name)const;
 	private:
 		int m_shaderHandle;

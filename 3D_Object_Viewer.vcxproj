@@ -285,6 +285,7 @@
     <None Include="Shaders\MaterialShader.glsl" />
     <None Include="Shaders\NormalOrientationShader.glsl" />
     <None Include="Shaders\PostProcessShader.glsl" />
+    <None Include="Shaders\ShaderCommonFunctions.glsl" />
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
     <None Include="Shaders\UVShader.glsl" />

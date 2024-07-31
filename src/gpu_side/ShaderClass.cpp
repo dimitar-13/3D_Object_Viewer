@@ -3,24 +3,14 @@
 #include"Logging/App_Logger.h"
 OBJ_Viewer::ShaderClass::ShaderClass(const char* filePath)
 {
-    std::vector<std::string> sources = readShaderSource(filePath);
-    std::vector<GLuint>shaderHandles(sources.size());
-    for (size_t i = 0; i < sources.size(); i++)
+    std::unordered_map<ShaderSourceType_, std::string> sources = readShaderSource(filePath);
+    std::vector<GLuint>shaderHandles {};
+    for (const auto& item : sources)
     {
-        switch (i)
-        {
-        case VERTEX_SHADER:
-            shaderHandles[i] = compileShader(GL_VERTEX_SHADER, &sources[VERTEX_SHADER]);
-            break;
-        case FRAGMENT_SHADER:
-            shaderHandles[i] = compileShader(GL_FRAGMENT_SHADER, &sources[FRAGMENT_SHADER]);
-            break;
-        case GEOMETRY_SHADER:
-            shaderHandles[i] = compileShader(GL_GEOMETRY_SHADER, &sources[GEOMETRY_SHADER]);
-            break;
-        default:
-            break;
-        } 
+        ShaderSourceType_ shaderKey = item.first;
+        const std::string& shaderSource = item.second;
+
+        shaderHandles.push_back(compileShader(shaderKey,shaderSource));
     }
     this->m_shaderHandle = glCreateProgram();
     for (const auto handle : shaderHandles)
@@ -58,7 +48,7 @@ std::vector<std::string> OBJ_Viewer::ShaderClass::GetShaderUniformList()const
     
 }
 
-std::vector<std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* path)
+std::unordered_map<OBJ_Viewer::ShaderSourceType_,std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* path)
 {
     std::fstream sourceFile;
     sourceFile.open(path);
@@ -67,33 +57,63 @@ std::vector<std::string> OBJ_Viewer::ShaderClass::readShaderSource(const char* p
         LOGGER_LOG_WARN("Was not able to open file at path:{0}", path);
     }
     std::string line;
-    std::vector<std::string>shaderSources;
-    std::string* p_currentShaderSource = NULL;
+    std::unordered_map<OBJ_Viewer::ShaderSourceType_, std::string> result {};
+    ShaderSourceType_ currentReadingShader {};
+
+    std::string shaderPathNoFilename = path;
+    shaderPathNoFilename = shaderPathNoFilename.substr(0, shaderPathNoFilename.find_last_of('\\') + 1);
+    std::replace(shaderPathNoFilename.begin(), shaderPathNoFilename.end(), '\\', '/');
+
     while (std::getline(sourceFile, line))
     {
         if (line.compare("#Shader:vertex") == 0)
         {
-            shaderSources.push_back(std::string());
-            p_currentShaderSource = &shaderSources[VERTEX_SHADER];
+            currentReadingShader = ShaderSourceType_Vertex;
+            result[ShaderSourceType_Vertex] = std::string();
             continue;
         }
         else if (line.compare("#Shader:fragment") == 0)
         {
-            shaderSources.push_back(std::string());
-            p_currentShaderSource = &shaderSources[FRAGMENT_SHADER];
+            currentReadingShader = ShaderSourceType_Fragment;
+            result[ShaderSourceType_Fragment] = std::string();
             continue;
         }
         else if (line.compare("#Shader:geometry") == 0)
         {
-            shaderSources.push_back(std::string());
-            p_currentShaderSource = &shaderSources[GEOMETRY_SHADER];
+            currentReadingShader = ShaderSourceType_Geometry;
+            result[ShaderSourceType_Geometry] = std::string();
             continue;
         }
-        *p_currentShaderSource += line +'\n';
+        else if (line.find("#include") != std::string::npos)
+        {
+            result[currentReadingShader] += ReadIncludeFile(shaderPathNoFilename + line.substr(line.find_first_of('"') + 1, line.find_last_of('"') - line.find_first_of('"') - 1));
+            continue;
+        }
+        result[currentReadingShader] += line +'\n';
         //TODO:Add support for differed shader types like tessellation,geo,compute etc.
     }
     sourceFile.close();
-    return shaderSources;
+    return result;
+}
+
+std::string OBJ_Viewer::ShaderClass::ReadIncludeFile(const std::string& path)
+{
+    std::fstream sourceFile;
+    std::string line;
+    std::string result{};
+
+    sourceFile.open(path);
+    if (!sourceFile.is_open())
+    {
+        LOGGER_LOG_WARN("Was not able to open file at path:{0}", path);
+        return result;
+    }
+
+    while (std::getline(sourceFile, line))
+    {
+        result += line + '\n';
+    }
+    return result;
 }
 
 bool OBJ_Viewer::ShaderClass::isShaderCompilerSuccessfully(const GLuint Shader)
@@ -127,10 +147,10 @@ bool OBJ_Viewer::ShaderClass::isProgramLinkedSuccessfully()const
     return true;
 }
 
-GLuint OBJ_Viewer::ShaderClass::compileShader(const GLenum shaderType, const std::string* shaderSource)
+GLuint OBJ_Viewer::ShaderClass::compileShader(const GLenum shaderType, const std::string& shaderSource)
 {
     GLuint shaderHandle =  glCreateShader(shaderType);
-    const char* source = shaderSource->c_str();
+    const char* source = shaderSource.c_str();
     //function expects array of strings so forced to this :)
     glShaderSource(shaderHandle, 1, &source, NULL);
     glCompileShader(shaderHandle);

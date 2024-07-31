@@ -26,6 +26,9 @@ void main()
 #Shader:fragment
 #version 330 core
 
+#include "ShaderCommonFunctions.glsl"
+
+
 out vec4 FragColor;
 in vec3 FragNormal;
 in vec3 FragPosition;
@@ -33,9 +36,6 @@ in vec3 FragPosition;
 uniform vec3 u_Color;
 
 void main()
-{
-	const float LIGHT_POW_FACTOR = 2.f; 
-	vec3 fragToCamDir = normalize(-FragPosition);
-	float lightFactor = pow(max(dot(fragToCamDir,FragNormal),0),LIGHT_POW_FACTOR);
-	FragColor = vec4(u_Color*lightFactor,1);
+{	
+	FragColor = vec4(GetStudioShading(FragPosition,FragNormal,u_Color),1);
 }

@@ -27,40 +27,6 @@ void main()
 	vs_out_studioData.FractLightSpaceNormal = normalize(vs_out_studioData.FractLightSpaceNormal);
 }
 
-#Shader:fragment
-#version 330 core
-
-out vec4 FragColor;
-noperspective in vec3 distance;
-
-in VS_OUT_STUDIO_DATA{
-    vec3 FractLightSpacePos;
-    vec3 FractLightSpaceNormal;
-}fs_in_studioData;
-
-
-uniform vec3 u_frameColor;
-uniform float frameThickness;
-
-vec3 GetStudioLightShading();
-
-void main()
-{
-    float minDist = min(distance.x,min(distance.y,distance.z));
-    float mixVal = smoothstep(frameThickness - 1, frameThickness + 1, minDist );
-    vec3 FinalColor = vec3(mix( u_frameColor, GetStudioLightShading(), mixVal ));
-    FragColor = vec4(FinalColor,1);
-}
-vec3 GetStudioLightShading()
-{
-    const float LIGHT_POW_FACTOR = 2.f; 
-
-	vec3 fragToCamDir = normalize(-fs_in_studioData.FractLightSpacePos);
-	float lightFactor = pow(max(dot(fragToCamDir,fs_in_studioData.FractLightSpaceNormal),0),LIGHT_POW_FACTOR);
-
-    return vec3(vec3(1)*lightFactor);
-}
-
 #Shader:geometry
 #version 330 core
 layout(triangles) in;
@@ -120,4 +86,31 @@ void main()
     EmitVertex();
 
     EndPrimitive();
+}
+
+#Shader:fragment
+#version 330 core
+
+#include "ShaderCommonFunctions.glsl"
+
+out vec4 FragColor;
+noperspective in vec3 distance;
+
+in VS_OUT_STUDIO_DATA{
+    vec3 FractLightSpacePos;
+    vec3 FractLightSpaceNormal;
+}fs_in_studioData;
+
+
+uniform vec3 u_frameColor;
+uniform float frameThickness;
+
+
+void main()
+{
+    float minDist = min(distance.x,min(distance.y,distance.z));
+    float mixVal = smoothstep(frameThickness - 1, frameThickness + 1, minDist );
+    vec3 FinalColor = vec3(mix( u_frameColor,
+    GetStudioShading(fs_in_studioData.FractLightSpacePos,fs_in_studioData.FractLightSpaceNormal,vec3(1)), mixVal ));
+    FragColor = vec4(FinalColor,1);
 }

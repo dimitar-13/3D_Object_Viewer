@@ -26,25 +26,22 @@ void main()
 #Shader:fragment
 #version 330 core
 
+#include "ShaderCommonFunctions.glsl"
+
 out vec4 FragColor;
 in vec3 FragNormal;
 in vec3 FragPosition;
 
 
-const vec3 frontFacingColor = vec3(0,0,1);
-const vec3 backFacingColor = vec3(1,0,0);
+const vec3 correctFacingColor = vec3(0,0,1);
+const vec3 incorrectFacingColor = vec3(1,0,0);
 
 
 void main()
 {
-	const float LIGHT_POW_FACTOR = 2.f; 
-	vec3 fragToCamDir = normalize(-FragPosition);
 
 	bool isNormalFacingCorrect = !(FragNormal.z <= 0 && !gl_FrontFacing);
+	vec3 FinalColor = isNormalFacingCorrect ? correctFacingColor : incorrectFacingColor;
 
-	vec3 FinalColor = isNormalFacingCorrect ? frontFacingColor : backFacingColor;
-
-	float lightFactor = pow(max(dot(fragToCamDir,abs(FragNormal)),0),LIGHT_POW_FACTOR);
-
-	FragColor = vec4(FinalColor*lightFactor,1);
+	FragColor = vec4(GetStudioShading(FragPosition,FragNormal,FinalColor),1);
 }

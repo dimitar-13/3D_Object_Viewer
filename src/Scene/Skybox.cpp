@@ -5,17 +5,17 @@
 OBJ_Viewer::Skybox::Skybox(const std::array<TexturePixelReader, Skybox::SKYBOX_FACE_COUNT>& textures):
 	m_skyboxVAO(GenerateCubeVAO(true))
 {
-	const Size2D SkyboxTextureSize = textures[0].GetTextureSize();
+	const Size2D skybox_texture_size = textures[0].GetTextureSize();
 
-	const size_t SKYBOX_FACE_TEXTURE_BUFFER_BYTE_SIZE = static_cast<size_t>(SkyboxTextureSize.height)
-		* static_cast<size_t>(SkyboxTextureSize.width) * textures[0].GetChannelCount();
+	const size_t kSkyboxPixelBufferByteSize = static_cast<size_t>(skybox_texture_size.height)
+		* static_cast<size_t>(skybox_texture_size.width) * textures[0].GetChannelCount();
 
-	BufferData pixelBufferData;
-	pixelBufferData.type = OPENGL_PIXEL_UNPACK_BUFFER;
-	pixelBufferData.usageType = OPENGL_STREAM_DRAW_BUFFER_USAGE;
-	pixelBufferData.bufferSize = SKYBOX_FACE_TEXTURE_BUFFER_BYTE_SIZE;
+	BufferData pixel_buffer_info;
+	pixel_buffer_info.type = BufferType_kPixelUnpackBuffer;
+	pixel_buffer_info.usageType = BufferUsageType_kStreamDraw;
+	pixel_buffer_info.bufferSize = kSkyboxPixelBufferByteSize;
 
-	m_CubeMapTextSize = SkyboxTextureSize;
+	m_CubeMapTextSize = skybox_texture_size;
 	m_format = textures[0].GetTextureFormat();
 
 #pragma region GPU side skybox settings
@@ -34,18 +34,18 @@ OBJ_Viewer::Skybox::Skybox(const std::array<TexturePixelReader, Skybox::SKYBOX_F
 
 	for (size_t i = 0; i < SKYBOX_FACE_COUNT; i++)
 	{	
-		pixelBufferData.data = textures[i].GetTexturePixelData();
+		pixel_buffer_info.data = textures[i].GetTexturePixelData();
 
-		m_PixelBuffers.emplace_back(pixelBufferData);
+		m_PixelBuffers.emplace_back(pixel_buffer_info);
 
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, m_format, SkyboxTextureSize.width, SkyboxTextureSize.height,
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, m_format, skybox_texture_size.width, skybox_texture_size.height,
 			0, m_format, GL_UNSIGNED_BYTE, textures[i].GetTexturePixelData());
 
 		TextureBuilder builder;
 
 		m_faceTextures.emplace_back(builder.SetTextureFormat(m_format).
-			SetTextureInternalFormat(static_cast<TextureInternalFormat>(m_format))
-			.SetTextureSize(SkyboxTextureSize).SetTexturePixelData(textures[i].GetTexturePixelData()).buildTexture());
+			SetTextureInternalFormat(static_cast<TextureInternalFormat_>(m_format))
+			.SetTextureSize(skybox_texture_size).SetTexturePixelData(textures[i].GetTexturePixelData()).buildTexture());
 	}
 
 	m_faceTextures[0]->UnbindTexture();

@@ -48,12 +48,12 @@ namespace OBJ_Viewer {
 
 	namespace APP_FOCUS_REGIONS {
 		typedef  const char* AppWindowID;
-		constexpr AppWindowID UI_LAYER_SCENE_WINDOW_NAME = "Scene";
-		constexpr AppWindowID UI_LAYER_OBJECT_LOADING_WINDOW_NAME = "Loading panel";
-		constexpr AppWindowID UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME = "ModelAndRenderingSettings";
-		constexpr AppWindowID UI_LAYER_SCENE_SETTINGS_WINDOW_NAME = "Scene setting";
-		constexpr AppWindowID UI_WINDOW_SCREENSHOT_SETTINGS = "Screenshot settings";
-		constexpr AppWindowID UI_WINDOW_APP_CONTROLINFO= "Application controls";
-		constexpr AppWindowID UI_WINDOW_UNKNOWN = "unknownWindow";
+		constexpr AppWindowID kUI_SceneWindowName = "Scene";
+		constexpr AppWindowID kUI_ObjectLoadingWindowName = "Loading panel";
+		constexpr AppWindowID kUI_Model_and_renderingSettingsWindowName = "ModelAndRenderingSettings";
+		constexpr AppWindowID kUI_SceneSettingsWindowName = "Scene setting";
+		constexpr AppWindowID kUI_WindowScreenshotSettings = "Screenshot settings";
+		constexpr AppWindowID kUI_ApplicationControlInfoWindowName= "Application controls";
+		constexpr AppWindowID kUI_WindowNameUnknown = "unknownWindow";
 	}
 }

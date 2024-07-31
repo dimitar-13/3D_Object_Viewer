@@ -1,45 +1,31 @@
 #pragma once
 #include "pch.h"
 namespace OBJ_Viewer {
-	enum TextureFormat
+	enum TextureFormat_
 	{
-		TEXTURE_FORMAT_UKNOWN = -1,
-		TEXTURE_FORMAT_R = GL_RED,
-		TEXTURE_FORMAT_RG = GL_RG,
-		TEXTURE_FORMAT_RGB = GL_RGB,
-		TEXTURE_FORMAT_RGBA = GL_RGBA
+		TextureFormat_kUnknown,
+		TextureFormat_kR = GL_RED,
+		TextureFormat_kRG = GL_RG,
+		TextureFormat_kRGB = GL_RGB,
+		TextureFormat_kRGBA = GL_RGBA
 	};
-	enum TextureInternalFormat {
-		TEXTURE_INTERNAL_FORMAT_DEPTH = GL_DEPTH_COMPONENT,
-		TEXTURE_INTERNAL_FORMAT_DEPTH_STENCIL = GL_DEPTH_STENCIL,
-		TEXTURE_INTERNAL_FORMAT_R = GL_RED,
-		TEXTURE_INTERNAL_FORMAT_RG = GL_RG,
-		TEXTURE_INTERNAL_FORMAT_RGB = GL_RGB,
-		TEXTURE_INTERNAL_FORMAT_RGBA = GL_RGBA,
+	enum TextureInternalFormat_ {
+		TextureInternalFormat_kDepth = GL_DEPTH_COMPONENT,
+		TextureInternalFormat_kDepth_and_stencil = GL_DEPTH_STENCIL,
+		TextureInternalFormat_kR = GL_RED,
+		TextureInternalFormat_kRG = GL_RG,
+		TextureInternalFormat_kRGB = GL_RGB,
+		TextureInternalFormat_kRGBA = GL_RGBA,
 	};
-	enum TextureFilter
+	enum TextureFilter_
 	{
-		TEXTURE_FILTER_LINEAR = GL_LINEAR,
-		TEXTURE_FILTER_NEAREST = GL_NEAREST
+		TextureFilter_kLinear = GL_LINEAR,
+		TextureFilter_kNearest = GL_NEAREST
 	};
-	enum TextureWrap
+	enum TextureWrap_
 	{
-		TEXTURE_WRAP_REPEAT = GL_REPEAT,
-		TEXTURE_WRAP_MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
-		TEXTURE_WRAP_CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-
-		//TODO:Add more option
+		TextureWrap_kRepeat = GL_REPEAT,
+		TextureWrap_kMirroredRepeat = GL_MIRRORED_REPEAT,
+		TextureWrap_kClampToEdge = GL_CLAMP_TO_EDGE,
 	};
-	enum TexturePixelDataType
-	{
-		TEXTURE_PIXEL_DATA_UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
-		TEXTURE_PIXEL_DATA_BYTE = GL_BYTE,
-		TEXTURE_PIXEL_DATA_UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
-		TEXTURE_PIXEL_DATA_SHORT = GL_SHORT,
-		TEXTURE_PIXEL_DATA_UNSIGNED_INT = GL_UNSIGNED_INT,
-		TEXTURE_PIXEL_DATA_INT = GL_INT,
-		TEXTURE_PIXEL_DATA_HALF_FLOAT = GL_HALF_FLOAT,
-		TEXTURE_PIXEL_DATA_FLOAT = GL_FLOAT
-	};
-
 }

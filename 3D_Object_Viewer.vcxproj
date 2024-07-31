@@ -228,6 +228,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Enums\GpuDataTypes.h" />
     <ClInclude Include="src\Rendering\ShaderLibrary.h" />
     <ClInclude Include="src\Enums\FIleImageEnums.h" />
     <ClInclude Include="src\Scene\MaterialRegistry.h" />

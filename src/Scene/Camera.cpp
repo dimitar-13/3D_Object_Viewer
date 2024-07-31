@@ -3,19 +3,19 @@
 #include "Camera.h"
 #include "Controls/AppKeyBindings.h"
 
-#define IS_Y_VECTOR_FLIPPED(X) std::cos(glm::radians(X)) < 0
+#define OBJ_VIEWER_IS_Y_VECTOR_FLIPPED(X) std::cos(glm::radians(X)) < 0
 #define ASPECT(X,Y) (float)X / (float)Y
 
-constexpr float Z_FAR = 100.0f;
-constexpr float Z_NEAR = 0.1f;
-constexpr float FOV = 45.0f;
-constexpr glm::vec3 CAMERA_DEFAULT_ORIGIN = glm::vec3{0,1.0f,0};
+constexpr float kZfar = 100.0f;
+constexpr float kZnear = 0.1f;
+constexpr float kFieldOfView = 45.0f;
+constexpr glm::vec3 kCameraDefaultOrigin = glm::vec3{0,1.0f,0};
 
 OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app):
-	m_app(app),m_cameraCenter(CAMERA_DEFAULT_ORIGIN)
+	m_app(app),m_cameraCenter(kCameraDefaultOrigin)
 {
 	this->m_zoom = CameraZoom;
-	m_projectionMatrix = glm::perspective(glm::radians(FOV), ASPECT(screenSize.width, screenSize.height), Z_NEAR, Z_FAR);
+	m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), ASPECT(screenSize.width, screenSize.height), kZnear, kZfar);
 
 	this->m_EulerAngles.m_pitchAngle = 0.0f;
 	this->m_EulerAngles.m_yawAngle = 90.0f;
@@ -37,14 +37,14 @@ void OBJ_Viewer::Camera::CalculatePositionVector()
 
 void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 {
-	constexpr float sensitivity = 0.01f;
-	constexpr float maxZoom = 0.002;
-	this->m_zoom += this->m_zoom - e.GetScrollPosition().y <= maxZoom ? 0 : -e.GetScrollPosition().y;
+	constexpr float kScrollSensitivity = 0.01f;
+	constexpr float kMaxScrollZoom = 0.002;
+	this->m_zoom += this->m_zoom - e.GetScrollPosition().y <= kMaxScrollZoom ? 0 : -e.GetScrollPosition().y;
 
 	if (!m_isProjectionPerspective)
 	{
-		Size2D windowSize = m_app.GetSceneViewport().GetViewportSize();
-		CalculateOthoProjection(windowSize);
+		Size2D current_window_size = m_app.GetSceneViewport().GetViewportSize();
+		CalculateOthoProjection(current_window_size);
 	}
 
 	RecalculateViewMatrix();
@@ -52,41 +52,41 @@ void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 
 void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
-	auto& mousePos = e.GetMousePos();
+	auto& current_mouse_position = e.GetMousePos();
 #pragma region Check for LMB
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_1) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MouseKey_kLeftMouseButton) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
-		m_EulerAngleHelper.calculateEulerAngles(mousePos);
+		m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_1) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MouseKey_kLeftMouseButton) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
-		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(mousePos);
+		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
 		CalculatePositionVector();
 	}
 #pragma endregion
 
 #pragma region  Check for RMB
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MOUSE_KEY_2) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
+	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MouseKey_kRightMouseButton) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
-		m_lastMousePos = mousePos;
+		m_lastMousePos = current_mouse_position;
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MOUSE_KEY_2) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME)
+	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MouseKey_kRightMouseButton) &&
+		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
-		constexpr float CAMERA_SHIFTING_SPEED = .005;
-		glm::mat3 viewSpaceOrthogonalVectors = glm::mat3(m_viewMatrix);
-		glm::vec3 viewDirectionVector(0);
+		constexpr float kCameraShiftingSpeed = .005;
+		glm::mat3 view_space_no_transform_matrix = glm::mat3(m_viewMatrix);
+		glm::vec3 view_space_delta_vector(0);
 		//We calculate the offset in camera/view space first.
-		Position2D delta = Position2D{ mousePos.x - m_lastMousePos.x,mousePos.y - m_lastMousePos.y};
-		viewDirectionVector.x = delta.x* CAMERA_SHIFTING_SPEED;
+		Position2D delta = Position2D{ current_mouse_position.x - m_lastMousePos.x,current_mouse_position.y - m_lastMousePos.y};
+		view_space_delta_vector.x = delta.x* kCameraShiftingSpeed;
 		//We flip the y since opengl flips its y component 
-		viewDirectionVector.y = -delta.y* CAMERA_SHIFTING_SPEED;
+		view_space_delta_vector.y = -delta.y* kCameraShiftingSpeed;
 		//TL;DR: We use transpose as a cheap inverse since the "viewSpaceOrthogonalVectors" is a 3 orthogonal vector matrix
 		//and then we bring our viewSpace delta into word space.
 		/*Why we do it like this ? 
@@ -95,9 +95,9 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		* axis that we can move. To find where we camera up/down and right/left in world space we have to find this plane. The best approach is to 
 		* calculate the movement in view space and then inverse the view matrix to get what the vector will be in world space.
 		*/
-		viewDirectionVector = glm::transpose(viewSpaceOrthogonalVectors) * viewDirectionVector;
-		m_lastMousePos = mousePos;
-		m_cameraCenter += viewDirectionVector;
+		view_space_delta_vector = glm::transpose(view_space_no_transform_matrix) * view_space_delta_vector;
+		m_lastMousePos = current_mouse_position;
+		m_cameraCenter += view_space_delta_vector;
 		RecalculateViewMatrix();
 	}
 #pragma endregion
@@ -106,15 +106,15 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 
 void OBJ_Viewer::Camera::onViewportChanged(SceneViewportResizeEvent& e)
 {
-	const Size2D winSize = e.GetViewportSize();
-	RecalculateProjection(winSize);
+	const Size2D window_size = e.GetViewportSize();
+	RecalculateProjection(window_size);
 }
 
 void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 {
-	if (e.GetKeyCode() == AppKeyBinding::KEY_BIND_RESET_CAMERA_PIVOT)
+	if (e.GetKeyCode() == AppKeyBinding_::AppKeyBinding_kResetCameraPivot)
 	{
-		m_cameraCenter = CAMERA_DEFAULT_ORIGIN;
+		m_cameraCenter = kCameraDefaultOrigin;
 		RecalculateViewMatrix();
 	}
 }
@@ -124,7 +124,7 @@ void OBJ_Viewer::Camera::RecalculateProjection(Size2D windowSize)
 	windowSize = (windowSize.width == 0 || windowSize.height == 0) ? m_app.GetSceneViewport().GetViewportSize() : windowSize;
 
 	if (m_isProjectionPerspective)
-		m_projectionMatrix = glm::perspective(glm::radians(FOV), ASPECT(windowSize.width, windowSize.height) , Z_NEAR, Z_FAR);
+		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), ASPECT(windowSize.width, windowSize.height) , kZnear, kZfar);
 	else
 		CalculateOthoProjection(windowSize);
 }
@@ -137,43 +137,43 @@ void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e
 
 void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D windowSize)
 {
-	constexpr float ORTHOGRAPHIC_SCALE_FACTOR = 500.0f;
+	constexpr float kOrthographicScaleFactor = 500.0f;
 
-	float orthoScale = this->m_zoom / ORTHOGRAPHIC_SCALE_FACTOR;
+	float orthographic_scale = this->m_zoom / kOrthographicScaleFactor;
 	/*Orthographic projection doesn't really have a zoom since all you see must stay true to its size so instead we shrink the
 	* box defined by the left,right,bottom,top planes so that smaller values will get bigger meaning that since ortho matrix
 	* is just a scale and translate we make the scale bigger by multiplying left,right,bottom,top with the 'orthoScale'.
 	*/
-	m_projectionMatrix = glm::ortho(-((float)windowSize.width / 2) * orthoScale, ((float)windowSize.width / 2) * orthoScale,
-		-((float)windowSize.height / 2) * orthoScale, ((float)windowSize.height / 2) * orthoScale, -1.f/ orthoScale, Z_FAR);
+	m_projectionMatrix = glm::ortho(-((float)windowSize.width / 2) * orthographic_scale, ((float)windowSize.width / 2) * orthographic_scale,
+		-((float)windowSize.height / 2) * orthographic_scale, ((float)windowSize.height / 2) * orthographic_scale, -1.f/ orthographic_scale, kZfar);
 }
 
 
 
 void OBJ_Viewer::Camera::RecalculateViewMatrix()
 {
-	glm::vec3 upVec(0, 1, 0);
-	upVec.y *= IS_Y_VECTOR_FLIPPED(this->m_EulerAngles.m_pitchAngle) ? -1 : 1;
-	m_viewMatrix = glm::lookAt(m_position * m_zoom + m_cameraCenter, m_cameraCenter, upVec);
+	glm::vec3 up_vector(0, 1, 0);
+	up_vector.y *= OBJ_VIEWER_IS_Y_VECTOR_FLIPPED(this->m_EulerAngles.m_pitchAngle) ? -1 : 1;
+	m_viewMatrix = glm::lookAt(m_position * m_zoom + m_cameraCenter, m_cameraCenter, up_vector);
 }
 
 void OBJ_Viewer::Camera::OnEvent(Event& e)
 {
 	switch (e.GetEventType())
 	{
-	case EVENT_SCENE_VIEWPORT_SIZE_CHANGED:
+	case EventType_kViewportSizeChanged:
 		this->onViewportChanged(dynamic_cast<SceneViewportResizeEvent&>(e));
 		break;
-	case EVENT_MOUSE_POSITION_CHANGED:
+	case EventType_kMousePositionChanged:
 		this->onMousePositionChanged(dynamic_cast<MousePositionEvent&>(e));
 		break;
-	case EVENT_MOUSE_SCROLL_CHANGED:
+	case EventType_kMouseScrollChanged:
 		this->onScrollChanged(dynamic_cast<ScrollPositionChanged&>(e));
 		break;
-	case EVENT_KEY_PRESSES:
+	case EventType_kKeyPressed:
 		this->onKeyPressedEvent(dynamic_cast<KeyboardKeyEvent&>(e));
 		break;
-	case EVENT_CAMERA_PROJECTION_TYPE_CHANGED:
+	case EventType_kCameraProjectionChanged:
 		this->OnProjectionModeChanged(dynamic_cast<EventCameraProjectionChanged&>(e));
 		break;
 	default:

@@ -7,20 +7,20 @@
 
 void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
-	GLFWwindow* window = this->m_application.GetGlobalAppWindow().GetGLFW_Window();
+	GLFWwindow* application_window = this->m_application.GetGlobalAppWindow().GetGLFW_Window();
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
 	//glCullFace(GL_BACK);
 
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(application_window))
 	{
 		if (m_currentWindowState != WINDOW_STATE_MINIMIZED) {
 			if (!m_application.isUIHidden())
 				m_UILayer->RenderUI();
 
 			RenderScene();
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(application_window);
 		}
 		glfwPollEvents();
 
@@ -31,7 +31,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 
 void OBJ_Viewer::RenderingCoordinator::RenderScene()
 {
-	auto& appSettings =	m_application.GetScene_RefSettings();
+	auto& application_rendering_config_settings = m_application.GetScene_RefSettings();
 
 	//Set up the renderer based on the settings;
  
@@ -43,57 +43,61 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 	if (m_application.isUIHidden())
 	{
-		m_sceneRenderer->RenderScene(appSettings);
+		m_sceneRenderer->RenderScene(application_rendering_config_settings);
 	}
 	else
-		m_sceneRenderer->RenderScene(appSettings, &m_UILayer->GetInputFramebuffer());
+		m_sceneRenderer->RenderScene(application_rendering_config_settings, &m_UILayer->GetInputFramebuffer());
 
 }
 
 void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEvent& e)
 {
-	auto& renderingConfig = m_application.GetScene_RefSettings();
+	auto& application_rendering_config_settings = m_application.GetScene_RefSettings();
 	//App state saving
-	const bool APP_PREVIOUS_SKYBOX_STATE = renderingConfig.m_isSkyboxOn;
-	const bool APP_PREVIOUS_GRID_STATE = renderingConfig.m_isWireGridOn;
-	const Viewport& APP_PREVIOUS_VIEWPORT = m_application.GetSceneViewport().GetViewport();
-	const ImgOutputData& EVENT_DATA = e.ImgData();
-	const TextureFormat USE_TRANSPERANT_FORMAT =EVENT_DATA.allowTransparency ? TextureFormat::TEXTURE_FORMAT_RGBA :
-		TextureFormat::TEXTURE_FORMAT_RGB;
+	const bool kPreviousSkyboxEnableState = application_rendering_config_settings.m_isSkyboxOn;
+	const bool kPreviousGridEnableState = application_rendering_config_settings.m_isWireGridOn;
+
+	const Viewport& kPreviousApplicationViewport = m_application.GetSceneViewport().GetViewport();
+	const ImgOutputData& kEventDataImageData = e.ImgData();
+	TextureFormat_ is_output_image_with_transparency = kEventDataImageData.allowTransparency ? TextureFormat_::TextureFormat_kRGBA :
+		TextureFormat_::TextureFormat_kRGB;
 
 	Viewport OutputImageViewport{};
-	OutputImageViewport.x = 0;
-	OutputImageViewport.y = 0;
-	OutputImageViewport.width = EVENT_DATA.imgSize.width;
-	OutputImageViewport.height = EVENT_DATA.imgSize.height;
+	OutputImageViewport.width = kEventDataImageData.imgSize.width;
+	OutputImageViewport.height = kEventDataImageData.imgSize.height;
 
 	//Change app state
-	renderingConfig.m_isSkyboxOn = renderingConfig.m_isSkyboxOn   && !EVENT_DATA.renderObjectOnly;
-	renderingConfig.m_isWireGridOn = renderingConfig.m_isWireGridOn && !EVENT_DATA.renderObjectOnly;
+	application_rendering_config_settings.m_isSkyboxOn = 
+		application_rendering_config_settings.m_isSkyboxOn && !kEventDataImageData.renderObjectOnly;
+	application_rendering_config_settings.m_isWireGridOn = 
+		application_rendering_config_settings.m_isWireGridOn && !kEventDataImageData.renderObjectOnly;
+
 	m_application.SubmitSceneViewportSize(OutputImageViewport);
 
-	m_sceneRenderer->RenderScene(renderingConfig, &m_UILayer->GetInputFramebuffer());
+	m_sceneRenderer->RenderScene(application_rendering_config_settings, &m_UILayer->GetInputFramebuffer());
 
 	glFinish();
 	
-	const std::shared_ptr<std::vector<Framebuffer::pixel_component>> renderScenePixelData = 
-		std::make_shared<std::vector<Framebuffer::pixel_component>>(m_UILayer->GetInputFramebuffer().GetFramebufferPixels(USE_TRANSPERANT_FORMAT));
+	std::shared_ptr<std::vector<Framebuffer::pixel_component>> output_image_pixel_data = 
+		std::make_shared<std::vector<Framebuffer::pixel_component>>(m_UILayer->GetInputFramebuffer().GetFramebufferPixels(is_output_image_with_transparency));
 
-	m_saveImgResult = std::async(std::launch::async, TexturePixelSaver::SavePicture, EVENT_DATA.outPath, EVENT_DATA.imgSize,
-		USE_TRANSPERANT_FORMAT,renderScenePixelData, EVENT_DATA.outImgFormat);
+	m_saveImgResult = 
+		std::async(std::launch::async, TexturePixelSaver::SavePicture, kEventDataImageData.outPath, kEventDataImageData.imgSize,
+		is_output_image_with_transparency, output_image_pixel_data, kEventDataImageData.outImgFormat);
 
 	//Restore original state
-	m_application.SubmitSceneViewportSize(APP_PREVIOUS_VIEWPORT);
-	renderingConfig.m_isSkyboxOn = APP_PREVIOUS_SKYBOX_STATE;
-	renderingConfig.m_isWireGridOn = APP_PREVIOUS_GRID_STATE;
+	m_application.SubmitSceneViewportSize(kPreviousApplicationViewport);
+
+	application_rendering_config_settings.m_isSkyboxOn = kPreviousSkyboxEnableState;
+	application_rendering_config_settings.m_isWireGridOn = kPreviousGridEnableState;
 
 }
 
 void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)
 {
-	if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_WINDOW_STATE_CHANGED)
+	if (e.GetEventCategory() & EventCategory_kAppEvent && e.GetEventType() == EventType_kWindowStateChanged)
 		m_currentWindowState = dynamic_cast<WindowStateChangedEvent&>(e).GetWindowState();
-	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_SCREENSHOT_BUTTON_PRESSED)
+	else if (e.GetEventCategory() & EventCategory_kAppEvent && e.GetEventType() == EventType_kScreenshotButtonPressed)
 		onEventTakeScreenshot(dynamic_cast<ScreenshotEvent&>(e));
 }
 

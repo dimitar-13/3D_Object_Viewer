@@ -30,13 +30,13 @@ namespace OBJ_Viewer {
 
 	struct TextureFormatEnumConverter
 	{
-		static constexpr TextureFormat GetFormatByChannelCount(int channelCount);
-		static constexpr uint8_t GetChannelCountByFormat(TextureFormat format);
+		static constexpr TextureFormat_ GetFormatByChannelCount(int channelCount);
+		static constexpr uint8_t GetChannelCountByFormat(TextureFormat_ format);
 	};
 	struct TextureFileEnumConverter
 	{
-		static std::string_view GetStringTextureFormatFromEnum(ImageFileFormat val);
-		static std::string_view GetStringTextureFileExtensionFormatFromEnum(ImageFileFormat val);
+		static std::string_view GetStringTextureFormatFromEnum(ImageFileFormat_ val);
+		static std::string_view GetStringTextureFileExtensionFormatFromEnum(ImageFileFormat_ val);
 	};
 
 
@@ -44,11 +44,11 @@ namespace OBJ_Viewer {
 	{	
 	public:
 		static int SavePicture(std::string filePath_name, Size2D imageSize,
-			TextureFormat textureChanelFormat, std::shared_ptr<std::vector<unsigned char>> pixelDataToSave,ImageFileFormat imageSaveFormat);
+			TextureFormat_ textureChanelFormat, std::shared_ptr<std::vector<unsigned char>> pixelDataToSave,ImageFileFormat_ imageSaveFormat);
 	private:
-		static int SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);
-		static int SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);
-		static int SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);
+		static int SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave);
+		static int SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave);
+		static int SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave);
 	};
 
 	class TexturePixelReader
@@ -58,13 +58,13 @@ namespace OBJ_Viewer {
 		~TexturePixelReader(){ stbi_image_free(m_pixelData); }
 		unsigned char* GetTexturePixelData()const { return m_pixelData; }
 		Size2D GetTextureSize()const { return m_textureSize; }
-		TextureFormat GetTextureFormat()const { return m_textureFormat; }
+		TextureFormat_ GetTextureFormat()const { return m_textureFormat; }
 		bool isTextureValid()const { return m_pixelData != nullptr; }
 		uint8_t GetChannelCount()const { return TextureFormatEnumConverter::GetFormatByChannelCount(m_textureFormat); }
 	private:
 		unsigned char* m_pixelData = nullptr;
 		Size2D m_textureSize {};
-		TextureFormat m_textureFormat{};
+		TextureFormat_ m_textureFormat{};
 	};
 	
 }

@@ -4,7 +4,7 @@
 #include "Helpers/TextureHelpers.h"
 #include "Profiling/AppProfiler.h"
 
-OBJ_Viewer::ModelLoader::ModelLoader(const char* modelFilePath, LoadModelFileType modelFileType):
+OBJ_Viewer::ModelLoader::ModelLoader(const char* modelFilePath, LoadModelFileType_ modelFileType):
 	m_currentlyLoadingType(modelFileType)
 {
 	Timer timer;
@@ -33,13 +33,13 @@ OBJ_Viewer::ModelLoader::ModelLoader(const char* modelFilePath, LoadModelFileTyp
 
 	ReadSceneFile(scene->mRootNode, scene);
 
-	auto meshArray = CreateMeshArray();
+	auto scene_mesh_array = CreateMeshArray();
 
 	m_ModelData.textureCount = m_materialRegistry->GetRegistryTextureCount();
 	m_ModelData.modelPath = std::string(modelFilePath);
 
 	PostProcessScene();
-	m_loadedScene = new Model(meshArray,m_SceneAppNormalizeMatrix, m_ModelData);
+	m_loadedScene = new Model(scene_mesh_array,m_SceneAppNormalizeMatrix, m_ModelData);
 }
 
 void OBJ_Viewer::ModelLoader::ReadSceneFile(aiNode* node, const aiScene* scene)
@@ -49,17 +49,17 @@ void OBJ_Viewer::ModelLoader::ReadSceneFile(aiNode* node, const aiScene* scene)
 
 void OBJ_Viewer::ModelLoader::ReadNode(aiNode *node, const aiScene *scene)
 {
-	glm::mat4 transformMatrix(1);
+	glm::mat4 mesh_transform_matrix(1);
 
 	for (rsize_t i =0; i < node->mNumMeshes;i++)
 	{
 		if (node->mParent != nullptr)
-			transformMatrix = AssimpToGlmMatrix4x4(node->mParent->mTransformation* node->mTransformation);
+			mesh_transform_matrix = AssimpToGlmMatrix4x4(node->mParent->mTransformation* node->mTransformation);
 
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
 		m_meshThreadResults.emplace_back(std::async(std::launch::async,
-			&ModelLoader::ReadMesh,this, mesh, transformMatrix));
+			&ModelLoader::ReadMesh,this, mesh, mesh_transform_matrix));
 	}
 
 	for (rsize_t i = 0; i < node->mNumChildren; i++)
@@ -71,124 +71,128 @@ void OBJ_Viewer::ModelLoader::ReadNode(aiNode *node, const aiScene *scene)
 
 std::unique_ptr<std::vector<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateMeshArray()
 {
-	std::unique_ptr<std::vector<Mesh>> result = std::make_unique<std::vector<Mesh>>();
-	result->reserve(m_meshThreadResults.size());
+	std::unique_ptr<std::vector<Mesh>> mesh_vector_result = std::make_unique<std::vector<Mesh>>();
+
+	mesh_vector_result->reserve(m_meshThreadResults.size());
 
 	for (size_t i = 0; i < m_meshThreadResults.size(); i++)
 	{
-		const ReadMeshData& threadResult = m_meshThreadResults[i].get();
+		const ReadMeshData& mesh_reading_thread_result = m_meshThreadResults[i].get();
 
-		m_sceneBoundingBox.max.x = std::max(threadResult.meshBoundingBox.max.x,m_sceneBoundingBox.max.x);
-		m_sceneBoundingBox.max.y = std::max(threadResult.meshBoundingBox.max.y,m_sceneBoundingBox.max.y);
-		m_sceneBoundingBox.max.z = std::max(threadResult.meshBoundingBox.max.z,m_sceneBoundingBox.max.z);
+		m_sceneBoundingBox.max.x = std::max(mesh_reading_thread_result.mesh_bounding_box.max.x,m_sceneBoundingBox.max.x);
+		m_sceneBoundingBox.max.y = std::max(mesh_reading_thread_result.mesh_bounding_box.max.y,m_sceneBoundingBox.max.y);
+		m_sceneBoundingBox.max.z = std::max(mesh_reading_thread_result.mesh_bounding_box.max.z,m_sceneBoundingBox.max.z);
 
-		m_sceneBoundingBox.min.x = std::min(threadResult.meshBoundingBox.min.x,m_sceneBoundingBox.min.x);
-		m_sceneBoundingBox.min.y = std::min(threadResult.meshBoundingBox.min.y,m_sceneBoundingBox.min.y);
-		m_sceneBoundingBox.min.z = std::min(threadResult.meshBoundingBox.min.z,m_sceneBoundingBox.min.z);
+		m_sceneBoundingBox.min.x = std::min(mesh_reading_thread_result.mesh_bounding_box.min.x,m_sceneBoundingBox.min.x);
+		m_sceneBoundingBox.min.y = std::min(mesh_reading_thread_result.mesh_bounding_box.min.y,m_sceneBoundingBox.min.y);
+		m_sceneBoundingBox.min.z = std::min(mesh_reading_thread_result.mesh_bounding_box.min.z,m_sceneBoundingBox.min.z);
 
-		m_ModelData.meshInfo.faceCount += threadResult.meshInfo.faceCount;
-		m_ModelData.meshInfo.vertexCount += threadResult.meshInfo.vertexCount;
-		m_ModelData.meshInfo.triangleCount += threadResult.meshInfo.triangleCount;
+		m_ModelData.meshInfo.faceCount += mesh_reading_thread_result.mesh_Information.faceCount;
+		m_ModelData.meshInfo.vertexCount += mesh_reading_thread_result.mesh_Information.vertexCount;
+		m_ModelData.meshInfo.triangleCount += mesh_reading_thread_result.mesh_Information.triangleCount;
 
-		result->emplace_back(std::make_unique<VertexAttributeObject>(threadResult.vertexData, threadResult.indexData),
-			m_materialRegistry->GetMaterialAtIndex(threadResult.meshMaterialID).lock());
+		mesh_vector_result->emplace_back(std::make_unique<VertexAttributeObject>(mesh_reading_thread_result.vertex_data_vector, mesh_reading_thread_result.index_data_vector),
+			m_materialRegistry->GetMaterialAtIndex(mesh_reading_thread_result.mesh_material_ID).lock());
 	}
 
-	return result;
+	return mesh_vector_result;
 }
 
 OBJ_Viewer::ReadMeshData OBJ_Viewer::ModelLoader::ReadMesh(const aiMesh* assimpMesh,const glm::mat4 MeshTransform)
 {
-	ReadMeshData result;
-	result.meshMaterialID = assimpMesh->mMaterialIndex;
+	ReadMeshData mesh_data_result;
+	mesh_data_result.mesh_material_ID = assimpMesh->mMaterialIndex;
 
-	result.vertexData.resize(assimpMesh->mNumVertices);
+	mesh_data_result.vertex_data_vector.resize(assimpMesh->mNumVertices);
 
-	const glm::mat3 NormalMatrix = glm::mat3(glm::transpose(glm::inverse(MeshTransform)));
+	const glm::mat3 normal_matrix = glm::mat3(glm::transpose(glm::inverse(MeshTransform)));
 
 	for (size_t i = 0; i < assimpMesh->mNumVertices;i++)
 	{
-		result.vertexData[i].position.x = assimpMesh->mVertices[i].x;
-		result.vertexData[i].position.y = assimpMesh->mVertices[i].y;
-		result.vertexData[i].position.z = assimpMesh->mVertices[i].z;
+		mesh_data_result.vertex_data_vector[i].position.x = assimpMesh->mVertices[i].x;
+		mesh_data_result.vertex_data_vector[i].position.y = assimpMesh->mVertices[i].y;
+		mesh_data_result.vertex_data_vector[i].position.z = assimpMesh->mVertices[i].z;
 
 		//Pre-bake the transformation into the mesh position data.
-		result.vertexData[i].position = MeshTransform * glm::vec4(result.vertexData[i].position,1);
+		mesh_data_result.vertex_data_vector[i].position = MeshTransform * glm::vec4(mesh_data_result.vertex_data_vector[i].position,1);
 
-		result.meshBoundingBox.max.x = std::max(result.meshBoundingBox.max.x, result.vertexData[i].position.x);
-		result.meshBoundingBox.max.y = std::max(result.meshBoundingBox.max.y, result.vertexData[i].position.y);
-		result.meshBoundingBox.max.z = std::max(result.meshBoundingBox.max.z, result.vertexData[i].position.z);
+		mesh_data_result.mesh_bounding_box.max.x = std::max(mesh_data_result.mesh_bounding_box.max.x, mesh_data_result.vertex_data_vector[i].position.x);
+		mesh_data_result.mesh_bounding_box.max.y = std::max(mesh_data_result.mesh_bounding_box.max.y, mesh_data_result.vertex_data_vector[i].position.y);
+		mesh_data_result.mesh_bounding_box.max.z = std::max(mesh_data_result.mesh_bounding_box.max.z, mesh_data_result.vertex_data_vector[i].position.z);
 
-		result.meshBoundingBox.min.x = std::min(result.meshBoundingBox.min.x, result.vertexData[i].position.x);
-		result.meshBoundingBox.min.y = std::min(result.meshBoundingBox.min.y, result.vertexData[i].position.y);
-		result.meshBoundingBox.min.z = std::min(result.meshBoundingBox.min.z, result.vertexData[i].position.z);
+		mesh_data_result.mesh_bounding_box.min.x = std::min(mesh_data_result.mesh_bounding_box.min.x, mesh_data_result.vertex_data_vector[i].position.x);
+		mesh_data_result.mesh_bounding_box.min.y = std::min(mesh_data_result.mesh_bounding_box.min.y, mesh_data_result.vertex_data_vector[i].position.y);
+		mesh_data_result.mesh_bounding_box.min.z = std::min(mesh_data_result.mesh_bounding_box.min.z, mesh_data_result.vertex_data_vector[i].position.z);
 
 		if (assimpMesh->mTextureCoords[0])
 		{
-			result.vertexData[i].uvCoords.x = assimpMesh->mTextureCoords[0][i].x;
-			result.vertexData[i].uvCoords.y = assimpMesh->mTextureCoords[0][i].y;
+			mesh_data_result.vertex_data_vector[i].uvCoords.x = assimpMesh->mTextureCoords[0][i].x;
+			mesh_data_result.vertex_data_vector[i].uvCoords.y = assimpMesh->mTextureCoords[0][i].y;
 		}
 		else
-			result.vertexData[i].uvCoords = glm::vec2(0.0f, 0.0f);
+			mesh_data_result.vertex_data_vector[i].uvCoords = glm::vec2(0.0f, 0.0f);
 
 		if (assimpMesh->mNormals != nullptr)
 		{
-			result.vertexData[i].normal.x = assimpMesh->mNormals[i].x;
-			result.vertexData[i].normal.y = assimpMesh->mNormals[i].y;
-			result.vertexData[i].normal.z = assimpMesh->mNormals[i].z;
-			result.vertexData[i].normal = NormalMatrix * result.vertexData[i].normal;
+			mesh_data_result.vertex_data_vector[i].normal.x = assimpMesh->mNormals[i].x;
+			mesh_data_result.vertex_data_vector[i].normal.y = assimpMesh->mNormals[i].y;
+			mesh_data_result.vertex_data_vector[i].normal.z = assimpMesh->mNormals[i].z;
+			mesh_data_result.vertex_data_vector[i].normal = normal_matrix * mesh_data_result.vertex_data_vector[i].normal;
 		}
 		if (assimpMesh->mTangents != nullptr)
 		{
-			result.vertexData[i].tangent.x = assimpMesh->mTangents[i].x;
-			result.vertexData[i].tangent.y = assimpMesh->mTangents[i].y;
-			result.vertexData[i].tangent.z = assimpMesh->mTangents[i].z;
-			result.vertexData[i].tangent = NormalMatrix * result.vertexData[i].tangent;
+			mesh_data_result.vertex_data_vector[i].tangent.x = assimpMesh->mTangents[i].x;
+			mesh_data_result.vertex_data_vector[i].tangent.y = assimpMesh->mTangents[i].y;
+			mesh_data_result.vertex_data_vector[i].tangent.z = assimpMesh->mTangents[i].z;
+			mesh_data_result.vertex_data_vector[i].tangent = normal_matrix * mesh_data_result.vertex_data_vector[i].tangent;
 		}
 	}
-	constexpr uint8_t INDEX_MAX_COUNT = 3;
-	const size_t VECTOR_ALLOCATION_SIZE = static_cast<size_t>(assimpMesh->mNumFaces * 3);
+	constexpr uint8_t kIndexMaxCount = 3;
+	const size_t kVectorAllocationSize = static_cast<size_t>(assimpMesh->mNumFaces * 3);
 
-	result.indexData.reserve(VECTOR_ALLOCATION_SIZE);
+	mesh_data_result.index_data_vector.reserve(kVectorAllocationSize);
 
 	for (size_t i = 0; i < assimpMesh->mNumFaces; i++)
 	{
 		aiFace face = assimpMesh->mFaces[i];
 		for (size_t j = 0; j < face.mNumIndices; j++)
-			result.indexData.push_back(face.mIndices[j]);
+			mesh_data_result.index_data_vector.push_back(face.mIndices[j]);
 	}
 	
-	result.meshInfo.faceCount = assimpMesh->mNumFaces;
-	result.meshInfo.vertexCount = assimpMesh->mNumVertices;
-	result.meshInfo.triangleCount = result.meshInfo.vertexCount / 3;
+	mesh_data_result.mesh_Information.faceCount = assimpMesh->mNumFaces;
+	mesh_data_result.mesh_Information.vertexCount = assimpMesh->mNumVertices;
+	mesh_data_result.mesh_Information.triangleCount = mesh_data_result.mesh_Information.vertexCount / 3;
 
-	return result;
+	return mesh_data_result;
 }
 
 void OBJ_Viewer::ModelLoader::PostProcessScene()
 {
 	//We approximate a vector that covers our scene size. Like a box around out scene
-	glm::vec3 boundingBoxRange = m_sceneBoundingBox.max - m_sceneBoundingBox.min;
-	glm::vec3 SceneOrigin = m_sceneBoundingBox.min + (boundingBoxRange/2.0f);
+	glm::vec3 bounding_box_range = m_sceneBoundingBox.max - m_sceneBoundingBox.min;
+	glm::vec3 scene_origin = m_sceneBoundingBox.min + (bounding_box_range/2.0f);
 
 	//We use the "-m_sceneBoundingBox.min.y" because we want the scene to be standing above the XZ plane.
-	glm::vec3 toOriginTransformVector = glm::vec3{-SceneOrigin.x , -m_sceneBoundingBox.min.y, -SceneOrigin.z };
+	glm::vec3 toOriginTransformVector = glm::vec3{-scene_origin.x , -m_sceneBoundingBox.min.y, -scene_origin.z };
 
-	constexpr float APP_SCALING_UNIT = 10.f;
-	float scaleFactor = glm::length(boundingBoxRange);
+	constexpr float kApplicationScaleUnit = 10.f;
+	float scale_factor = glm::length(bounding_box_range);
 	
 	//By inversing it we say ok if scaleFactor/(approximated scene size) is small then scale it up if it's too big then scale it down.
 	//We also bring the scale factor to range [0:1].
-	scaleFactor = 1.0f / scaleFactor;
-	const glm::mat4 TO_ORIGIN_TRANSFORM = glm::translate(glm::mat4(1), toOriginTransformVector);
-	m_SceneAppNormalizeMatrix = glm::scale(m_SceneAppNormalizeMatrix,glm::vec3(APP_SCALING_UNIT*scaleFactor))* TO_ORIGIN_TRANSFORM;
+
+	scale_factor = 1.0f / scale_factor;
+
+	const glm::mat4 kTransformSceneToOriginMatrix = glm::translate(glm::mat4(1), toOriginTransformVector);
+	m_SceneAppNormalizeMatrix = 
+		glm::scale(m_SceneAppNormalizeMatrix,glm::vec3(kApplicationScaleUnit* scale_factor))* kTransformSceneToOriginMatrix;
 }
 
 std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::LoadSceneMaterials(const aiScene* scene)
 {
-	std::vector<std::shared_ptr<Material>> result;
+	std::vector<std::shared_ptr<Material>> material_vector_result;
 
-	result.reserve(scene->mNumMaterials);
+	material_vector_result.reserve(scene->mNumMaterials);
 
 	TypeMaterialRepresentation matRepresentation(m_currentlyLoadingType);
 
@@ -214,17 +218,17 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::Load
 		AddTextureToMaterialDataIfValid(data, MATERIAL_TEXTURE_ROUGHNESS_METALLIC,
 			ReadTexture(scene->mMaterials[i], matRepresentation.specularRoughnessEnum));
 
-		result.emplace_back(std::make_shared<Material>(scene->mMaterials[i]->GetName().C_Str(), data));
+		material_vector_result.emplace_back(std::make_shared<Material>(scene->mMaterials[i]->GetName().C_Str(), data));
 	}
-	return result;
+	return material_vector_result;
 }
 std::string OBJ_Viewer::ModelLoader::GetTrueTexturePathString(const aiString& texturePath)const
 {
 	//If textures are not in the same disk location or don't share common path assimp will return absolute path.
 	//that's why we need to check for that and return either concatenated path or the absolute path from assimp.
 
-	std::filesystem::path fileSysPath(texturePath.C_Str());
-	if (fileSysPath.is_absolute())
+	std::filesystem::path file_system_path(texturePath.C_Str());
+	if (file_system_path.is_absolute())
 		return std::string(texturePath.C_Str());
 
 	return std::string(m_modelPath + texturePath.C_Str());
@@ -252,19 +256,19 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 	if (mat->GetTextureCount(type) == 0)
 		return std::shared_ptr<Texture>();
 
-	aiString retrievedTexturePath;
-	mat->GetTexture(type, 0, &retrievedTexturePath);
-	std::string resolvedTexturePath = GetTrueTexturePathString(retrievedTexturePath);
+	aiString retrieved_texture_path;
+	mat->GetTexture(type, 0, &retrieved_texture_path);
+	std::string resolved_texture_path = GetTrueTexturePathString(retrieved_texture_path);
 	
-	TextureBuilder textureBuilder;
+	TextureBuilder texture_builder;
 
-	TexturePixelReader textureReader(resolvedTexturePath.c_str());
+	TexturePixelReader texture_data_reader (resolved_texture_path.c_str());
 
-	TextureFormat format = textureReader.GetTextureFormat();
+	TextureFormat_ texture_format = texture_data_reader.GetTextureFormat();
 
-	return textureBuilder.SetTextureSize(textureReader.GetTextureSize()).
-			SetTexturePixelData(textureReader.GetTexturePixelData()).
-			SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).
-			SetTextureFormat(format).buildTexture();
+	return texture_builder.SetTextureSize(texture_data_reader.GetTextureSize()).
+			SetTexturePixelData(texture_data_reader.GetTexturePixelData()).
+			SetTextureInternalFormat(static_cast<TextureInternalFormat_>(texture_format)).
+			SetTextureFormat(texture_format).buildTexture();
 	
 }

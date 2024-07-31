@@ -1,10 +1,11 @@
 #pragma once
 namespace OBJ_Viewer {
 
-	enum ImageFileFormat
+	enum ImageFileFormat_
 	{
-		IMAGE_FORMAT_PNG,
-		IMAGE_FORMAT_JPEG,
-		IMAGE_FORMAT_BMP,
+		ImageFileFormat_kUknown,
+		ImageFileFormat_kPNG,
+		ImageFileFormat_kJPEG,
+		ImageFileFormat_kBMP,
 	};
 }

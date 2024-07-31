@@ -21,8 +21,8 @@ namespace OBJ_Viewer
 	public:
 		using IndexDataType = unsigned int;
 
-		VertexAttributeObject(const std::vector<Vertex>& vertexData,const std::vector<IndexDataType>& indexData);
-		VertexAttributeObject(const std::vector<glm::vec3>& vertexData,const std::vector<IndexDataType>& indexData);
+		VertexAttributeObject(const std::vector<Vertex>& kVertexDataVectorRef,const std::vector<IndexDataType>& kIndexDataVectorRef);
+		VertexAttributeObject(const std::vector<glm::vec3>& kPostionDataVectorRef, const std::vector<IndexDataType>& kIndexDataVectorRef);
 		size_t GetIndexCount()const { return this->m_vertexData.indexCount; }
 		size_t GetVertexCount()const { return this->m_vertexData.vertexCount; }
 		void BindBuffer()const{ glBindVertexArray(this->m_vertexAttributeObjHandle); }

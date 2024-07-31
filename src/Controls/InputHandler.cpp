@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "InputHandler.h"
 
-OBJ_Viewer::KeyState OBJ_Viewer::KeyboardInputStateManager::GetKeyState(KeyboardKey key)
+OBJ_Viewer::KeyState_ OBJ_Viewer::KeyboardInputStateManager::GetKeyState(KeyboardKey_ key)
 {
 	if (m_keyHashes.find(key) == m_keyHashes.end())
-		return KEY_STATE_UKNOWN;
+		return KeyState_kUnknown;
 
-	KeyState result = static_cast<KeyState>(m_keyHashes.find(key) != m_keyHashes.end() ? m_keyHashes.at(key) : KEY_PRESSED);
+	KeyState_ result = static_cast<KeyState_>(m_keyHashes.find(key) != m_keyHashes.end() ? m_keyHashes.at(key) : KeyState_kPressed);
 	return result;
 }
 void OBJ_Viewer::KeyboardInputStateManager::onKeyStateChanged(KeyboardKeyEvent& e)
@@ -14,7 +14,7 @@ void OBJ_Viewer::KeyboardInputStateManager::onKeyStateChanged(KeyboardKeyEvent& 
 	if (m_keyHashes.find(e.GetKeyCode()) == m_keyHashes.end())
 		return;
 
-	KeyState state = static_cast<KeyState>(e.GetKeyAction());
+	KeyState_ state = static_cast<KeyState_>(e.GetKeyAction());
 	m_keyHashes.at(e.GetKeyCode()) = state;
 }
 void OBJ_Viewer::MouseInputStateManager::onButtonStateChanged(MouseKeyEvent& e)
@@ -22,16 +22,16 @@ void OBJ_Viewer::MouseInputStateManager::onButtonStateChanged(MouseKeyEvent& e)
 	if (m_mouseKeyHashes.find(e.GetKeyCode()) == m_mouseKeyHashes.end())
 		return;
 
-	KeyState state = static_cast<KeyState>(e.GetKeyAction());
+	KeyState_ state = static_cast<KeyState_>(e.GetKeyAction());
 	m_mouseKeyHashes.at(e.GetKeyCode()) = state;
 }
 
-OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(MouseKey button)
+OBJ_Viewer::KeyState_ OBJ_Viewer::MouseInputStateManager::GetButtonState(MouseKey_ button)
 {
 	if (m_mouseKeyHashes.find(button) == m_mouseKeyHashes.end())
-		return KEY_STATE_UKNOWN;
+		return KeyState_kUnknown;
 
-	KeyState result = static_cast<KeyState>(m_mouseKeyHashes.at(button));
+	KeyState_ result = static_cast<KeyState_>(m_mouseKeyHashes.at(button));
 	//TODO:Add error checks;
 	/*Why don't just return the state? Well because GLFW doesn't really have state for the held mouse button it will only tell us if the mouse is pressed or released.
 	So that means in between these 2 stages that happens the mouse is being held.The user of this class is the one interested in the state so in a way we can make 
@@ -39,7 +39,7 @@ OBJ_Viewer::KeyState OBJ_Viewer::MouseInputStateManager::GetButtonState(MouseKey
 	instead of recording bool we can use this trick to save us the trouble because now we don't have to define this for every key.And the moment GLFW detects the key 
 	is released it will set it up back to released.You could say what if multiple classes need to access this information but does anything change the assumption is 
 	still correct.In any means is not the most accurate way to test weather a key is held but for this project it satisfies the need well enough.*/
-	m_mouseKeyHashes.at(button) = result == KEY_PRESSED ? KEY_HELD : result;
+	m_mouseKeyHashes.at(button) = result == KeyState_kPressed ? KeyState_kHeld : result;
 	return result;
 }
 
@@ -47,10 +47,10 @@ void OBJ_Viewer::InputHandler::OnEvent(Event& e)
 {
 	switch (e.GetEventType())
 	{
-	case EVENT_KEY_PRESSES:
+	case EventType_kKeyPressed:
 		this->m_keyboardInputManager.onKeyStateChanged(dynamic_cast<KeyboardKeyEvent&>(e));
 		break;
-	case EVENT_MOUSE_BUTTON_PRESSED:
+	case EventType_kMouseButtonPressed:
 		this->m_mouseInputManager.onButtonStateChanged(dynamic_cast<MouseKeyEvent&>(e));
 		break;
 	default:

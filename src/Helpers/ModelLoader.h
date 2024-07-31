@@ -14,17 +14,17 @@ namespace OBJ_Viewer
 	};
 	struct ReadMeshData
 	{
-		unsigned int meshMaterialID;
-		MeshInfo meshInfo;
-		std::vector<Vertex> vertexData;
-		std::vector<VertexAttributeObject::IndexDataType> indexData;
-		BoundingBox meshBoundingBox;
+		unsigned int mesh_material_ID;
+		MeshInfo mesh_Information;
+		std::vector<Vertex> vertex_data_vector;
+		std::vector<VertexAttributeObject::IndexDataType> index_data_vector;
+		BoundingBox mesh_bounding_box;
 	};
 	
 	class ModelLoader
 	{
 	public:
-		ModelLoader(const char* modelFilePath, LoadModelFileType modelFileType);
+		ModelLoader(const char* modelFilePath, LoadModelFileType_ modelFileType);
 		std::unique_ptr<Model> GetLoadedModel() { return std::unique_ptr<Model>(m_loadedScene); }
 		std::unique_ptr<MaterialRegistry> GetLoadedMaterialRegistry() { return std::unique_ptr<MaterialRegistry>(m_materialRegistry); }
 		bool isFileLoadedSuccessfully() { return (m_loadedScene != nullptr); }
@@ -41,25 +41,25 @@ namespace OBJ_Viewer
 	private:
 		struct TypeMaterialRepresentation
 		{
-			TypeMaterialRepresentation(LoadModelFileType typeOFModel)
+			TypeMaterialRepresentation(LoadModelFileType_ typeOFModel)
 			{
 				switch (typeOFModel)
 				{
 			
-				case OBJ_Viewer::MODEL_TYPE_OBJ:
+				case OBJ_Viewer::LoadModelFileType_kOBJ:
 					colorTextureEnum = aiTextureType::aiTextureType_DIFFUSE;
 					normalTextureEnum = aiTextureType::aiTextureType_HEIGHT;
 					ambientOcclusionEnum = aiTextureType::aiTextureType_AMBIENT_OCCLUSION;
 					specularRoughnessEnum = aiTextureType::aiTextureType_SPECULAR;
 					break;
-				case OBJ_Viewer::MODEL_TYPE_FBX:
+				case OBJ_Viewer::LoadModelFileType_kFBX:
 					colorTextureEnum = aiTextureType::aiTextureType_DIFFUSE;
 					normalTextureEnum = aiTextureType::aiTextureType_NORMALS;
 					ambientOcclusionEnum = aiTextureType::aiTextureType_AMBIENT_OCCLUSION;
 					specularRoughnessEnum = aiTextureType::aiTextureType_METALNESS;
 					break;
 
-				case OBJ_Viewer::MODEL_TYPE_UKNOWN: default:
+				case OBJ_Viewer::LoadModelFileType_kUknown: default:
 					colorTextureEnum = aiTextureType::aiTextureType_UNKNOWN;
 					normalTextureEnum = aiTextureType::aiTextureType_UNKNOWN;
 					ambientOcclusionEnum = aiTextureType::aiTextureType_UNKNOWN;
@@ -77,7 +77,7 @@ namespace OBJ_Viewer
 		Model* m_loadedScene = nullptr;
 		ModelData m_ModelData;
 		std::string m_modelPath;
-		LoadModelFileType m_currentlyLoadingType;
+		LoadModelFileType_ m_currentlyLoadingType;
 		std::future<std::vector<std::shared_ptr<Material>>> m_materialRegistryThread;
 		std::vector<std::future<ReadMeshData>> m_meshThreadResults;
 #pragma region Post-proccess variables

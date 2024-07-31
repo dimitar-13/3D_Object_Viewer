@@ -58,8 +58,8 @@ void OBJ_Viewer::Renderer::RenderMeshMaterialWithLight(const ShaderClass& shader
 		BindMaterialTexture(shaderToUse, m_defaultWhiteTexture, GL_TEXTURE4, "Mesh_material.ambientOcclusion");
 	}
 
-	shaderToUse.UniformSet3FloatVector("Mesh_material.color", material.GetMaterialBaseColor());
-	shaderToUse.UniformSet1Float("Mesh_material.specular", material.GetMaterialRoughness());
+	shaderToUse.SetUniformSet3FloatVector("Mesh_material.color", material.GetMaterialBaseColor());
+	shaderToUse.SetUniformSet1Float("Mesh_material.specular", material.GetMaterialRoughness());
 	glDrawElements(GL_TRIANGLES, meshVAO.GetIndexCount(), GL_UNSIGNED_INT, NULL);
 	meshVAO.UnBind();
 }
@@ -72,10 +72,10 @@ void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const Vert
 	glDisable(GL_DEPTH_TEST);
 
 	shaderToUse.UseShader();
-	shaderToUse.UniformSet3FloatVector("cameraPosition", mainCamera.GetCameraPos());
-	shaderToUse.UniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
-	shaderToUse.UniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
-	shaderToUse.UniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);
+	shaderToUse.SetUniformSet3FloatVector("cameraPosition", mainCamera.GetCameraPos());
+	shaderToUse.SetUniformSet1Float("gridInfo.gridScale", gridInfo.gridScale);
+	shaderToUse.SetUniformSet3FloatVector("gridInfo.gridLineColor", gridInfo.gridLineColor);
+	shaderToUse.SetUniformSet1Int("gridInfo.isAxisShaded", gridInfo.isAxisShaded);
 
 	vao.BindBuffer();
 	glDrawElements(GL_TRIANGLES, vao.GetIndexCount(), GL_UNSIGNED_INT, NULL);
@@ -95,7 +95,7 @@ void OBJ_Viewer::Renderer::RenderSkybox(const ShaderClass& skyboxShader, const S
 	skyboxShader.UseShader();
 	glActiveTexture(GL_TEXTURE0);
 	skybox.BindSkyboxTexture();
-	skyboxShader.UniformSet1Int("skyboxSampler", 0);
+	skyboxShader.SetUniformSet1Int("skyboxSampler", 0);
 	skybox.GetSkyboxVAO().BindBuffer();
 	glDrawElements(GL_TRIANGLES, skybox.GetSkyboxVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
 	skybox.GetSkyboxVAO().UnBind();
@@ -107,17 +107,17 @@ void OBJ_Viewer::Renderer::BindMaterialTexture(const ShaderClass& shaderToUse, s
 	shaderToUse.UseShader();
 	glActiveTexture(textureUnit);
 	textureToBind->BindTexture();
-	shaderToUse.UniformSet1Int(textureName, textureUnit - GL_TEXTURE0);
+	shaderToUse.SetUniformSet1Int(textureName, textureUnit - GL_TEXTURE0);
 }
 
 std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDefaultTexture(const std::string& path)
 {
 	TexturePixelReader reader(path.c_str());
 	TextureBuilder builder;
-	TextureFormat format = reader.GetTextureFormat();
+	TextureFormat_ format = reader.GetTextureFormat();
 
 	return builder.SetTextureFormat(format).
-		SetTextureInternalFormat(static_cast<TextureInternalFormat>(format)).SetTextureSize(reader.GetTextureSize()).
-		SetTexturePixelData(reader.GetTexturePixelData()).SetTextureWrapT(TEXTURE_WRAP_CLAMP_TO_EDGE).
-		SetTextureWrapS(TEXTURE_WRAP_CLAMP_TO_EDGE).buildTexture();
+		SetTextureInternalFormat(static_cast<TextureInternalFormat_>(format)).SetTextureSize(reader.GetTextureSize()).
+		SetTexturePixelData(reader.GetTexturePixelData()).SetTextureWrapT(TextureWrap_kClampToEdge).
+		SetTextureWrapS(TextureWrap_kClampToEdge).buildTexture();
 }

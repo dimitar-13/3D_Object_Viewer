@@ -5,17 +5,17 @@ namespace OBJ_Viewer {
 
 	enum ShaderLibarryShaderName_
 	{
-		ShaderLibarryShaderName_Uknown,
-		ShaderLibarryShaderName_StudioLightShader,
-		ShaderLibarryShaderName_GridShader,
-		ShaderLibarryShaderName_SkyboxShader,
-		ShaderLibarryShaderName_LightShader,
-		ShaderLibarryShaderName_WireframeShader,
-		ShaderLibarryShaderName_PointShader,
-		ShaderLibarryShaderName_UVShader,
-		ShaderLibarryShaderName_SingleTextureShader,
-		ShaderLibarryShaderName_PostProcessShader,
-		ShaderLibarryShaderName_NormalShader,
+		ShaderLibarryShaderName_kUknown,
+		ShaderLibarryShaderName_kStudioLightShader,
+		ShaderLibarryShaderName_kGridShader,
+		ShaderLibarryShaderName_kSkyboxShader,
+		ShaderLibarryShaderName_kLightShader,
+		ShaderLibarryShaderName_kWireframeShader,
+		ShaderLibarryShaderName_kPointShader,
+		ShaderLibarryShaderName_kUVShader,
+		ShaderLibarryShaderName_kSingleTextureShader,
+		ShaderLibarryShaderName_kPostProcessShader,
+		ShaderLibarryShaderName_kNormalShader,
 	};
 
 	class ShaderLibrary

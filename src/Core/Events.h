@@ -6,36 +6,36 @@
 #include "Helpers/TextureHelpers.h"
 #include "Core/SceneViewport.h"
 namespace OBJ_Viewer {
-	enum EventType
+	enum EventType_
 	{
-		EVENT_NONE = 0,
-		EVENT_KEY_PRESSES,
-		EVENT_MOUSE_BUTTON_PRESSED,
-		EVENT_MOUSE_POSITION_CHANGED,
-		EVENT_MOUSE_SCROLL_CHANGED,
-		EVENT_WINDOW_SIZE_CHANGED,
-		EVENT_ON_SKYBOX_LOAD,
-		EVENT_ON_MODEL_LOAD,
-		EVENT_ON_FOCUSED_WINDOW_CHANGED,
-		EVENT_WINDOW_STATE_CHANGED,
-		EVENT_CAMERA_PROJECTION_TYPE_CHANGED,
-		EVENT_SCENE_VIEWPORT_SIZE_CHANGED,
-		EVENT_SCREENSHOT_BUTTON_PRESSED
+		EventType_kUknown,
+		EventType_kKeyPressed,
+		EventType_kMouseButtonPressed,
+		EventType_kMousePositionChanged,
+		EventType_kMouseScrollChanged,
+		EventType_kWindowSizeChanged,
+		EventType_kSkyboxLoad,
+		EventType_kModelLoad,
+		EventType_kFocusedWindowChanged,
+		EventType_kWindowStateChanged,
+		EventType_kCameraProjectionChanged,
+		EventType_kViewportSizeChanged,
+		EventType_kScreenshotButtonPressed
 	};
 
-	enum EventCategory
+	enum EventCategory_
 	{
-		APP_EVENT = 1,
-		INPUT_EVENT = 2,
-		WINDOW_EVENT = 4
+		EventCategory_kAppEvent = 1,
+		EventCategory_kInputEvent = 2,
+		EventCategory_kWindowEvent = 4
 	};
 
 	class Event
 	{
 	public:
 		Event() = default;
-		virtual EventType GetEventType()const = 0;
-		virtual EventCategory GetEventCategory()const = 0;
+		virtual EventType_ GetEventType()const = 0;
+		virtual EventCategory_ GetEventCategory()const = 0;
 	};
 
 	class Listener
@@ -49,8 +49,8 @@ namespace OBJ_Viewer {
 		MousePositionEvent(Position2D mousePos) : m_mousePos(mousePos) {
 
 		}
-		EventType GetEventType()const override { return EVENT_MOUSE_POSITION_CHANGED; }
-		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kMousePositionChanged; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kInputEvent; }
 
 		Position2D& GetMousePos() { return m_mousePos; }
 	private:
@@ -60,20 +60,20 @@ namespace OBJ_Viewer {
 	class MouseKeyEvent : public Event
 	{
 	public:
-		MouseKeyEvent(MouseKey key, int action, int mod) {
+		MouseKeyEvent(MouseKey_ key, int action, int mod) {
 			m_key = key;
 			m_action = action;
 			m_mod = mod;
 		}
-		EventType GetEventType()const override { return EVENT_MOUSE_BUTTON_PRESSED; }
-		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kMouseButtonPressed; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kInputEvent; }
 
-		MouseKey GetKeyCode()const { return m_key; }
+		MouseKey_ GetKeyCode()const { return m_key; }
 		int GetKeyAction()const { return m_action; }
 		int GetKeyMod()const { return m_mod; }
 
 	private:
-		MouseKey m_key;
+		MouseKey_ m_key;
 		int m_action;
 		int m_mod;
 	};
@@ -81,23 +81,23 @@ namespace OBJ_Viewer {
 	class KeyboardKeyEvent : public Event
 	{
 	public:
-		KeyboardKeyEvent(KeyboardKey key, int scanCode, int action, int mod) {
+		KeyboardKeyEvent(KeyboardKey_ key, int scanCode, int action, int mod) {
 			m_key = key;
 			m_scanCode = scanCode;
 			m_action = action;
 			m_mod = mod;
 		}
-		EventType GetEventType()const override { return EVENT_KEY_PRESSES; }
-		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kKeyPressed; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kInputEvent; }
 
-		KeyboardKey GetKeyCode()const { return m_key; }
+		KeyboardKey_ GetKeyCode()const { return m_key; }
 		int GetKeyAction()const { return m_action; }
 		int GetKeyMod()const { return m_mod; }
 		int GetKeyScanCode()const { return m_scanCode; }
 
 
 	private:
-		KeyboardKey m_key;
+		KeyboardKey_ m_key;
 		int m_scanCode;
 		int m_action;
 		int m_mod;
@@ -108,8 +108,8 @@ namespace OBJ_Viewer {
 	public:
 		WindowResizeEvent(Size2D newSize):m_windowNewSize(newSize)
 		{ }
-		EventType GetEventType()const override { return EVENT_WINDOW_SIZE_CHANGED; }
-		EventCategory GetEventCategory()const override { return WINDOW_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kWindowSizeChanged; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kWindowEvent; }
 
 		Size2D GetWindowSize()const { return m_windowNewSize; }
 	private:
@@ -121,8 +121,8 @@ namespace OBJ_Viewer {
 	public:
 		SceneViewportResizeEvent(const Viewport& newSize) :m_viewport(newSize)
 		{ }
-		EventType GetEventType()const override { return EVENT_SCENE_VIEWPORT_SIZE_CHANGED; }
-		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kViewportSizeChanged; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
 
 		Size2D GetViewportSize()const { return Size2D{ m_viewport.width,m_viewport.height}; }
 		Size2D GetViewportOffset()const { return Size2D{ m_viewport.x,m_viewport.y }; }
@@ -137,8 +137,8 @@ namespace OBJ_Viewer {
 		ScrollPositionChanged(Position2D mousePos) : m_mousePos(mousePos) {
 
 		}
-		EventType GetEventType()const override { return EVENT_MOUSE_SCROLL_CHANGED; }
-		EventCategory GetEventCategory()const override { return INPUT_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kMouseScrollChanged; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kInputEvent; }
 
 		Position2D& GetScrollPosition() { return m_mousePos; }
 	private:
@@ -149,7 +149,7 @@ namespace OBJ_Viewer {
 	{
 		Size2D imgSize;
 		std::string outPath;
-		ImageFileFormat outImgFormat;
+		ImageFileFormat_ outImgFormat;
 		bool renderObjectOnly;
 		bool allowTransparency;
 	};
@@ -164,8 +164,8 @@ namespace OBJ_Viewer {
 			m_outputData.outPath.append(formatString.data());
 			
 		}
-		EventType GetEventType()const override { return EVENT_SCREENSHOT_BUTTON_PRESSED; }
-		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kScreenshotButtonPressed; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
 		const ImgOutputData& ImgData()const { return m_outputData; }
 		Size2D GetImageSize()const { return m_outputData.imgSize; }
 		const ImgOutputData& GetOutputData() { return m_outputData; }

@@ -18,7 +18,7 @@ namespace OBJ_Viewer
 		std::unique_ptr<UILayer> m_UILayer;
 		std::shared_ptr<SceneRenderer> m_sceneRenderer;
 		WindowState m_currentWindowState;
-
+		std::future<int> m_saveImgResult;
 		// Inherited via Listener
 		
 	};

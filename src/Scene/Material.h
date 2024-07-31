@@ -34,7 +34,9 @@ namespace OBJ_Viewer {
 		Material(const std::string& materialName, MaterialData data = {}):
 			m_materialInfo(data),m_materialName(materialName)
 		{}
-		const MaterialData& GetMaterialData()const { return m_materialInfo; }
+		size_t GetMaterialTextureCount()const { return m_materialInfo.m_materialTextures.size(); }
+		glm::vec3 GetMaterialBaseColor()const { return m_materialInfo.color; }
+		float GetMaterialRoughness()const { return m_materialInfo.roughness; }
 		std::weak_ptr<Texture> GetMaterialTexture(MaterialTextures texture)const;
 		const std::string& GetMaterialName()const { return m_materialName; }
 	private:

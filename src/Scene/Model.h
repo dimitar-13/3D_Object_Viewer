@@ -1,13 +1,17 @@
 #pragma once
-#include"Mesh.h"
+#include "Mesh.h"
 #include "pch.h"
 
 namespace OBJ_Viewer {
-	struct ModelData
+	struct MeshInfo
 	{
 		size_t vertexCount;
 		size_t faceCount;
 		size_t triangleCount;
+	};
+	struct ModelData
+	{
+		MeshInfo meshInfo;
 		size_t textureCount = 0;
 		std::string modelPath = "Unavailable";
 	};
@@ -15,9 +19,9 @@ namespace OBJ_Viewer {
 	class Model
 	{
 	public:
-		Model(std::vector<std::shared_ptr<Mesh>> meshes,const glm::mat4& modelMatrix, const ModelData& data);
+		Model(std::unique_ptr<std::vector<Mesh>>& meshes,const glm::mat4& modelMatrix, const ModelData& data);
 		const ModelData& GetModelData()const { return this->m_data; }
-		const std::vector<std::shared_ptr<Mesh>>& GetModelMeshes()const { return this->m_meshes; }
+		const std::vector<Mesh>& GetModelMeshes()const { return *this->m_meshes; }
 		const glm::mat4& GetModelMatrix()const { return m_ModelMatrix; }
 		glm::mat4 GetNormalMatrix()const { return glm::transpose(glm::inverse(m_ModelMatrix)); }
 		void GetMatrixDecomposed(glm::vec3& pPosition, glm::vec3& pRotation, glm::vec3& pScale)const;
@@ -25,7 +29,7 @@ namespace OBJ_Viewer {
 	private:
 		ModelData m_data;
 		glm::mat4 m_ModelMatrix;
-		std::vector<std::shared_ptr<Mesh>> m_meshes;
+		std::unique_ptr<std::vector<Mesh>> m_meshes;
 	};
 }
 

@@ -46,13 +46,15 @@ OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<Render
 	m_app.AddEventListener(m_sceneCamera);
 
 	ModelData data;
-	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(std::move(GenerateCubeVAO()));
-	//These are not correct
-	data.vertexCount = mesh->GetMeshVAO().GetVertexCount();
-	data.triangleCount = data.vertexCount/3;
-	data.faceCount = data.triangleCount/2;
+	std::unique_ptr<std::vector<Mesh>> meshVector = std::make_unique<std::vector<Mesh>>();
+	meshVector->emplace_back((std::move(GenerateCubeVAO())));
 
-	m_sceneModel = std::make_shared<Model>(std::vector<std::shared_ptr<Mesh>>{ mesh }, glm::mat4(1), data);
+	//These are not correct
+	data.meshInfo.vertexCount = meshVector->at(0).GetMeshVAO().GetVertexCount();
+	data.meshInfo.triangleCount = data.meshInfo.vertexCount/3;
+	data.meshInfo.faceCount = data.meshInfo.triangleCount/2;
+
+	m_sceneModel = std::make_shared<Model>(meshVector, glm::mat4(1), data);
 
 	m_renderingMediator->SetSceneModel(m_sceneModel);
 	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
@@ -81,32 +83,32 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 		switch (renderSettings.m_currentRenderingMode)
 		{
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME:
-			SetUpForWireframeRendering(*mesh, renderSettings.wireframeSettings);
+			SetUpForWireframeRendering(mesh, renderSettings.wireframeSettings);
 			break;
 
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR:
 			m_clearColorShader.UseShader();
 			m_clearColorShader.UniformSet3FloatVector("u_Color", renderSettings.m_colorRenderingColor);
-			m_mainRenderer.RenderMesh(m_clearColorShader, mesh->GetMeshVAO(), *m_sceneCamera);
+			m_mainRenderer.RenderMesh(m_clearColorShader, mesh.GetMeshVAO(), *m_sceneCamera);
 			break;
 
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES:
 			m_singleTextureShader.UseShader();
-			if (auto material = mesh->GetMaterial().lock())
+			if (auto material = mesh.GetMaterial().lock())
 			{
 				if(auto texture = material->GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
 					m_mainRenderer.BindMaterialTexture(m_singleTextureShader, texture, GL_TEXTURE1, "textureToInspect");
 			}
-			m_mainRenderer.RenderMesh(m_singleTextureShader, mesh->GetMeshVAO(), *m_sceneCamera);
+			m_mainRenderer.RenderMesh(m_singleTextureShader, mesh.GetMeshVAO(), *m_sceneCamera);
 			break;
 
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_UV:
 			m_UVShader.UseShader();
 			m_UVShader.UniformSet1Float("uvScale", renderSettings.m_uvViewSettings.UV_scaleFactor);
-			m_mainRenderer.RenderMesh(m_UVShader, mesh->GetMeshVAO(), *m_sceneCamera);
+			m_mainRenderer.RenderMesh(m_UVShader, mesh.GetMeshVAO(), *m_sceneCamera);
 			break;
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT:
-			SetUpShaderForLightRendering(*mesh, renderSettings.m_MaterialFlags, renderSettings.lightInfo);
+			SetUpShaderForLightRendering(mesh, renderSettings.m_MaterialFlags, renderSettings.lightInfo);
 			break;
 		default:
 			break;
@@ -221,7 +223,6 @@ void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,cons
 
 void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 {
-	//TODO: This can be async
 
 	if (paths.empty())
 	{
@@ -251,7 +252,6 @@ void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 			return;
 		}
 	}
-
 	this->m_sceneSkybox.reset(new Skybox(readers));
 }
 
@@ -273,13 +273,13 @@ void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 	ModelLoader loader(path.c_str(), modelFileFormat);
 	
 
-	if (!loader.isFiledLoadedSuccessfully())
+	if (!loader.isFileLoadedSuccessfully())
 	{
 		LOGGER_LOG_WARN("Failed to load model at path {0}", path);
 		return;
 	}
-	m_sceneModel = std::move(loader.GetLoadedModel());
-	m_sceneRegistry = std::move(loader.GetLoadedMaterialRegistry());
+	m_sceneModel =loader.GetLoadedModel();
+	m_sceneRegistry = loader.GetLoadedMaterialRegistry();
 }
 
 void OBJ_Viewer::SceneRenderer::SetUpUniformBuffers()

@@ -16,7 +16,7 @@ enum ImageResolutionEnum_
 constexpr ImGuiWindowFlags_ APP_WINDOW_STYLE_FLAGS = ImGuiWindowFlags_NoMove;
 
 #pragma region KEY_UI_LABEL_MAPS
-inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> UI_SKYBOX_FACE_LABEL_MAP =
+inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> kUI_SkyboxFaceLabelMap =
 {
 	{OBJ_Viewer::SKYBOX_FACE_RIGHT, "Right face"},
 	{OBJ_Viewer::SKYBOX_FACE_LEFT ,"Left face"},
@@ -26,7 +26,7 @@ inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> UI_SKYBOX_F
 	{OBJ_Viewer::SKYBOX_FACE_BACK,"Back face"}
 };
 
-inline const std::unordered_map<ImageResolutionEnum_, const char *> UI_RESOLUTION_OPTION_ENUM_LABEL_MAP =
+inline const std::unordered_map<ImageResolutionEnum_, const char *> kUI_ResolutionOptionLabelMap =
 {
 	 {ImageResolutionEnum_::ImageResolutionEnum_k_640_X_480, "SD 640 x 480"},
 	 {ImageResolutionEnum_::ImageResolutionEnum_k_1280_X_720, "HD 1280 x 720"},
@@ -35,7 +35,7 @@ inline const std::unordered_map<ImageResolutionEnum_, const char *> UI_RESOLUTIO
 	 {ImageResolutionEnum_::ImageResolutionEnum_kCustom,"Custom"},
 
 };
-inline const std::unordered_map<OBJ_Viewer::ImageFileFormat_, const char*> UI_IMAGE_FORMAT_ENUM_LABEL_MAP =
+inline const std::unordered_map<OBJ_Viewer::ImageFileFormat_, const char*> kUI_ImageFormatLabelMap =
 {
 	{OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kPNG, "PNG"},
 	{OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kJPEG ,"JPEG"},
@@ -173,8 +173,8 @@ void OBJ_Viewer::UILayer::RenderUI()
 					}
 				};
 
-			currentlySelectedFormat = RenderComboBox("Format", UI_IMAGE_FORMAT_ENUM_LABEL_MAP, currentlySelectedFormat);
-			currentResolution = RenderComboBox("Image resolution", UI_RESOLUTION_OPTION_ENUM_LABEL_MAP, currentResolution);
+			currentlySelectedFormat = RenderComboBox("Format", kUI_ImageFormatLabelMap, currentlySelectedFormat);
+			currentResolution = RenderComboBox("Image resolution", kUI_ResolutionOptionLabelMap, currentResolution);
 
 			imageSize = GetResolutionFromEnum(currentResolution);
 			if (currentResolution == ImageResolutionEnum_::ImageResolutionEnum_kCustom)
@@ -624,7 +624,7 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 			ImGui::Image((ImTextureID)skyboxTextures[i]->GetTextureHandle(),{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 			ImGui::SameLine();
 			index_to_string[index_to_string.size() - 1] = '0' + i;
-			comboResult = RenderComboBox<SkyboxFace>(index_to_string, UI_SKYBOX_FACE_LABEL_MAP,
+			comboResult = RenderComboBox<SkyboxFace>(index_to_string, kUI_SkyboxFaceLabelMap,
 				static_cast<SkyboxFace>(i));
 
 			if(i != comboResult)

@@ -3,25 +3,25 @@
 
 namespace OBJ_Viewer {
 
-	enum LoadModelFileType
+	enum LoadModelFileType_
 	{
-		MODEL_TYPE_UKNOWN,
-		MODEL_TYPE_OBJ,
-		MODEL_TYPE_FBX
+		LoadModelFileType_kUknown,
+		LoadModelFileType_kOBJ,
+		LoadModelFileType_kFBX
 	};
 
 	struct FileFormatHelper {
 
-		static LoadModelFileType GetFileFormatFromPath(const std::string& path)
+		static LoadModelFileType_ GetFileFormatFromPath(const std::string& path)
 		{
 			const size_t fileFormatOffset = path.find_last_of(".");
 
 			if(path.substr(fileFormatOffset + 1).compare("fbx") == 0)
-				return MODEL_TYPE_FBX;
+				return LoadModelFileType_kFBX;
 			else if(path.substr(fileFormatOffset + 1).compare("obj") == 0 )
-				return MODEL_TYPE_OBJ;
+				return LoadModelFileType_kOBJ;
 			else
-				return MODEL_TYPE_UKNOWN;
+				return LoadModelFileType_kUknown;
 		}
 	};
 }

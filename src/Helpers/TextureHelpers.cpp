@@ -2,44 +2,44 @@
 #include "TextureHelpers.h"
 
 #pragma region Texture format converter src
-constexpr OBJ_Viewer::TextureFormat OBJ_Viewer::TextureFormatEnumConverter::GetFormatByChannelCount(int channelCount)
+constexpr OBJ_Viewer::TextureFormat_ OBJ_Viewer::TextureFormatEnumConverter::GetFormatByChannelCount(int channelCount)
 {
 	switch (channelCount)
 	{
 	case 1:
-		return TEXTURE_FORMAT_R;
+		return TextureFormat_kR;
 		break;
 	case 2:
-		return TEXTURE_FORMAT_RG;
+		return TextureFormat_kRG;
 		break;
 	case 3:
-		return TEXTURE_FORMAT_RGB;
+		return TextureFormat_kRGB;
 		break;
 	case 4:
-		return TEXTURE_FORMAT_RGBA;
+		return TextureFormat_kRGBA;
 		break;
 	default:
 		break;
 	}
 }
 
-constexpr uint8_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat(TextureFormat format)
+constexpr uint8_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat(TextureFormat_ format)
 {
 	switch (format)
 	{
-	case OBJ_Viewer::TEXTURE_FORMAT_UKNOWN:
+	case OBJ_Viewer::TextureFormat_kUnknown:
 		return 0;
 		break;
-	case OBJ_Viewer::TEXTURE_FORMAT_R:
+	case OBJ_Viewer::TextureFormat_kR:
 		return 1;
 		break;
-	case OBJ_Viewer::TEXTURE_FORMAT_RG:
+	case OBJ_Viewer::TextureFormat_kRG:
 		return 2;
 		break;
-	case OBJ_Viewer::TEXTURE_FORMAT_RGB:
+	case OBJ_Viewer::TextureFormat_kRGB:
 		return 3;
 		break;
-	case OBJ_Viewer::TEXTURE_FORMAT_RGBA:
+	case OBJ_Viewer::TextureFormat_kRGBA:
 		return 4;
 		break;
 	default:
@@ -50,18 +50,18 @@ constexpr uint8_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByForma
 
 #pragma region Image saver src
 
-int OBJ_Viewer::TexturePixelSaver::SavePicture(const std::string& filePath_name, Size2D imageSize,TextureFormat textureChanelFormat,
-	std::shared_ptr<std::vector<unsigned char>> pixelDataToSave, ImageFileFormat imageSaveFormat)
+int OBJ_Viewer::TexturePixelSaver::SavePicture(std::string filePath_name, Size2D imageSize,TextureFormat_ textureChanelFormat,
+	std::shared_ptr<std::vector<unsigned char>> pixelDataToSave, ImageFileFormat_ imageSaveFormat)
 {
 	switch (imageSaveFormat)
 	{
-	case ImageFileFormat::IMAGE_FORMAT_PNG:
+	case ImageFileFormat_::ImageFileFormat_kPNG:
 		return SavePNG(filePath_name.c_str(), imageSize, textureChanelFormat,(void*)(pixelDataToSave->data()));
 		break;
-	case ImageFileFormat::IMAGE_FORMAT_JPEG:
+	case ImageFileFormat_::ImageFileFormat_kJPEG:
 		return SaveJPEG(filePath_name.c_str(), imageSize, textureChanelFormat, (void*)pixelDataToSave->data());
 		break;
-	case ImageFileFormat::IMAGE_FORMAT_BMP:
+	case ImageFileFormat_::ImageFileFormat_kBMP:
 			return SaveBitmap(filePath_name.c_str(), imageSize, textureChanelFormat,(void*)pixelDataToSave->data());
 			break;
 	default:
@@ -69,7 +69,7 @@ int OBJ_Viewer::TexturePixelSaver::SavePicture(const std::string& filePath_name,
 	}
 }
 
-int OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave)
+int OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	constexpr int JPEG_QUALITY = 50;
 	int result = stbi_write_jpg(filePath_name, imageSize.width, imageSize.height,
@@ -82,7 +82,7 @@ int OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D im
 	return result;
 }
 
-int OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave)
+int OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	const size_t imageStride = imageSize.width * TextureFormatEnumConverter::GetChannelCountByFormat(saveFormat);
 
@@ -95,7 +95,7 @@ int OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D ima
 	}
 	return result;
 }
-int OBJ_Viewer::TexturePixelSaver::SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave)
+int OBJ_Viewer::TexturePixelSaver::SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	const size_t imageStride = imageSize.width * TextureFormatEnumConverter::GetChannelCountByFormat(saveFormat);
 
@@ -120,7 +120,7 @@ OBJ_Viewer::TexturePixelReader::TexturePixelReader(const char* path)
 	if (!m_pixelData)
 	{
 		LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", path);
-		m_textureFormat = TEXTURE_FORMAT_UKNOWN;
+		m_textureFormat = TextureFormat_kUnknown;
 		m_textureSize = { 0,0 };
 		return;
 	}
@@ -128,24 +128,24 @@ OBJ_Viewer::TexturePixelReader::TexturePixelReader(const char* path)
 }
 #pragma endregion
 
-std::string_view OBJ_Viewer::TextureFileEnumConverter::GetStringTextureFormatFromEnum(ImageFileFormat val)
+std::string_view OBJ_Viewer::TextureFileEnumConverter::GetStringTextureFormatFromEnum(ImageFileFormat_ val)
 {
 	//A little bit "hacky" but it avoids some code duplication
 
 	return GetStringTextureFileExtensionFormatFromEnum(val).substr(1);
 }
 
-std::string_view OBJ_Viewer::TextureFileEnumConverter::GetStringTextureFileExtensionFormatFromEnum(ImageFileFormat val)
+std::string_view OBJ_Viewer::TextureFileEnumConverter::GetStringTextureFileExtensionFormatFromEnum(ImageFileFormat_ val)
 {
 	switch (val)
 	{
-	case ImageFileFormat::IMAGE_FORMAT_PNG:
+	case ImageFileFormat_::ImageFileFormat_kPNG:
 		return ".png";
 		break;
-	case ImageFileFormat::IMAGE_FORMAT_JPEG:
+	case ImageFileFormat_::ImageFileFormat_kJPEG:
 		return ".jpeg";
 		break;
-	case ImageFileFormat::IMAGE_FORMAT_BMP:
+	case ImageFileFormat_::ImageFileFormat_kBMP:
 		return ".bmp";
 		break;
 	default:

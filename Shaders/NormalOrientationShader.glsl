@@ -28,14 +28,20 @@ void main()
 
 #include "ShaderCommonFunctions.glsl"
 
-
 out vec4 FragColor;
 in vec3 FragNormal;
 in vec3 FragPosition;
 
-uniform vec3 u_Color;
+
+const vec3 correctFacingColor = vec3(0,0,1);
+const vec3 incorrectFacingColor = vec3(1,0,0);
+
 
 void main()
-{	
-	FragColor = vec4(GetStudioShading(FragPosition,FragNormal,u_Color),1);
+{
+
+	bool isNormalFacingCorrect = !(FragNormal.z <= 0 && !gl_FrontFacing);
+	vec3 FinalColor = isNormalFacingCorrect ? correctFacingColor : incorrectFacingColor;
+
+	FragColor = vec4(GetStudioShading(FragPosition,FragNormal,FinalColor),1);
 }

@@ -7,14 +7,14 @@
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
 	GLsizei length, const char* message, const void* userParam);
 
-enum ExitStatus
+enum ExitStatus_
 {
-	EXIT_STATUS_ON_APP_CLOSED = 1,
-	EXIT_STATUS_GLFW_INIT_FALIED = -1,
-	EXIT_STATUS_GLEW_INIT_FAILED = -2,
-	EXIT_STATUS_WINDOW_CONTEXT_CREATION_FAILED = -3,
-	EXIT_STATUS_APP_CREATION_FAILED = -4,
-	APP_EXIT_SUCCSESS = EXIT_STATUS_ON_APP_CLOSED
+	ExitStatus_kOnApplicationCloses= 1,
+	ExitStatus_kGLFW_InitFailed = -1,
+	ExitStatus_kGLEW_InitFailed = -2,
+	ExitStatus_kWindowContextCreationFailed = -3,
+	ExitStatus_kApplicationCreationFailled = -4,
+	ExitStatus_ApplicationExitSuccsess = ExitStatus_kOnApplicationCloses
 };
 
 
@@ -23,10 +23,10 @@ int main()
 #pragma region Const startup app data
 
 
-	constexpr int STARTUP_WINDOW_WIDTH = 1200;
-	constexpr int STARTUP_WINDOW_HEIGHT = 1500;
+	constexpr int kStartupWindowWidth = 1200;
+	constexpr int kStartupWindowHeight = 1500;
 	const char* winTitle = "3D_viewer";
-	constexpr OBJ_Viewer::Size2D WINDOW_STARTUP_SIZE = { STARTUP_WINDOW_WIDTH,STARTUP_WINDOW_HEIGHT };
+	constexpr OBJ_Viewer::Size2D kWindowStartupSize = { kStartupWindowWidth,kStartupWindowHeight };
 #pragma endregion
 
 #pragma region Application dependencies and Window inilizing 
@@ -36,16 +36,16 @@ int main()
 	{
 		LOGGER_LOG_FATAL("GLFW failed to initialize");
 
-		return ExitStatus::EXIT_STATUS_GLFW_INIT_FALIED;
+		return ExitStatus_::ExitStatus_kGLFW_InitFailed;
 	}
 
-	OBJ_Viewer::Window appWindow(WINDOW_STARTUP_SIZE, winTitle);
+	OBJ_Viewer::Window appWindow(kWindowStartupSize, winTitle);
 
 	if (!appWindow.isWinContextInitialized())
 	{
 		LOGGER_LOG_FATAL("GLFW failed to create a valid window context.");
 
-		return ExitStatus::EXIT_STATUS_WINDOW_CONTEXT_CREATION_FAILED;
+		return ExitStatus_::ExitStatus_kWindowContextCreationFailed;
 	}
 
 	if (glewInit() != GLEW_OK)
@@ -54,7 +54,7 @@ int main()
 
 		LOGGER_LOG_FATAL("GLEW failed to initialize.");
 
-		return ExitStatus::EXIT_STATUS_GLEW_INIT_FAILED;
+		return ExitStatus_::ExitStatus_kGLEW_InitFailed;
 	}
 
 	glewExperimental = GL_TRUE;
@@ -82,7 +82,7 @@ int main()
 		app.~Application();
 		LOGGER_LOG_FATAL("App failed to launch successfully");
 
-		return ExitStatus::EXIT_STATUS_APP_CREATION_FAILED;
+		return ExitStatus_::ExitStatus_kWindowContextCreationFailed;
 	}
 	LOGGER_LOG_INFO("App launched successfully");
 
@@ -92,7 +92,7 @@ int main()
 
 	LOGGER_LOG_INFO("App exited successfully.");
 
-	return ExitStatus::APP_EXIT_SUCCSESS;
+	return ExitStatus_::ExitStatus_ApplicationExitSuccsess;
 }
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type,
@@ -101,10 +101,10 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type,
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
 
-	constexpr size_t STRING_MESSAGE_RESERVED_SIZE = 50;
+	constexpr size_t kStringMessageReserveSize = 50;
 
 	std::string errorString;
-	errorString.reserve(STRING_MESSAGE_RESERVED_SIZE);
+	errorString.reserve(kStringMessageReserveSize);
 
 	switch (source)
 	{

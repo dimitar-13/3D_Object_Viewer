@@ -29,46 +29,6 @@ void main()
 	vs_out_studioData.FractLightSpaceNormal = normalize(vs_out_studioData.FractLightSpaceNormal);
 }
 
-#Shader:fragment
-#version 330 core
-
-out vec4 FragColor;
-uniform vec3 u_Color;
-uniform float pointSize;
-noperspective in vec3 pointDist;
-
-in VS_OUT_STUDIO_DATA{
-    vec3 FractLightSpacePos;
-    vec3 FractLightSpaceNormal;
-}fs_in_studioData;
-
-flat in vec3 vertex0;
-flat in vec3 vertex1;
-flat in vec3 vertex2;
-const float smoothness = 1.;
-
-vec3 GetStudioLightShading();
-
-void main()
-{
-    float maxFactor = min(smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex0)),
-    min(smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex1)),
-    smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex2))));
-
-    vec3 FinalColor = vec3(mix( u_Color, GetStudioLightShading() , maxFactor ));
-	FragColor = vec4(FinalColor,1);
-}
-vec3 GetStudioLightShading()
-{
-    const float LIGHT_POW_FACTOR = 2.f; 
-
-	vec3 fragToCamDir = normalize(-fs_in_studioData.FractLightSpacePos);
-	float lightFactor = pow(max(dot(fragToCamDir,fs_in_studioData.FractLightSpaceNormal),0),LIGHT_POW_FACTOR);
-
-    return vec3(vec3(1)*lightFactor);
-}
-
-
 #Shader:geometry
 #version 330 core
 layout(triangles) in;
@@ -126,3 +86,37 @@ void main()
 
     EndPrimitive();
 }
+
+#Shader:fragment
+#version 330 core
+
+#include "ShaderCommonFunctions.glsl"
+
+out vec4 FragColor;
+uniform vec3 u_Color;
+uniform float pointSize;
+noperspective in vec3 pointDist;
+
+in VS_OUT_STUDIO_DATA{
+    vec3 FractLightSpacePos;
+    vec3 FractLightSpaceNormal;
+}fs_in_studioData;
+
+flat in vec3 vertex0;
+flat in vec3 vertex1;
+flat in vec3 vertex2;
+const float smoothness = 1.;
+
+
+void main()
+{
+    float maxFactor = min(smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex0)),
+    min(smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex1)),
+    smoothstep(pointSize - smoothness, pointSize + smoothness, length(pointDist - vertex2))));
+
+    vec3 FinalColor = vec3(mix( u_Color, 
+    GetStudioShading(fs_in_studioData.FractLightSpacePos,fs_in_studioData.FractLightSpaceNormal,vec3(1)) , maxFactor ));
+   
+	FragColor = vec4(FinalColor,1);
+}
+

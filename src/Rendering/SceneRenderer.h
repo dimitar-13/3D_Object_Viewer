@@ -8,6 +8,7 @@
 #include "RenderingMediator.h"
 #include "Core/Events.h"
 #include "Renderer.h"
+#include "Rendering/ShaderLibrary.h"
 namespace OBJ_Viewer {
 	class SceneRenderer : public Listener
 	{
@@ -25,7 +26,7 @@ namespace OBJ_Viewer {
 		std::weak_ptr<Skybox> GetSkyboxModel() { return m_sceneSkybox; }
 	private:
 		void SetUpUniformBuffers();
-		void SetUniformMatrixBuffer()const;
+		void SetUniformMatrixBuffer();
 		// Inherited via AppEventListener
 		void OnEvent(Event& e)override;
 		void OnSkyboxLoadEvent(EventOnSkyboxLoaded& e);
@@ -53,19 +54,7 @@ namespace OBJ_Viewer {
 		UniformBuffer m_uniformLightBuffer;	
 #pragma endregion
 
-#pragma region Scene shaders
-		ShaderClass m_clearColorShader;
-		ShaderClass m_gridShader;
-		ShaderClass m_skyboxShader;
-		ShaderClass m_lightShader;
-		ShaderClass m_materialShader;
-		ShaderClass m_wireframeShader;
-		ShaderClass m_wireframePointShader;
-		ShaderClass m_UVShader;
-		ShaderClass m_singleTextureShader;
-		ShaderClass m_postProcessingShader;
-#pragma endregion
-
+		ShaderLibrary m_shaderLib;
 		std::shared_ptr<RenderingMediator> m_renderingMediator;
 		Application& m_app;
 		Renderer m_mainRenderer;

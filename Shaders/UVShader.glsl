@@ -32,6 +32,9 @@ void main()
 
 #Shader:fragment
 #version 330 core
+
+#include "ShaderCommonFunctions.glsl"
+
 #define SMOOTHNESS_FACTOR 22.f
 out vec4 FragColor;
 
@@ -60,20 +63,12 @@ void main()
     v = clamp( .5+.5* v/fwidth(v) ,0.,1. );
 
 	vec3 AACheckerboardCol = mix( GrayCol, WhiteCol, v);
-
-	vec3 ApplyStudioLightShading = GetStudioLightShading(AACheckerboardCol);
+	
+	vec3 ApplyStudioLightShading =
+	GetStudioShading(fs_in_studioData.FractLightSpacePos,fs_in_studioData.FractLightSpaceNormal,AACheckerboardCol);
 
 	FragColor = vec4(ApplyStudioLightShading, 1.0);
 }
 
-vec3 GetStudioLightShading(vec3 color)
-{
-    const float LIGHT_POW_FACTOR = 2.f; 
-
-	vec3 fragToCamDir = normalize(-fs_in_studioData.FractLightSpacePos);
-	float lightFactor = pow(max(dot(fragToCamDir,fs_in_studioData.FractLightSpaceNormal),0),LIGHT_POW_FACTOR);
-
-    return vec3(color*lightFactor);
-}
 
 

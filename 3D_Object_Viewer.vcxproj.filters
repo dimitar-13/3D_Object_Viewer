@@ -117,6 +117,9 @@
     <ClCompile Include="src\Helpers\TextureHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Rendering\ShaderLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h">
@@ -260,6 +263,12 @@
     <ClInclude Include="src\Enums\FIleImageEnums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Rendering\ShaderLibrary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enums\GpuDataTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
@@ -272,6 +281,8 @@
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\PostProcessShader.glsl" />
     <None Include="Shaders\ClearColorMeshShader.glsl" />
+    <None Include="Shaders\NormalOrientationShader.glsl" />
+    <None Include="Shaders\ShaderCommonFunctions.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">

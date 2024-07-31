@@ -61,7 +61,7 @@ void OBJ_Viewer::Window::glfwCursorPositionCallback(GLFWwindow* window, double x
 
 void OBJ_Viewer::Window::glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	MouseKeyEvent mouseKeyStateChangeEvent(static_cast<MouseKey>(button), action, mods);
+	MouseKeyEvent mouseKeyStateChangeEvent(static_cast<MouseKey_>(button), action, mods);
 	m_onEvent(mouseKeyStateChangeEvent);
 }
 
@@ -73,7 +73,7 @@ void OBJ_Viewer::Window::glfwScrollCallback(GLFWwindow* window, double xoffset, 
 
 void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	KeyboardKeyEvent keyboardKeyStateEvent(static_cast<KeyboardKey>(key), scancode, action, mods);
+	KeyboardKeyEvent keyboardKeyStateEvent(static_cast<KeyboardKey_>(key), scancode, action, mods);
 	m_onEvent(keyboardKeyStateEvent);
 }
 

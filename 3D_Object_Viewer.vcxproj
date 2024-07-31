@@ -153,6 +153,7 @@
       <FileType>Document</FileType>
     </Text>
     <ClCompile Include="Dependencies\stbi_image\stb_write_imp.cpp" />
+    <ClCompile Include="src\Rendering\ShaderLibrary.cpp" />
     <ClCompile Include="src\Helpers\TextureHelpers.cpp" />
     <ClCompile Include="src\Scene\MaterialRegistry.cpp" />
     <ClCompile Include="src\Profiling\AppProfiler.cpp" />
@@ -227,6 +228,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Enums\GpuDataTypes.h" />
+    <ClInclude Include="src\Rendering\ShaderLibrary.h" />
     <ClInclude Include="src\Enums\FIleImageEnums.h" />
     <ClInclude Include="src\Scene\MaterialRegistry.h" />
     <ClInclude Include="src\Profiling\AppProfiler.h" />
@@ -281,7 +284,9 @@
     <None Include="Shaders\GridShader.glsl" />
     <None Include="Shaders\LightShader.glsl" />
     <None Include="Shaders\MaterialShader.glsl" />
+    <None Include="Shaders\NormalOrientationShader.glsl" />
     <None Include="Shaders\PostProcessShader.glsl" />
+    <None Include="Shaders\ShaderCommonFunctions.glsl" />
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />
     <None Include="Shaders\UVShader.glsl" />

@@ -5,18 +5,18 @@
 #include "Enums/FIleImageEnums.h"
 #include "Helpers/TextureHelpers.h"
 
-enum ImageResolutionEnum
+enum ImageResolutionEnum_
 {
-	IMAGE_RESOLUTION_640_X_480 = 0,
-	IMAGE_RESOLUTION_1280_X_720 = 1,
-	IMAGE_RESOLUTION_2560_X_1440 = 2,
-	IMAGE_RESOLUTION_3840_X_2160 = 3,
-	IMAGE_RESOLUTION_CUSTOM = 4,
+	ImageResolutionEnum_k_640_X_480 = 0,
+	ImageResolutionEnum_k_1280_X_720 = 1,
+	ImageResolutionEnum_k_2560_X_1440 = 2,
+	ImageResolutionEnum_k_3840_X_2160 = 3,
+	ImageResolutionEnum_kCustom = 4,
 };
 constexpr ImGuiWindowFlags_ APP_WINDOW_STYLE_FLAGS = ImGuiWindowFlags_NoMove;
 
 #pragma region KEY_UI_LABEL_MAPS
-inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> UI_SKYBOX_FACE_LABEL_MAP =
+inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> kUI_SkyboxFaceLabelMap =
 {
 	{OBJ_Viewer::SKYBOX_FACE_RIGHT, "Right face"},
 	{OBJ_Viewer::SKYBOX_FACE_LEFT ,"Left face"},
@@ -26,27 +26,27 @@ inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> UI_SKYBOX_F
 	{OBJ_Viewer::SKYBOX_FACE_BACK,"Back face"}
 };
 
-inline const std::unordered_map<ImageResolutionEnum, const char *> UI_RESOLUTION_OPTION_ENUM_LABEL_MAP =
+inline const std::unordered_map<ImageResolutionEnum_, const char *> kUI_ResolutionOptionLabelMap =
 {
-	 {ImageResolutionEnum::IMAGE_RESOLUTION_640_X_480, "SD 640 x 480"},
-	 {ImageResolutionEnum::IMAGE_RESOLUTION_1280_X_720, "HD 1280 x 720"},
-	 {ImageResolutionEnum::IMAGE_RESOLUTION_2560_X_1440,"2K 2560 x 1440"},
-	 {ImageResolutionEnum::IMAGE_RESOLUTION_3840_X_2160,"4K 3840 x 2160"},
-	 {ImageResolutionEnum::IMAGE_RESOLUTION_CUSTOM,"Custom"},
+	 {ImageResolutionEnum_::ImageResolutionEnum_k_640_X_480, "SD 640 x 480"},
+	 {ImageResolutionEnum_::ImageResolutionEnum_k_1280_X_720, "HD 1280 x 720"},
+	 {ImageResolutionEnum_::ImageResolutionEnum_k_2560_X_1440,"2K 2560 x 1440"},
+	 {ImageResolutionEnum_::ImageResolutionEnum_k_3840_X_2160,"4K 3840 x 2160"},
+	 {ImageResolutionEnum_::ImageResolutionEnum_kCustom,"Custom"},
 
 };
-inline const std::unordered_map<OBJ_Viewer::ImageFileFormat, const char*> UI_IMAGE_FORMAT_ENUM_LABEL_MAP =
+inline const std::unordered_map<OBJ_Viewer::ImageFileFormat_, const char*> kUI_ImageFormatLabelMap =
 {
-	{OBJ_Viewer::ImageFileFormat::IMAGE_FORMAT_PNG, "PNG"},
-	{OBJ_Viewer::ImageFileFormat::IMAGE_FORMAT_JPEG ,"JPEG"},
-	{OBJ_Viewer::ImageFileFormat::IMAGE_FORMAT_BMP ,"BMP"},
+	{OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kPNG, "PNG"},
+	{OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kJPEG ,"JPEG"},
+	{OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kBMP ,"BMP"},
 
 };
 #pragma endregion
 
 OBJ_Viewer::UILayer::UILayer(Application& appState,std::shared_ptr<RenderingMediator> renderingMediator):
 	m_application(appState),
-	m_UI_inputFramebuffer(appState.GetSceneViewport().GetViewportSize(), FRAMEBUFFER_COLOR_ATTACHMENT)
+	m_UI_inputFramebuffer(appState.GetSceneViewport().GetViewportSize(), FramebufferAttachmentsFlags_kColorAttachment)
 {
 	//m_appEventCallback = m_application.GetOnAppEventCallback();
 
@@ -139,32 +139,32 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 #pragma region Screenshot window
 	if (isScreenshotSettingsWindowOpen) {
-		if (ImGui::Begin(APP_FOCUS_REGIONS::UI_WINDOW_SCREENSHOT_SETTINGS,&isScreenshotSettingsWindowOpen,ImGuiWindowFlags_NoDocking))
+		if (ImGui::Begin(APP_FOCUS_REGIONS::kUI_WindowScreenshotSettings,&isScreenshotSettingsWindowOpen,ImGuiWindowFlags_NoDocking))
 		{
-			isAppWindowFocused(APP_FOCUS_REGIONS::UI_WINDOW_SCREENSHOT_SETTINGS);
+			isAppWindowFocused(APP_FOCUS_REGIONS::kUI_WindowScreenshotSettings);
 			static bool renderWithGrid{};
 			static bool renderWithTransparency{};
-			static ImageFileFormat currentlySelectedFormat = ImageFileFormat::IMAGE_FORMAT_PNG;
-			static ImageResolutionEnum currentResolution = ImageResolutionEnum::IMAGE_RESOLUTION_2560_X_1440;
+			static ImageFileFormat_ currentlySelectedFormat = ImageFileFormat_::ImageFileFormat_kPNG;
+			static ImageResolutionEnum_ currentResolution = ImageResolutionEnum_::ImageResolutionEnum_k_2560_X_1440;
 			Size2D imageSize;
 
-			constexpr auto GetResolutionFromEnum = [](ImageResolutionEnum val)
+			constexpr auto GetResolutionFromEnum = [](ImageResolutionEnum_ val)
 				{
 					switch (val)
 					{
-					case IMAGE_RESOLUTION_640_X_480:
+					case ImageResolutionEnum_k_640_X_480:
 						return Size2D{ 640,480 };
 						break;
-					case IMAGE_RESOLUTION_1280_X_720:
+					case ImageResolutionEnum_k_1280_X_720:
 						return Size2D{ 1280,720 };
 						break;
-					case IMAGE_RESOLUTION_2560_X_1440:
+					case ImageResolutionEnum_k_2560_X_1440:
 						return Size2D{ 2560,1440 };
 						break;
-					case IMAGE_RESOLUTION_3840_X_2160:
+					case ImageResolutionEnum_k_3840_X_2160:
 						return Size2D{ 3840,2160 };
 						break;
-					case IMAGE_RESOLUTION_CUSTOM:
+					case ImageResolutionEnum_kCustom:
 						return Size2D{ 0,0 };
 						break;
 					default:
@@ -173,11 +173,11 @@ void OBJ_Viewer::UILayer::RenderUI()
 					}
 				};
 
-			currentlySelectedFormat = RenderComboBox("Format", UI_IMAGE_FORMAT_ENUM_LABEL_MAP, currentlySelectedFormat);
-			currentResolution = RenderComboBox("Image resolution", UI_RESOLUTION_OPTION_ENUM_LABEL_MAP, currentResolution);
+			currentlySelectedFormat = RenderComboBox("Format", kUI_ImageFormatLabelMap, currentlySelectedFormat);
+			currentResolution = RenderComboBox("Image resolution", kUI_ResolutionOptionLabelMap, currentResolution);
 
 			imageSize = GetResolutionFromEnum(currentResolution);
-			if (currentResolution == ImageResolutionEnum::IMAGE_RESOLUTION_CUSTOM)
+			if (currentResolution == ImageResolutionEnum_::ImageResolutionEnum_kCustom)
 			{
 				static Size2D tempResolution{};
 				ImGui::Text("Custom resolution");
@@ -196,7 +196,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 			{
 				DialogWrapper dialogFolderPath;
 				dialogFolderPath.OpenDialogSavePath(TextureFileEnumConverter::GetStringTextureFormatFromEnum(currentlySelectedFormat).data());
-				if (!dialogFolderPath.isDialogClosed())
+				if (!dialogFolderPath.IsDialogClosed())
 				{
 					ImgOutputData eventData{};
 					eventData.imgSize = imageSize;
@@ -214,9 +214,9 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 #pragma region ModelAndRenderingSettings
 	//Right panel for model and rendering settings.
-	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME, (bool*)0, APP_WINDOW_STYLE_FLAGS))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::kUI_Model_and_renderingSettingsWindowName, (bool*)0, APP_WINDOW_STYLE_FLAGS))
 	{
-		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME);
+		isAppWindowFocused(APP_FOCUS_REGIONS::kUI_Model_and_renderingSettingsWindowName);
 
 		ImGui::Text("Model view settings");
 		ImGui::InputFloat3("Position", &position[0]);
@@ -237,44 +237,44 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Rendering Modes 
 
 			if (ImGui::RadioButton("Wireframe",
-				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME))
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe))
 			{
-				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME;
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe;
 			}
 			ImGui::SetItemTooltip("Renders wireframe of the 3D model.");
 
 			if (ImGui::RadioButton("Normal orientation",
-				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_NORMAL_ORIENTATION))
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation))
 			{
-				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_NORMAL_ORIENTATION;
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation;
 			}
 			ImGui::SetItemTooltip("Color each face based on the orientation of the normal red if its inwards and blue if outwards.");
 
 			if (ImGui::RadioButton("Clear color rendering",
-				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR))
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor))
 			{
-				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR;
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor;
 			}
 			ImGui::SetItemTooltip("Renders the mesh using a single color.");
 
 			if (ImGui::RadioButton("Individual textures",
-				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES))
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture))
 			{
-				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES;
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture;
 			}
 			ImGui::SetItemTooltip("Renders only single selected texture.");
 
 			if (ImGui::RadioButton("Uv mode",
-				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_UV))
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kUV))
 			{
-				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_UV;
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kUV;
 			}
 			ImGui::SetItemTooltip("Renders checkerboard texture for UV inspection.");
 
 			if (ImGui::RadioButton("Light rendering",
-				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT))
+				pSettings.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kLight))
 			{
-				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT;
+				pSettings.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kLight;
 			}
 			ImGui::SetItemTooltip("Render the 3D object with light calculations.");
 #pragma endregion
@@ -284,13 +284,13 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 			switch (pSettings.m_currentRenderingMode)
 			{
-			case APP_SETTINGS::RenderingMode::RENDER_MODE_WIREFRAME:
+			case APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe:
 				ImGui::InputFloat("Wire line Thickness", &pSettings.wireframeSettings.lineThickness);
 				ImGui::ColorPicker3("Line color", &(pSettings.wireframeSettings.lineColor)[0]);
 				ImGui::Checkbox("Render points", &pSettings.wireframeSettings.isPointRenderingOn);
 				break;
 
-			case APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT:
+			case APP_SETTINGS::RenderingMode_::RenderingMode_kLight:
 				static bool isAlbedoOn = pSettings.m_MaterialFlags & IS_ALBEDO_ON;
 				static bool isNormalOn = pSettings.m_MaterialFlags & IS_CUSTOM_SPECULAR_ON;
 				static bool isRoughnessOn = pSettings.m_MaterialFlags & IS_CUSTOM_NORMALS_ON;
@@ -315,7 +315,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 				pSettings.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialFlags>(pSettings.m_MaterialFlags | IS_AMBIENT_OCCLUSION_ON) : pSettings.m_MaterialFlags;
 				break;
 
-			case APP_SETTINGS::RenderingMode::RENDER_MODE_INDIVIDUAL_TEXTURES:
+			case APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture:
 				static bool selectedTexture;
 
 				if (ImGui::RadioButton("Color texture",
@@ -341,15 +341,15 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 				break;
 
-			case APP_SETTINGS::RenderingMode::RENDER_MODE_UV:
+			case APP_SETTINGS::RenderingMode_::RenderingMode_kUV:
 				ImGui::SliderFloat("Uv scale", &pSettings.m_uvViewSettings.UV_scaleFactor, 1.f, 150.f);
 				break;
 
-			case APP_SETTINGS::RenderingMode::RENDER_MODE_SOLID_COLOR:
+			case APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor:
 				ImGui::ColorPicker3("Mesh color", &pSettings.m_colorRenderingColor[0]);
 				break;
 
-			case APP_SETTINGS::RenderingMode::RENDER_MODE_NORMAL_ORIENTATION:
+			case APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation:
 
 				break;
 			default:
@@ -362,9 +362,9 @@ void OBJ_Viewer::UILayer::RenderUI()
 #pragma region Scene settings
 
 
-	if (ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME))
+	if (ImGui::Begin(APP_FOCUS_REGIONS::kUI_SceneSettingsWindowName))
 	{
-		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_SCENE_SETTINGS_WINDOW_NAME);
+		isAppWindowFocused(APP_FOCUS_REGIONS::kUI_SceneSettingsWindowName);
 		
 		ModelData currentModelData = SceneModel->GetModelData();
 
@@ -403,7 +403,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 							if (ImGui::Selectable(shadingModes[n], is_selected))
 							{
 								currentShadingModel = shadingModes[n];
-								pSettings.lightInfo.currentLightModel = static_cast<APP_SETTINGS::LightShadingModel>(n);
+								pSettings.lightInfo.currentLightModel = static_cast<APP_SETTINGS::LightShadingModel_>(n);
 								break;
 							}
 						}
@@ -548,9 +548,9 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 #pragma region Scene window
 
-	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
+	if(ImGui::Begin(APP_FOCUS_REGIONS::kUI_SceneWindowName,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
-		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
+		isAppWindowFocused(APP_FOCUS_REGIONS::kUI_SceneWindowName);
 
 		ImVec2 winSize = ImGui::GetWindowSize();
 		static Viewport sceneWinViewport{};
@@ -624,7 +624,7 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 			ImGui::Image((ImTextureID)skyboxTextures[i]->GetTextureHandle(),{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 			ImGui::SameLine();
 			index_to_string[index_to_string.size() - 1] = '0' + i;
-			comboResult = RenderComboBox<SkyboxFace>(index_to_string, UI_SKYBOX_FACE_LABEL_MAP,
+			comboResult = RenderComboBox<SkyboxFace>(index_to_string, kUI_SkyboxFaceLabelMap,
 				static_cast<SkyboxFace>(i));
 
 			if(i != comboResult)

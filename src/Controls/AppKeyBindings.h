@@ -4,10 +4,10 @@
 
 namespace OBJ_Viewer {
 	//Consider changing it to struct to support custom controls.
-	enum AppKeyBinding
+	enum AppKeyBinding_
 	{
-		KEY_BIND_HIDE_UI = KEYBOARD_KEY_H , 
-		KEY_BIND_RESET_CAMERA_PIVOT = KEYBOARD_KEY_Q
+		AppKeyBinding_kHideUI = KeyboardKey_kH,
+		AppKeyBinding_kResetCameraPivot = KeyboardKey_kQ
 	};
 
 

@@ -32,7 +32,7 @@ namespace OBJ_Viewer
 		GLuint m_cubeMapHandle = 0;
 		std::unique_ptr<VertexAttributeObject> m_skyboxVAO;
 		Size2D m_CubeMapTextSize;
-		TextureFormat m_format;
+		TextureFormat_ m_format;
 	};
 
 }

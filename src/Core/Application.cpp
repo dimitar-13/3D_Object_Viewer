@@ -65,42 +65,42 @@ void OBJ_Viewer::Application::OnEvent(Event& winEvent)
 			listener->OnEvent(winEvent);
 		}
 	}
-	if (winEvent.GetEventType() == EVENT_KEY_PRESSES )
+	if (winEvent.GetEventType() == EventType_kKeyPressed )
 	{
 		KeyboardKeyEvent e = dynamic_cast<KeyboardKeyEvent&>(winEvent);
 		OnAppKeyBindPressed(e);
 	}
-	else if (winEvent.GetEventType() == EVENT_WINDOW_SIZE_CHANGED && m_isUIHidden)
+	else if (winEvent.GetEventType() == EventType_kWindowSizeChanged && m_isUIHidden)
 	{
 		WindowResizeEvent e = dynamic_cast<WindowResizeEvent&>(winEvent);
-		Size2D winSize = e.GetWindowSize();
+		Size2D win_size = e.GetWindowSize();
 
 		static Viewport viewport{};
 		viewport.x = 0;
 		viewport.y = 0;
-		viewport.width = winSize.width;
-		viewport.height = winSize.height;
+		viewport.width = win_size.width;
+		viewport.height = win_size.height;
 		SubmitSceneViewportSize(viewport);
 	}
 }
 
 void OBJ_Viewer::Application::OnAppKeyBindPressed(KeyboardKeyEvent& e)
 {
-	m_isUIHidden = e.GetKeyCode() == KEY_BIND_HIDE_UI && e.GetKeyAction() == GLFW_PRESS ? !m_isUIHidden : m_isUIHidden;
-	if (m_isUIHidden && e.GetKeyCode() == KEY_BIND_HIDE_UI)
+	m_isUIHidden = e.GetKeyCode() == AppKeyBinding_kHideUI && e.GetKeyAction() == GLFW_PRESS ? !m_isUIHidden : m_isUIHidden;
+	if (m_isUIHidden && e.GetKeyCode() == AppKeyBinding_kHideUI)
 	{
 		static Viewport viewport{};
 		/* If we do 'static Size2D winSize = m_window->GetWindowSize();' the winSize wont update its values because this is a
 		 * copy constructor initialization meaning since this variable is marked as static will be done only once and each other time it wont
 		 * update its value.*/
-		static Size2D winSize = {};
-		winSize = m_window.GetWindowSize();
+		static Size2D win_size = {};
+		win_size = m_window.GetWindowSize();
 		viewport.x = 0;
 		viewport.y = 0;
-		viewport.width = winSize.width;
-		viewport.height = winSize.height;
+		viewport.width = win_size.width;
+		viewport.height = win_size.height;
 		SubmitSceneViewportSize(viewport);
 
-		m_inputHandler->SetCurrentlyFocusedWindow(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
+		m_inputHandler->SetCurrentlyFocusedWindow(APP_FOCUS_REGIONS::kUI_SceneWindowName);
 	}
 }

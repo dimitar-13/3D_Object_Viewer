@@ -12,24 +12,24 @@ namespace OBJ_Viewer {
 
 	namespace APP_SETTINGS {
 		
-		enum LightShadingModel
+		enum LightShadingModel_
 		{
-			LIGHT_MODEL_BLIN_PHONG = 0,
-			LIGHT_MODEL_TOON_SHADING = 1,
-			LIGHT_MODEL_RIM_SHADING = 2,
-			LIGHT_MODEL_RIM_AND_TOON_SHADING = 3,
-			LIGHT_MODEL_UKNOWN
+			LightShadingModel_kBlinPhong = 0,
+			LightShadingModel_kToonShading = 1,
+			LightShadingModel_kRimShading = 2,
+			LightShadingModel_kRim_and_ToonShading = 3,
+			LightShadingModel_kUknown
 		};
 
-		enum RenderingMode
+		enum RenderingMode_
 		{
-			RENDER_MODE_UKNOWN,
-			RENDER_MODE_WIREFRAME,
-			RENDER_MODE_SOLID_COLOR,
-			RENDER_MODE_LIGHT,
-			RENDER_MODE_UV,
-			RENDER_MODE_INDIVIDUAL_TEXTURES,
-			RENDER_MODE_NORMAL_ORIENTATION
+			RenderingMode_kUknown,
+			RenderingMode_kWireframe,
+			RenderingMode_kSolidColor,
+			RenderingMode_kLight,
+			RenderingMode_kUV,
+			RenderingMode_kIndividualTexture,
+			RenderingMode_kNormalOrientation
 		};
 
 		struct GridData
@@ -63,7 +63,7 @@ namespace OBJ_Viewer {
 				DirectionalLight{glm::vec3(0),0,glm::vec3(0),0},
 				DirectionalLight{glm::vec3(0),0,glm::vec3(0),0},
 			};
-			LightShadingModel currentLightModel = LIGHT_MODEL_BLIN_PHONG;
+			LightShadingModel_ currentLightModel = LightShadingModel_kBlinPhong;
 		};
 		struct UV_ViewAppSetting
 		{
@@ -74,7 +74,7 @@ namespace OBJ_Viewer {
 			bool m_isWireGridOn = false;
 			bool m_isSkyboxOn = false;
 			bool m_EnableAA = true;
-			RenderingMode m_currentRenderingMode = RENDER_MODE_SOLID_COLOR;
+			RenderingMode_ m_currentRenderingMode = RenderingMode_kSolidColor;
 			glm::vec3 m_colorRenderingColor = glm::vec3(1);
 			MaterialFlags m_MaterialFlags = FLAGS_ALL;
 			bool isCurrentProjectionPerspective = true;
@@ -87,11 +87,11 @@ namespace OBJ_Viewer {
 			SceneLightInfo lightInfo;
 			WireFrameSettings wireframeSettings;
 		};
-		enum BaseMeshType
+		enum BaseMeshType_
 		{
-			MESH_TYPE_CUBE = 0,
-			MESH_TYPE_SPHERE = 1,
-			MESH_TYPE_TORUS = 2
+			BaseMeshType_kCube = 0,
+			BaseMeshType_kSphere = 1,
+			BaseMeshType_kTorus = 2
 		};
 	}
 

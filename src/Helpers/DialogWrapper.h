@@ -9,7 +9,7 @@ namespace OBJ_Viewer {
 		void OpenDialog(const std::string_view& filterLIst);
 		void OpenDialogMultiple(const std::string_view& filterList);
 		void OpenDialogSavePath(const std::string_view& filterLIst);
-		bool isDialogClosed()const { return isDialogAborted; }
+		bool IsDialogClosed()const { return isDialogAborted; }
 		~DialogWrapper();
 		const std::string GetFirstDialogResult()const { return outPaths[0]; }
 		const std::vector<nfdchar_t*>& GetDialogResult() const { return outPaths; }

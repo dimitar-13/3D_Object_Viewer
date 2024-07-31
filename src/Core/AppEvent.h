@@ -8,16 +8,16 @@ namespace OBJ_Viewer {
 	public:
 		EventOnSkyboxLoaded()
 		{}
-		EventType GetEventType()const override { return EVENT_ON_SKYBOX_LOAD; }
-		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kSkyboxLoad; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
 	};
 	class EventOnModelLoaded : public Event
 	{
 	public:
 		EventOnModelLoaded()
 		{}
-		EventType GetEventType()const override { return EVENT_ON_MODEL_LOAD; }
-		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kModelLoad; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
 	private:
 	};
 	class WindowStateChangedEvent : public Event
@@ -25,8 +25,8 @@ namespace OBJ_Viewer {
 	public:
 		WindowStateChangedEvent(Size2D metrics,WindowState state) :m_metrics(metrics), m_state(state)
 		{}
-		EventType GetEventType()const override { return EVENT_WINDOW_STATE_CHANGED; }
-		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kWindowStateChanged; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
 		WindowState GetWindowState()const { return m_state; }
 		Size2D GetWindowMetrics()const { return m_metrics; }
 
@@ -39,8 +39,8 @@ namespace OBJ_Viewer {
 	public:
 		EventCameraProjectionChanged(bool isProjectionPerspective):m_isProjectionPerspective(isProjectionPerspective)
 		{}
-		EventType GetEventType()const override { return EVENT_CAMERA_PROJECTION_TYPE_CHANGED; }
-		EventCategory GetEventCategory()const override { return APP_EVENT; }
+		EventType_ GetEventType()const override { return EventType_kCameraProjectionChanged; }
+		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
 		bool isCameraProjectionPerspective()const { return m_isProjectionPerspective; }
 	private:
 		bool m_isProjectionPerspective;

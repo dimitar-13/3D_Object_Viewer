@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "VertexAttributeObject.h"
 
-OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<Vertex>& vertexData,const std::vector<IndexDataType>& indexData)
+OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<Vertex>& kVertexDataVectorRef,
+	const std::vector<IndexDataType>& kIndexDataVectorRef)
 {
 	glGenVertexArrays(1, &this->m_vertexAttributeObjHandle);
 	glBindVertexArray(this->m_vertexAttributeObjHandle);
@@ -10,11 +11,11 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<Verte
 	glGenBuffers(1, &this->m_indexBufferObjHandle);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->m_vertexBufferObjHandle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*vertexData.size(), vertexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*kVertexDataVectorRef.size(), kVertexDataVectorRef.data(), GL_STATIC_DRAW);
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_indexBufferObjHandle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(IndexDataType)* indexData.size(), indexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(IndexDataType)* kIndexDataVectorRef.size(), kIndexDataVectorRef.data(), GL_STATIC_DRAW);
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
@@ -29,11 +30,12 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<Verte
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_vertexData.indexCount = indexData.size();
-	m_vertexData.vertexCount = vertexData.size();
+	m_vertexData.indexCount = kVertexDataVectorRef.size();
+	m_vertexData.vertexCount = kIndexDataVectorRef.size();
 }
 
-OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::vec3>& vertexData,const std::vector<IndexDataType>& indexData)
+OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::vec3>& kPostionDataVectorRef,
+	const std::vector<IndexDataType>& kIndexDataVectorRef)
 {
 	glGenVertexArrays(1, &this->m_vertexAttributeObjHandle);
 	glBindVertexArray(this->m_vertexAttributeObjHandle);
@@ -43,11 +45,11 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->m_vertexBufferObjHandle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData[0]) * vertexData.size(), vertexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(kPostionDataVectorRef[0]) * kPostionDataVectorRef.size(), kPostionDataVectorRef.data(), GL_STATIC_DRAW);
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_indexBufferObjHandle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(IndexDataType) * indexData.size(), indexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(IndexDataType) * kIndexDataVectorRef.size(), kIndexDataVectorRef.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0,3, GL_FLOAT,GL_FALSE, sizeof(float)*3, (void*)0);
 	glEnableVertexAttribArray(0);
@@ -56,6 +58,6 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_vertexData.indexCount = indexData.size();
-	m_vertexData.vertexCount = vertexData.size();
+	m_vertexData.indexCount = kIndexDataVectorRef.size();
+	m_vertexData.vertexCount = kPostionDataVectorRef.size();
 }

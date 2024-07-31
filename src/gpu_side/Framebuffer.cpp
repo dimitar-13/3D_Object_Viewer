@@ -4,7 +4,7 @@
 
 constexpr uint8_t FRAMEBUFFER_TEXTURE_COMPONENT_COUNT = 4;
 
-OBJ_Viewer::Framebuffer::Framebuffer(Size2D size, FramebufferAttachmentsFlags attachmentFlags, bool isMultiSampleBuffer, uint8_t sampleCount):
+OBJ_Viewer::Framebuffer::Framebuffer(Size2D size, FramebufferAttachmentsFlags_ attachmentFlags, bool isMultiSampleBuffer, uint8_t sampleCount):
 m_framebufferSize(size),m_isMultiSample(isMultiSampleBuffer),m_sampleCount(sampleCount)
 {
 	glGenFramebuffers(1, &this->m_framebuffer);
@@ -12,8 +12,8 @@ m_framebufferSize(size),m_isMultiSample(isMultiSampleBuffer),m_sampleCount(sampl
 
 	TextureBuilder builder;
 	this->m_texture = 
-		builder.SetTextureFormat(TEXTURE_FORMAT_RGBA).
-		SetTextureInternalFormat(TEXTURE_INTERNAL_FORMAT_RGBA).
+		builder.SetTextureFormat(TextureFormat_kRGBA).
+		SetTextureInternalFormat(TextureInternalFormat_kRGBA).
 		SetTextureSize(size).isTextureMultiSample(m_isMultiSample).SetSampleCount(sampleCount)
 		.buildTexture();
 
@@ -83,10 +83,10 @@ void OBJ_Viewer::Framebuffer::CopyFramebufferContent(const Framebuffer& framebuf
 		m_framebufferSize.width, m_framebufferSize.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
-std::vector<OBJ_Viewer::Framebuffer::pixel_component> OBJ_Viewer::Framebuffer::GetFramebufferPixels(TextureFormat retrieveFormat)const
+std::vector<OBJ_Viewer::Framebuffer::pixel_component> OBJ_Viewer::Framebuffer::GetFramebufferPixels(TextureFormat_ retrieveFormat)const
 {
-	const size_t FRAMEBUFFER_TEXTURE_BUFFER_SIZE = m_framebufferSize.width * m_framebufferSize.height * FRAMEBUFFER_TEXTURE_COMPONENT_COUNT;
-	std::vector<pixel_component> result(FRAMEBUFFER_TEXTURE_BUFFER_SIZE);
+	const size_t kFramebufferTextureByteSize = m_framebufferSize.width * m_framebufferSize.height * FRAMEBUFFER_TEXTURE_COMPONENT_COUNT;
+	std::vector<pixel_component> result(kFramebufferTextureByteSize);
 	BindFramebuffer();
 
 	glReadPixels(0, 0, m_framebufferSize.width, m_framebufferSize.height, retrieveFormat, GL_UNSIGNED_BYTE, result.data());

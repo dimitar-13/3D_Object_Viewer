@@ -59,7 +59,7 @@ namespace OBJ_Viewer
 		glm::vec3 m_position;
 		Application& m_app;
 
-		glm::vec3 m_cameraCenter = glm::vec3(0);
+		glm::vec3 m_cameraCenter;
 		Position2D m_lastMousePos = Position2D{0,0};
 
 		bool m_isProjectionPerspective = true;

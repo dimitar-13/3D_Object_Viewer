@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "VertexAttributeObject.h"
 
-OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> vertexData, std::vector<IndexDataType>indexData)
+OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<Vertex>& vertexData,const std::vector<IndexDataType>& indexData)
 {
 	glGenVertexArrays(1, &this->m_vertexAttributeObjHandle);
 	glBindVertexArray(this->m_vertexAttributeObjHandle);
@@ -33,7 +33,7 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<Vertex> ver
 	m_vertexData.vertexCount = vertexData.size();
 }
 
-OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(std::vector<glm::vec3> vertexData, std::vector<IndexDataType>indexData)
+OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::vec3>& vertexData,const std::vector<IndexDataType>& indexData)
 {
 	glGenVertexArrays(1, &this->m_vertexAttributeObjHandle);
 	glBindVertexArray(this->m_vertexAttributeObjHandle);

@@ -12,7 +12,6 @@ namespace OBJ_Viewer {
 		FRAMEBUFFER_NORMAL_ATTACHMENT = 4,
 		FRAMEBUFFER_SPECULAR_ATTACHMENT = 8
 	};
-
 	class Framebuffer
 	{
 	public:
@@ -28,7 +27,7 @@ namespace OBJ_Viewer {
 		Size2D GetFramebufferSize()const { return m_framebufferSize; }
 		void ResizeFramebuffer(Size2D newSize);
 		void CopyFramebufferContent(const Framebuffer& framebufferToCopy);
-		std::vector<pixel_component> GetFramebufferPixels(TextureFormat retrieveFormat);
+		std::vector<pixel_component> GetFramebufferPixels(TextureFormat retrieveFormat)const;
 		~Framebuffer();
 	private:
 		GLuint m_framebuffer;

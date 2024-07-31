@@ -50,18 +50,19 @@ constexpr uint8_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByForma
 
 #pragma region Image saver src
 
-int OBJ_Viewer::TexturePixelSaver::SavePicture(const char* filePath_name, Size2D imageSize, TextureFormat textureChanelFormat, void* pixelDataToSave, ImageFileFormat imageSaveFormat)
+int OBJ_Viewer::TexturePixelSaver::SavePicture(const std::string& filePath_name, Size2D imageSize,TextureFormat textureChanelFormat,
+	std::shared_ptr<std::vector<unsigned char>> pixelDataToSave, ImageFileFormat imageSaveFormat)
 {
 	switch (imageSaveFormat)
 	{
 	case ImageFileFormat::IMAGE_FORMAT_PNG:
-		return SavePNG(filePath_name, imageSize, textureChanelFormat, pixelDataToSave);
+		return SavePNG(filePath_name.c_str(), imageSize, textureChanelFormat,(void*)(pixelDataToSave->data()));
 		break;
 	case ImageFileFormat::IMAGE_FORMAT_JPEG:
-		return SaveJPEG(filePath_name, imageSize, textureChanelFormat, pixelDataToSave);
+		return SaveJPEG(filePath_name.c_str(), imageSize, textureChanelFormat, (void*)pixelDataToSave->data());
 		break;
 	case ImageFileFormat::IMAGE_FORMAT_BMP:
-			return SaveBitmap(filePath_name, imageSize, textureChanelFormat, pixelDataToSave);
+			return SaveBitmap(filePath_name.c_str(), imageSize, textureChanelFormat,(void*)pixelDataToSave->data());
 			break;
 	default:
 		break;

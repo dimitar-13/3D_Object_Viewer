@@ -7,21 +7,36 @@
 #include "Scene/MaterialRegistry.h"
 namespace OBJ_Viewer
 {
+	struct BoundingBox
+	{
+		glm::vec3 max = glm::vec3(-std::numeric_limits<float>::min());
+		glm::vec3 min = glm::vec3(std::numeric_limits<float>::max());
+	};
+	struct ReadMeshData
+	{
+		unsigned int meshMaterialID;
+		MeshInfo meshInfo;
+		std::vector<Vertex> vertexData;
+		std::vector<VertexAttributeObject::IndexDataType> indexData;
+		BoundingBox meshBoundingBox;
+	};
+	
 	class ModelLoader
 	{
 	public:
-		ModelLoader(const char* path, LoadModelFileType modelFileType);
+		ModelLoader(const char* modelFilePath, LoadModelFileType modelFileType);
 		std::unique_ptr<Model> GetLoadedModel() { return std::unique_ptr<Model>(m_loadedScene); }
 		std::unique_ptr<MaterialRegistry> GetLoadedMaterialRegistry() { return std::unique_ptr<MaterialRegistry>(m_materialRegistry); }
-		bool isFiledLoadedSuccessfully() { return (m_loadedScene != nullptr); }
+		bool isFileLoadedSuccessfully() { return (m_loadedScene != nullptr); }
 	private:
+		void ReadSceneFile(aiNode* node, const aiScene* scene);
 		void ReadNode(aiNode* node,const aiScene* scene);
-		std::vector<std::shared_ptr<Mesh>> CreateMeshArray();
-		std::shared_ptr<Mesh> ReadMesh(aiMesh* assimpMesh,glm::mat4& MeshTransform);
 		void PostProcessScene();
-		void LoadSceneMaterials(const aiScene* scene);
+		ReadMeshData ReadMesh(const aiMesh* assimpMesh,const glm::mat4 MeshTransform);
+		std::vector<std::shared_ptr<Material>> LoadSceneMaterials(const aiScene* scene);
+		std::unique_ptr<std::vector<Mesh>> CreateMeshArray();
 		std::shared_ptr<OBJ_Viewer::Texture> ReadTexture(aiMaterial* mat, aiTextureType type);
-		std::string GetModelTexturePathAbsolute(aiString texturePath)const;
+		std::string GetTrueTexturePathString(const aiString& texturePath)const;
 		glm::mat4 AssimpToGlmMatrix4x4(const aiMatrix4x4& matrix);
 	private:
 		struct TypeMaterialRepresentation
@@ -60,15 +75,14 @@ namespace OBJ_Viewer
 	private:
 		MaterialRegistry* m_materialRegistry = nullptr;
 		Model* m_loadedScene = nullptr;
-		std::vector<aiMesh*> m_meshes;
-		std::vector<glm::mat4> m_meshTransforms;
 		ModelData m_ModelData;
 		std::string m_modelPath;
 		LoadModelFileType m_currentlyLoadingType;
+		std::future<std::vector<std::shared_ptr<Material>>> m_materialRegistryThread;
+		std::vector<std::future<ReadMeshData>> m_meshThreadResults;
 #pragma region Post-proccess variables
-		glm::vec3 m_biggestComponents;
-		glm::vec3 m_smallestComponents;
-		glm::mat4 m_sceneScaleMatrix;
+		BoundingBox m_sceneBoundingBox{};
+		glm::mat4 m_SceneAppNormalizeMatrix = glm::mat4(1);;
 #pragma endregion
 	};
 }

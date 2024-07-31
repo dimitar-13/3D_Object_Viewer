@@ -11,7 +11,7 @@
 #include<numeric>
 #include<filesystem>
 #include<cassert>
-#include <future>
+#include<future>
 //OpenGL related includes
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>

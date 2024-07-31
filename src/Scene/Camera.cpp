@@ -9,9 +9,10 @@
 constexpr float Z_FAR = 100.0f;
 constexpr float Z_NEAR = 0.1f;
 constexpr float FOV = 45.0f;
+constexpr glm::vec3 CAMERA_DEFAULT_ORIGIN = glm::vec3{0,1.0f,0};
 
 OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app):
-	m_app(app)
+	m_app(app),m_cameraCenter(CAMERA_DEFAULT_ORIGIN)
 {
 	this->m_zoom = CameraZoom;
 	m_projectionMatrix = glm::perspective(glm::radians(FOV), ASPECT(screenSize.width, screenSize.height), Z_NEAR, Z_FAR);
@@ -113,7 +114,7 @@ void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 {
 	if (e.GetKeyCode() == AppKeyBinding::KEY_BIND_RESET_CAMERA_PIVOT)
 	{
-		m_cameraCenter = glm::vec3(0);
+		m_cameraCenter = CAMERA_DEFAULT_ORIGIN;
 		RecalculateViewMatrix();
 	}
 }

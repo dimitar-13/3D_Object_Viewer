@@ -55,7 +55,6 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEvent& e)
 {
-
 	auto& renderingConfig = m_application.GetScene_RefSettings();
 	//App state saving
 	const bool APP_PREVIOUS_SKYBOX_STATE = renderingConfig.m_isSkyboxOn;
@@ -82,10 +81,11 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 
 	glFinish();
 	
-	std::vector<Framebuffer::pixel_component> renderScenePixelData = outputFramebuffer.GetFramebufferPixels(USE_TRANSPERANT_FORMAT);
+	const std::shared_ptr<std::vector<Framebuffer::pixel_component>> renderScenePixelData = 
+		std::make_shared<std::vector<Framebuffer::pixel_component>>(outputFramebuffer.GetFramebufferPixels(USE_TRANSPERANT_FORMAT));
 
-	std::async(std::launch::async, TexturePixelSaver::SavePicture, EVENT_DATA.outPath.c_str(), EVENT_DATA.imgSize,
-		USE_TRANSPERANT_FORMAT, renderScenePixelData.data(), EVENT_DATA.outImgFormat);
+	m_saveImgResult = std::async(std::launch::async, TexturePixelSaver::SavePicture, EVENT_DATA.outPath, EVENT_DATA.imgSize,
+		USE_TRANSPERANT_FORMAT,renderScenePixelData, EVENT_DATA.outImgFormat);
 
 	//Restore original state
 	m_application.UpdateSceneViewport(APP_PREVIOUS_VIEWPORT);

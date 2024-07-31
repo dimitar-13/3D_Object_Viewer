@@ -58,8 +58,8 @@ void OBJ_Viewer::Renderer::RenderMeshMaterialWithLight(const ShaderClass& shader
 		BindMaterialTexture(shaderToUse, m_defaultWhiteTexture, GL_TEXTURE4, "Mesh_material.ambientOcclusion");
 	}
 
-	shaderToUse.UniformSet3FloatVector("Mesh_material.color", material.GetMaterialData().color);
-	shaderToUse.UniformSet1Float("Mesh_material.specular", material.GetMaterialData().roughness);
+	shaderToUse.UniformSet3FloatVector("Mesh_material.color", material.GetMaterialBaseColor());
+	shaderToUse.UniformSet1Float("Mesh_material.specular", material.GetMaterialRoughness());
 	glDrawElements(GL_TRIANGLES, meshVAO.GetIndexCount(), GL_UNSIGNED_INT, NULL);
 	meshVAO.UnBind();
 }

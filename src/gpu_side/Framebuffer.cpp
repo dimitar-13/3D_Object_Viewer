@@ -80,7 +80,7 @@ void OBJ_Viewer::Framebuffer::CopyFramebufferContent(const Framebuffer& framebuf
 		m_framebufferSize.width, m_framebufferSize.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
-std::vector<OBJ_Viewer::Framebuffer::pixel_component> OBJ_Viewer::Framebuffer::GetFramebufferPixels(TextureFormat retrieveFormat)
+std::vector<OBJ_Viewer::Framebuffer::pixel_component> OBJ_Viewer::Framebuffer::GetFramebufferPixels(TextureFormat retrieveFormat)const
 {
 	const size_t FRAMEBUFFER_TEXTURE_BUFFER_SIZE = m_framebufferSize.width * m_framebufferSize.height * FRAMEBUFFER_TEXTURE_COMPONENT_COUNT;
 	std::vector<pixel_component> result(FRAMEBUFFER_TEXTURE_BUFFER_SIZE);

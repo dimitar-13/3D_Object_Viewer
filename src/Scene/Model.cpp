@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "Model.h"
 
-OBJ_Viewer::Model::Model(std::vector<std::shared_ptr<Mesh>> meshes,const glm::mat4& modelMatrix,const ModelData& data):
-	m_ModelMatrix(modelMatrix), m_data(data)
+OBJ_Viewer::Model::Model(std::unique_ptr<std::vector<Mesh>>& meshes,const glm::mat4& modelMatrix,const ModelData& data):
+	m_ModelMatrix(modelMatrix), m_data(data),m_meshes(std::move(meshes))
 {
-	m_meshes = meshes;
 }
 
 void OBJ_Viewer::Model::GetMatrixDecomposed(glm::vec3& pPosition, glm::vec3& pRotation, glm::vec3& pScale) const

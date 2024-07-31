@@ -448,9 +448,9 @@ void OBJ_Viewer::UILayer::RenderUI()
 			{
 #pragma region Scene mesh info
 				ImGui::Text("Model info");
-				ImGui::Text("Object triangle count:%d", currentModelData.triangleCount);
-				ImGui::Text("Object vertex count:%d", currentModelData.vertexCount);
-				ImGui::Text("Object face count:%d", currentModelData.faceCount);
+				ImGui::Text("Object triangle count:%d", currentModelData.meshInfo.triangleCount);
+				ImGui::Text("Object vertex count:%d", currentModelData.meshInfo.vertexCount);
+				ImGui::Text("Object face count:%d", currentModelData.meshInfo.faceCount);
 				ImGui::Text("Texture count:%d", currentModelData.textureCount);
 
 				ImGui::Text("File path %s", currentModelData.modelPath.c_str());
@@ -464,7 +464,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 				{
 					ImGui::Text("Scene materials");
 
-					for (size_t i = 0; i < registry->GetRegistrySize(); i++)
+					for (size_t i = 0; i < registry->GetMaterialCount(); i++)
 					{
 						if (const auto& material = registry->GetMaterialAtIndex(i).lock())
 						{

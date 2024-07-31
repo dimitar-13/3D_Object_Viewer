@@ -13,8 +13,6 @@ namespace OBJ_Viewer {
 		void RenderUI();
 		Framebuffer& GetInputFramebuffer() { return m_UI_inputFramebuffer; }
 	private:
-		void LoadModel();
-		void LoadSkybox();
 		template<typename T>
 		T RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items, const T& previewItem);
 		void RenderSkyboxSettings();
@@ -29,7 +27,6 @@ namespace OBJ_Viewer {
 		std::shared_ptr<RenderingMediator> m_mediator;
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
-		std::function<void(Event&)> m_appEventCallback;
 	};
 	template<typename T>
 	inline T UILayer::RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items,

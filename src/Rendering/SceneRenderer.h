@@ -54,7 +54,6 @@ namespace OBJ_Viewer {
 #pragma endregion
 
 #pragma region Scene shaders
-
 		ShaderClass m_clearColorShader;
 		ShaderClass m_gridShader;
 		ShaderClass m_skyboxShader;

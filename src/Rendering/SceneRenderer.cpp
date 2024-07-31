@@ -7,6 +7,7 @@
 #include "ShaderPath.h"
 #include "Helpers/MeshGeneratingMethods.h"
 #include "Profiling/AppProfiler.h"
+#include "Helpers/DialogWrapper.h"
 
 #pragma region Constants
 constexpr uint8_t MATRIX_UBO_BINDING_POINT = 0;
@@ -328,14 +329,38 @@ void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
 
 void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
 {
-	LoadSkybox(e.GetSkyboxPaths());
-	m_renderingMediator->SetSkybox(m_sceneSkybox);
+	DialogWrapper dialog;
+	dialog.OpenDialogMultiple("png,jpeg,jpg");
 
+	if (dialog.isDialogClosed())
+		return;
+
+	auto& VecPaths = dialog.GetDialogResult();
+	std::vector<std::string> m_stringVector(VecPaths.size());
+	for (uint32_t i = 0; i < VecPaths.size(); i++)
+	{
+		m_stringVector[i] = std::string(VecPaths.at(i));
+	}
+
+	LoadSkybox(m_stringVector);
+	m_renderingMediator->SetSkybox(m_sceneSkybox);
 }
 
 void OBJ_Viewer::SceneRenderer::OnModelLoadEvent(EventOnModelLoaded& e)
 {
-	LoadModel(e.GetModelPath());
+	DialogWrapper loadModelDialog;
+	std::string_view filterList = "obj";
+
+	if (!m_app.isFBXLoadingDisabled())
+		filterList = "obj,fbx";
+
+	loadModelDialog.OpenDialog(filterList);
+
+	if (loadModelDialog.isDialogClosed())
+		return;
+
+	LoadModel(loadModelDialog.GetFirstDialogResult());
+
 	m_renderingMediator->SetSceneModel(m_sceneModel);
 	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
 }

@@ -6,20 +6,21 @@ namespace OBJ_Viewer {
 	class DialogWrapper {
 	public:
 		DialogWrapper() = default;
-		void OpenDialog(const std::string& filterLIst);
-		void OpenDialogMultiple(const std::string& filterList);
-		void OpenDialogSavePath(const std::string& filterLIst);
+		void OpenDialog(const std::string_view& filterLIst);
+		void OpenDialogMultiple(const std::string_view& filterList);
+		void OpenDialogSavePath(const std::string_view& filterLIst);
 		bool isDialogClosed()const { return isDialogAborted; }
 		~DialogWrapper();
+		const std::string GetFirstDialogResult()const { return outPaths[0]; }
 		const std::vector<nfdchar_t*>& GetDialogResult() const { return outPaths; }
 	private:
 		std::vector<nfdchar_t*> outPaths;
 		bool isDialogAborted = false;
 	};
-	inline void DialogWrapper::OpenDialog(const std::string& filterLIst)
+	inline void DialogWrapper::OpenDialog(const std::string_view& filterLIst)
 	{
 		outPaths.push_back(nullptr);
-		nfdresult_t result = NFD_OpenDialog(filterLIst.c_str(), NULL, &outPaths[0]);
+		nfdresult_t result = NFD_OpenDialog(filterLIst.data(), NULL, &outPaths[0]);
 		if (result != NFD_OKAY) {
 			if (result == NFD_ERROR)
 				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
@@ -27,11 +28,11 @@ namespace OBJ_Viewer {
 			return;
 		}
 	}
-	inline void DialogWrapper::OpenDialogSavePath(const std::string& filterLIst)
+	inline void DialogWrapper::OpenDialogSavePath(const std::string_view& filterLIst)
 	{
 		outPaths.push_back(nullptr);
 		
-		nfdresult_t result = NFD_SaveDialog(filterLIst.c_str() , NULL, &outPaths[0]);
+		nfdresult_t result = NFD_SaveDialog(filterLIst.data() , NULL, &outPaths[0]);
 		if (result != NFD_OKAY) {
 			if (result == NFD_ERROR)
 				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
@@ -39,10 +40,10 @@ namespace OBJ_Viewer {
 			return;
 		}
 	}
-	inline void DialogWrapper::OpenDialogMultiple(const std::string& filterList)
+	inline void DialogWrapper::OpenDialogMultiple(const std::string_view& filterList)
 	{
 		nfdpathset_t paths;
-		nfdresult_t result = NFD_OpenDialogMultiple(filterList.c_str(), NULL, &paths);
+		nfdresult_t result = NFD_OpenDialogMultiple(filterList.data(), NULL, &paths);
 		if (result != NFD_OKAY) {
 			if(result == NFD_ERROR)
 				LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());

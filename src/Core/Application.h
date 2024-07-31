@@ -102,6 +102,7 @@ namespace OBJ_Viewer {
 		Application(Window& appWindow);
 		void AppStartRenderLoop();
 		APP_SETTINGS::RenderStateSettings& GetScene_RefSettings() { return m_appStetting; }
+		bool isFBXLoadingDisabled()const { return m_appStetting.m_disableFBXLoading; }
 		bool isAppInitStatusSuccess()const { return m_appInitStatusSuccsess; }
 		bool isUIHidden()const { return m_isUIHidden; }
 		InputHandler& GetGlobalInputHandler() { return *m_inputHandler; }
@@ -110,7 +111,7 @@ namespace OBJ_Viewer {
 		const SceneViewport& GetSceneViewport_ConstRef()const { return m_sceneViewport; }
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
 		void SubmitSceneViewportSize(const Viewport& newViewport);
-		std::function<void(Event&)> GetOnAppEventCallback() { return std::bind(&Application::OnEvent, this, std::placeholders::_1);}
+		void SubmitEvent(Event& event) { OnEvent(event); }
 		~Application();
 	private:
 		void InitImGui();

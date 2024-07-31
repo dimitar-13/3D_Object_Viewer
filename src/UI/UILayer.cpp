@@ -48,7 +48,7 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,std::shared_ptr<RenderingMedi
 	m_application(appState),
 	m_UI_inputFramebuffer(appState.GetSceneViewport().GetViewportSize(), FRAMEBUFFER_COLOR_ATTACHMENT)
 {
-	m_appEventCallback = m_application.GetOnAppEventCallback();
+	//m_appEventCallback = m_application.GetOnAppEventCallback();
 
 	this->m_imgGuiDockSpaceFlags = ImGuiDockNodeFlags_None;
 	this->m_imGuiWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration;
@@ -65,6 +65,7 @@ OBJ_Viewer::UILayer::UILayer(Application& appState,std::shared_ptr<RenderingMedi
 	if (this->m_imgGuiDockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		this->m_imGuiWindowFlags |= ImGuiWindowFlags_NoBackground;
 }
+
 void OBJ_Viewer::UILayer::isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID windowID)
 {
 	m_currentlyFocusedWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
@@ -77,10 +78,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	auto& pSettings = m_application.GetScene_RefSettings();
 	std::shared_ptr<Model> SceneModel = m_mediator->GetModel().lock();
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();	
-	
+
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::vec3 rotation = { 0,0,0 };
@@ -89,11 +87,14 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 	uint32_t vertexCount = 4050, triangleCount = 2323, faceCount = 23232;
 
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
 	ImGui::SetNextWindowViewport(viewport->ID);
-
 
 	ImGui::Begin("DockSpace Demo", (bool*)true, m_imGuiWindowFlags);
 	ImGuiIO& io = ImGui::GetIO();
@@ -112,7 +113,8 @@ void OBJ_Viewer::UILayer::RenderUI()
 		{
 			if (ImGui::MenuItem("Open file"))
 			{
-				LoadModel();
+				EventOnModelLoaded e;
+				m_application.SubmitEvent(e);
 			}
 			if (ImGui::MenuItem("Take screenshot"))
 			{
@@ -203,7 +205,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 					eventData.outImgFormat = currentlySelectedFormat;
 					eventData.allowTransparency = renderWithTransparency;
 					ScreenshotEvent e(eventData);
-					m_appEventCallback(e);
+					m_application.SubmitEvent(e);
 				}
 			}
 		}ImGui::End();
@@ -459,7 +461,7 @@ void OBJ_Viewer::UILayer::RenderUI()
 				{
 					pSettings.isCurrentProjectionPerspective = !pSettings.isCurrentProjectionPerspective;
 					EventCameraProjectionChanged e(pSettings.isCurrentProjectionPerspective);
-					m_appEventCallback(e);
+					m_application.SubmitEvent(e);
 				}
 
 				ImGui::SetItemTooltip("Current projection mode is:%s", pSettings.isCurrentProjectionPerspective ? "Perspective" : "Orthographic");
@@ -546,7 +548,6 @@ void OBJ_Viewer::UILayer::RenderUI()
 
 #pragma region Scene window
 
-
 	if(ImGui::Begin(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME,(bool*)0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse))
 	{
 		isAppWindowFocused(APP_FOCUS_REGIONS::UI_LAYER_SCENE_WINDOW_NAME);
@@ -607,7 +608,9 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 	
 	if (ImGui::Button("Load skybox textures."))
 	{
-		LoadSkybox();	
+		
+		EventOnSkyboxLoaded e;
+		m_application.SubmitEvent(e);		
 	}
 	if (auto sceneSkybox = m_mediator->GetSkybox().lock())
 	{
@@ -641,60 +644,4 @@ void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3
 	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->y), -1.f, 1.f);
 	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->z), -1.f, 1.f);
 
-}
-
-//int OBJ_Viewer::UILayer::RenderComboBox(const std::string& comboLabel,const std::vector<std::string>& items, int index)
-//{	
-//	if (ImGui::BeginCombo(comboLabel.c_str(), items[index].c_str())) // The second parameter is the label previewed before opening the combo.
-//	{
-//		for (int n = 0; n < items.size(); n++)
-//		{
-//			bool is_selected = (items[index] == items[n]); // You can store your selection however you want, outside or inside your objects
-//			if (ImGui::Selectable(items[n].c_str(), is_selected))
-//			{				
-//				ImGui::EndCombo();
-//				return n;
-//			}
-//		}
-//		ImGui::EndCombo();
-//	}
-//
-//	return index;
-//}
-
-void OBJ_Viewer::UILayer::LoadModel()
-{
-	DialogWrapper dialog;
-	std::string filterList = "obj";
-
-	if (!m_application.GetScene_RefSettings().m_disableFBXLoading)
-		filterList += ",fbx";
-
-	dialog.OpenDialog(filterList);
-	//If error occurs or the user change their mind we wont send an event;
-	if (dialog.isDialogClosed())
-		return;
-
-	auto& VecPaths = dialog.GetDialogResult();
-	EventOnModelLoaded e(std::string(VecPaths.at(0)));
-	m_appEventCallback(e);
-}
-
-void OBJ_Viewer::UILayer::LoadSkybox()
-{
-	DialogWrapper dialog;
-	dialog.OpenDialogMultiple("png,jpeg,jpg");
-
-	//If error occurs or the user change their mind we wont send an event;
-	if (dialog.isDialogClosed())
-		return;
-
-	auto& VecPaths = dialog.GetDialogResult();
-	std::vector<std::string> m_stringVector(VecPaths.size());
-	for (uint32_t i = 0; i < VecPaths.size(); i++)
-	{
-		m_stringVector[i] = std::string(VecPaths.at(i));
-	}
-	EventOnSkyboxLoaded e(m_stringVector);
-	m_appEventCallback(e);
 }

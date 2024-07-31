@@ -50,7 +50,7 @@ constexpr uint8_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByForma
 
 #pragma region Image saver src
 
-int OBJ_Viewer::TexturePixelSaver::SavePicture(const std::string& filePath_name, Size2D imageSize,TextureFormat textureChanelFormat,
+int OBJ_Viewer::TexturePixelSaver::SavePicture(std::string filePath_name, Size2D imageSize,TextureFormat textureChanelFormat,
 	std::shared_ptr<std::vector<unsigned char>> pixelDataToSave, ImageFileFormat imageSaveFormat)
 {
 	switch (imageSaveFormat)

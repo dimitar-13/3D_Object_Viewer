@@ -278,6 +278,7 @@
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\PostProcessShader.glsl" />
     <None Include="Shaders\ClearColorMeshShader.glsl" />
+    <None Include="Shaders\NormalOrientationShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">

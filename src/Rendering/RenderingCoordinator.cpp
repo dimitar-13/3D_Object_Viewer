@@ -9,9 +9,9 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 {
 	GLFWwindow* window = this->m_application.GetGlobalAppWindow().GetGLFW_Window();
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK);
 
 	while (!glfwWindowShouldClose(window))
 	{

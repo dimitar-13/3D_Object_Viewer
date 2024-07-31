@@ -103,6 +103,10 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 		case APP_SETTINGS::RenderingMode::RENDER_MODE_LIGHT:
 			SetUpShaderForLightRendering(mesh, renderSettings.m_MaterialFlags, renderSettings.lightInfo);
 			break;
+		case APP_SETTINGS::RENDER_MODE_NORMAL_ORIENTATION:
+			shaderToUse = m_shaderLib.GetShaderPtr(ShaderLibarryShaderName_NormalShader);
+			m_mainRenderer.RenderMesh(*shaderToUse, mesh.GetMeshVAO(), *m_sceneCamera);
+			break;
 		default:
 			break;
 		}
@@ -118,10 +122,10 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 
 	if (renderSettings.m_isSkyboxOn && m_sceneSkybox != nullptr)
 	{
-		glDisable(GL_CULL_FACE);
+		//glDisable(GL_CULL_FACE);
 		auto& shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_SkyboxShader);
 		m_mainRenderer.RenderSkybox(shader, *m_sceneSkybox, *m_sceneCamera);
-		glEnable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
 	}
 
 	if (renderSettings.m_isWireGridOn)
@@ -170,8 +174,6 @@ void OBJ_Viewer::SceneRenderer::PostProcessScene(bool doFXAA)
 	framebufferTexture.UnbindTexture();
 	glDisable(GL_BLEND);
 }
-
-
 
 void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags,
 	APP_SETTINGS::SceneLightInfo lightInfo)

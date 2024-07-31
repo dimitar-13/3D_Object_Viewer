@@ -283,6 +283,7 @@
     <None Include="Shaders\GridShader.glsl" />
     <None Include="Shaders\LightShader.glsl" />
     <None Include="Shaders\MaterialShader.glsl" />
+    <None Include="Shaders\NormalOrientationShader.glsl" />
     <None Include="Shaders\PostProcessShader.glsl" />
     <None Include="Shaders\SingleTextureInspectShader.glsl" />
     <None Include="Shaders\SkyboxShader.glsl" />

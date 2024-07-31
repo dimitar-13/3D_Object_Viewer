@@ -16,4 +16,6 @@ OBJ_Viewer::ShaderLibrary::ShaderLibrary()
 	m_shaderLibraryHash.emplace(ShaderLibarryShaderName_UVShader,ShaderAssetHelper::GetConcatShaderPath("UVShader.glsl").c_str());
 	m_shaderLibraryHash.emplace(ShaderLibarryShaderName_SingleTextureShader,ShaderAssetHelper::GetConcatShaderPath("SingleTextureInspectShader.glsl").c_str());
 	m_shaderLibraryHash.emplace(ShaderLibarryShaderName_PostProcessShader,ShaderAssetHelper::GetConcatShaderPath("PostProcessShader.glsl").c_str());
+	m_shaderLibraryHash.emplace(ShaderLibarryShaderName_NormalShader, ShaderAssetHelper::GetConcatShaderPath("NormalOrientationShader.glsl").c_str());
+
 }

@@ -43,7 +43,7 @@ namespace OBJ_Viewer {
 	class TexturePixelSaver
 	{	
 	public:
-		static int SavePicture(const std::string& filePath_name, Size2D imageSize,
+		static int SavePicture(std::string filePath_name, Size2D imageSize,
 			TextureFormat textureChanelFormat, std::shared_ptr<std::vector<unsigned char>> pixelDataToSave,ImageFileFormat imageSaveFormat);
 	private:
 		static int SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat saveFormat, void* pixelDataToSave);

@@ -53,6 +53,7 @@ namespace OBJ_Viewer {
 		constexpr AppWindowID UI_LAYER_MODEL_AND_RENDERING_SETTINGS_WINDOW_NAME = "ModelAndRenderingSettings";
 		constexpr AppWindowID UI_LAYER_SCENE_SETTINGS_WINDOW_NAME = "Scene setting";
 		constexpr AppWindowID UI_WINDOW_SCREENSHOT_SETTINGS = "Screenshot settings";
+		constexpr AppWindowID UI_WINDOW_APP_CONTROLINFO= "Application controls";
 		constexpr AppWindowID UI_WINDOW_UNKNOWN = "unknownWindow";
 	}
 }

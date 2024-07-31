@@ -69,7 +69,7 @@ OBJ_Viewer::SceneRenderer::~SceneRenderer()
 void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSettings& renderSettings, Framebuffer* outputFrameBuffer)
 {
 	SetUniformMatrixBuffer();
-
+	
 	if (renderSettings.m_EnableAA)
 		m_multiSampleSceneFrameBuffer.BindFramebuffer();
 	else
@@ -317,8 +317,12 @@ void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
 		OnSkyboxLoadEvent(dynamic_cast<EventOnSkyboxLoaded&>(e));
 	else if (e.GetEventCategory() & APP_EVENT && e.GetEventType() == EVENT_SCENE_VIEWPORT_SIZE_CHANGED)
 	{
-		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(m_app.GetSceneViewport().GetViewportSize());
-		m_intermidiateFramebuffer.ResizeFramebuffer(m_app.GetSceneViewport().GetViewportSize());
+		auto& sceneViewportEvent = dynamic_cast<SceneViewportResizeEvent&>(e);
+		const Viewport& newViewport = sceneViewportEvent.GetViewport();
+		glViewport(newViewport.x, newViewport.y, newViewport.width, newViewport.height);
+
+		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());
+		m_intermidiateFramebuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());
 	}
 }
 

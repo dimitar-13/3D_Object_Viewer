@@ -16,8 +16,6 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 	while (!glfwWindowShouldClose(window))
 	{
 		if (m_currentWindowState != WINDOW_STATE_MINIMIZED) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 			if (!m_application.isUIHidden())
 				m_UILayer->RenderUI();
 
@@ -34,7 +32,6 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 void OBJ_Viewer::RenderingCoordinator::RenderScene()
 {
 	auto& appSettings =	m_application.GetScene_RefSettings();
-	auto& framebuffer =	m_application.GetSceneFrameBuffer();
 
 	//Set up the renderer based on the settings;
  
@@ -49,7 +46,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 		m_sceneRenderer->RenderScene(appSettings);
 	}
 	else
-		m_sceneRenderer->RenderScene(appSettings, &framebuffer);
+		m_sceneRenderer->RenderScene(appSettings, &m_UILayer->GetInputFramebuffer());
 
 }
 
@@ -64,8 +61,6 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 	const TextureFormat USE_TRANSPERANT_FORMAT =EVENT_DATA.allowTransparency ? TextureFormat::TEXTURE_FORMAT_RGBA :
 		TextureFormat::TEXTURE_FORMAT_RGB;
 
-	Framebuffer& outputFramebuffer = m_application.GetSceneFrameBuffer();
-
 	Viewport OutputImageViewport{};
 	OutputImageViewport.x = 0;
 	OutputImageViewport.y = 0;
@@ -75,20 +70,20 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 	//Change app state
 	renderingConfig.m_isSkyboxOn = renderingConfig.m_isSkyboxOn   && !EVENT_DATA.renderObjectOnly;
 	renderingConfig.m_isWireGridOn = renderingConfig.m_isWireGridOn && !EVENT_DATA.renderObjectOnly;
-	m_application.UpdateSceneViewport(OutputImageViewport);
+	m_application.SubmitSceneViewportSize(OutputImageViewport);
 
-	m_sceneRenderer->RenderScene(renderingConfig, &outputFramebuffer);
+	m_sceneRenderer->RenderScene(renderingConfig, &m_UILayer->GetInputFramebuffer());
 
 	glFinish();
 	
 	const std::shared_ptr<std::vector<Framebuffer::pixel_component>> renderScenePixelData = 
-		std::make_shared<std::vector<Framebuffer::pixel_component>>(outputFramebuffer.GetFramebufferPixels(USE_TRANSPERANT_FORMAT));
+		std::make_shared<std::vector<Framebuffer::pixel_component>>(m_UILayer->GetInputFramebuffer().GetFramebufferPixels(USE_TRANSPERANT_FORMAT));
 
 	m_saveImgResult = std::async(std::launch::async, TexturePixelSaver::SavePicture, EVENT_DATA.outPath, EVENT_DATA.imgSize,
 		USE_TRANSPERANT_FORMAT,renderScenePixelData, EVENT_DATA.outImgFormat);
 
 	//Restore original state
-	m_application.UpdateSceneViewport(APP_PREVIOUS_VIEWPORT);
+	m_application.SubmitSceneViewportSize(APP_PREVIOUS_VIEWPORT);
 	renderingConfig.m_isSkyboxOn = APP_PREVIOUS_SKYBOX_STATE;
 	renderingConfig.m_isWireGridOn = APP_PREVIOUS_GRID_STATE;
 
@@ -109,6 +104,6 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application)
 	std::shared_ptr<RenderingMediator> mediator = std::make_shared<RenderingMediator>();
 	m_sceneRenderer = std::make_shared<SceneRenderer>(application, mediator);
 	m_application.AddEventListener(m_sceneRenderer);
-	m_UILayer = std::make_unique<UILayer>(m_application, mediator, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration, ImGuiDockNodeFlags_None);
+	m_UILayer = std::make_unique<UILayer>(m_application, mediator);
 
 }

@@ -44,7 +44,7 @@ namespace OBJ_Viewer
 #pragma region On Event
 		void onScrollChanged(ScrollPositionChanged& e);
 		void onMousePositionChanged(MousePositionEvent& e);
-		void onWinSizeChanged(SceneViewportResizeEvent& e);
+		void onViewportChanged(SceneViewportResizeEvent& e);
 		void onKeyPressedEvent(KeyboardKeyEvent& e);
 		void RecalculateProjection(Size2D windowSize = {0,0});
 		void OnProjectionModeChanged(EventCameraProjectionChanged& e);

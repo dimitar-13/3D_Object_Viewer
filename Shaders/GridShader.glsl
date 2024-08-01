@@ -33,13 +33,14 @@ void main()
 	frag_projMatrix = ProjectionMatrix;
 
 	farPoint = unprojectPoint(vec4(position.xy,1.0,1.0),ViewMatrix,ProjectionMatrix).xyz;
-	nearPoint = unprojectPoint(vec4(position.xy,0.0,1.0),ViewMatrix,ProjectionMatrix).xyz;
+	nearPoint = unprojectPoint(vec4(position.xy,-1.0,1.0),ViewMatrix,ProjectionMatrix).xyz;
 
 	gl_Position = vec4(position,1);
 }
 #Shader:fragment
 #version 330 core
 
+#define GRID_VANISH_POINT_VALUE 20.0f 
 out vec4 FragColor;
 in vec3 farPoint;
 in vec3 nearPoint;
@@ -75,20 +76,17 @@ vec4 GetGridCol(vec2 p,GridInfo grid_Info)
 	float dX = smoothstep(0.0, dCoords.x * 2.0, subregions.x);
 	float dY = smoothstep(0.0, dCoords.y * 2.0, subregions.y);
 
-	float d = 1.0 - (dX * dY);
+	float alpha = 1.0 - (dX * dY);
+
+	bool shadeXAxis =(1. - smoothstep(.0,dCoords.x*2.,abs(coords.x))) > 0 && grid_Info.isAxisShaded;
 	
-	if( 1. - smoothstep(.0,dCoords.x*2.,abs(coords.x)) > 0 && grid_Info.isAxisShaded)
-	{
-		gridColor = vec3(0,0,.5);
-		//d = 1.;
-	}
-		
-	if( 1. - smoothstep(.0,dCoords.y * 2.0,abs(coords.y))  > 0.  && grid_Info.isAxisShaded)
-	{
-		gridColor = vec3(.5,.0,0);
-		//d = 1.;
-	}
-	return vec4(gridColor,d);
+	gridColor = shadeXAxis ? vec3(0,0,1.) : gridColor;
+	
+	bool shadeYAxis = (1. - smoothstep(.0,dCoords.y * 2.0,abs(coords.y)))  > 0. && grid_Info.isAxisShaded;
+
+	gridColor = shadeYAxis ? vec3(1.,0,0) : gridColor;
+	
+	return vec4(gridColor,alpha);
 }
 
 void main()
@@ -99,7 +97,7 @@ void main()
 	
 	vec4 col = GetGridCol(fragPos3D.xz,gridInfo);
 	
-	col.a *= 1- smoothstep(0.,10., length(cameraPosition -fragPos3D ));
+	col.a *= 1 - smoothstep(0.,GRID_VANISH_POINT_VALUE, length(cameraPosition -fragPos3D ));
 	col.a *= t < 0 ? 0. :1.;
 	gl_FragDepth = GetFragDepth(fragPos3D);
 	FragColor = vec4(col);	

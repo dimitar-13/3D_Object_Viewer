@@ -30,8 +30,8 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<Verte
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_vertexData.indexCount = kVertexDataVectorRef.size();
-	m_vertexData.vertexCount = kIndexDataVectorRef.size();
+	m_vertexData.indexCount = kIndexDataVectorRef.size();
+	m_vertexData.vertexCount = kVertexDataVectorRef.size();
 }
 
 OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::vec3>& kPostionDataVectorRef,

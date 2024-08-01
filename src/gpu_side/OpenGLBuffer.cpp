@@ -10,6 +10,7 @@ OBJ_Viewer::OpenGLBuffer::OpenGLBuffer(const BufferData& data):
 	glBindBuffer(data.type, 0);
 }
 
+
 OBJ_Viewer::OpenGLBuffer::~OpenGLBuffer()
 {
 	glDeleteBuffers(1, &this->m_bufferHandle);

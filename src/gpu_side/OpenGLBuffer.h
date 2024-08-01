@@ -37,6 +37,7 @@ namespace OBJ_Viewer {
 	{
 	public:
 		OpenGLBuffer(const BufferData& data);
+        OpenGLBuffer(const OpenGLBuffer& other) = delete; //Recomend for chatching bugs if you dont intent to make copies.
 		void BindBuffer()const{ glBindBuffer(m_data.type, this->m_bufferHandle); }
 		void UnbindBuffer()const { glBindBuffer(m_data.type,0); }
 		~OpenGLBuffer();

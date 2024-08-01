@@ -10,11 +10,14 @@ layout(std140) uniform Matrices
 	mat4 ModelMatrix;
 	mat4 NormalMatrix;
 };
+uniform bool uIsProjectionPerspective;
 void main()
 {
 	mat4 skyboxView = mat4(mat3(ViewMatrix));
-	vec4 pos = ProjectionMatrix*skyboxView*vec4(position,1);
-	gl_Position = pos.xyww;
+	mat4 finalProjection = uIsProjectionPerspective ? ProjectionMatrix : mat4(1);
+
+	vec4 pos = finalProjection*skyboxView*vec4(position,1);
+	gl_Position =uIsProjectionPerspective ? pos.xyww : pos.xyzz;
 	FragCoords = position;
 }
 #Shader:fragment
@@ -25,5 +28,5 @@ in vec3 FragCoords;
 uniform samplerCube skyboxSampler;
 void main()
 {
-	FragColor = texture(skyboxSampler,FragCoords);
+	FragColor = vec4(texture(skyboxSampler,FragCoords).rgb,1);
 }

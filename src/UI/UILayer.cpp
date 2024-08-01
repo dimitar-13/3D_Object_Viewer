@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "UILayer.h"
-#include "Helpers/DialogWrapper.h"
-#include "Profiling/AppProfiler.h"
 #include "Enums/FIleImageEnums.h"
+#include "Helpers/DialogWrapper.h"
 #include "Helpers/TextureHelpers.h"
+#include "Profiling/AppProfiler.h"
+#include "UILayer.h"
 
 enum ImageResolutionEnum_
 {
@@ -16,14 +16,14 @@ enum ImageResolutionEnum_
 constexpr ImGuiWindowFlags_ APP_WINDOW_STYLE_FLAGS = ImGuiWindowFlags_NoMove;
 
 #pragma region KEY_UI_LABEL_MAPS
-inline const std::unordered_map<OBJ_Viewer::SkyboxFace, const char*> kUI_SkyboxFaceLabelMap =
+inline const std::unordered_map<OBJ_Viewer::SkyboxFace_, const char*> kUI_SkyboxFaceLabelMap =
 {
-	{OBJ_Viewer::SKYBOX_FACE_RIGHT, "Right face"},
-	{OBJ_Viewer::SKYBOX_FACE_LEFT ,"Left face"},
-	{OBJ_Viewer::SKYBOX_FACE_TOP,"Top face"},
-	{OBJ_Viewer::SKYBOX_FACE_BOTTOM,"Bottom face"},
-	{OBJ_Viewer::SKYBOX_FACE_FRONT,"Front face"},
-	{OBJ_Viewer::SKYBOX_FACE_BACK,"Back face"}
+	{OBJ_Viewer::SkyboxFace_kRight, "Right face"},
+	{OBJ_Viewer::SkyboxFace_kLeft ,"Left face"},
+	{OBJ_Viewer::SkyboxFace_kTop,"Top face"},
+	{OBJ_Viewer::SkyboxFace_kBottom,"Bottom face"},
+	{OBJ_Viewer::SkyboxFace_kFront,"Front face"},
+	{OBJ_Viewer::SkyboxFace_kBack,"Back face"}
 };
 
 inline const std::unordered_map<ImageResolutionEnum_, const char *> kUI_ResolutionOptionLabelMap =
@@ -614,21 +614,21 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings()
 	}
 	if (auto sceneSkybox = m_mediator->GetSkybox().lock())
 	{
-		std::vector <std::shared_ptr<Texture>> skyboxTextures = sceneSkybox->GetSkyboxFaceTextures();
+		std::array<std::shared_ptr<Texture>,Skybox::SKYBOX_FACE_COUNT> skyboxTextures = sceneSkybox->GetSkyboxFaceTextures();
 
 		int noTextureLoaded = 0;
-		static SkyboxFace comboResult{};
+		static SkyboxFace_ comboResult{};
 		static std::string index_to_string = "## ";
 		for (uint8_t i = 0; i < Skybox::SKYBOX_FACE_COUNT; i++)
 		{
 			ImGui::Image((ImTextureID)skyboxTextures[i]->GetTextureHandle(),{ 50,50 }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 			ImGui::SameLine();
 			index_to_string[index_to_string.size() - 1] = '0' + i;
-			comboResult = RenderComboBox<SkyboxFace>(index_to_string, kUI_SkyboxFaceLabelMap,
-				static_cast<SkyboxFace>(i));
+			comboResult = RenderComboBox<SkyboxFace_>(index_to_string, kUI_SkyboxFaceLabelMap,
+				static_cast<SkyboxFace_>(i));
 
 			if(i != comboResult)
-				m_mediator->GetSkybox().lock()->SwapSkyboxFaceTextures(static_cast<SkyboxFace>(i), comboResult);
+				m_mediator->GetSkybox().lock()->SwapSkyboxFaceTextures(static_cast<SkyboxFace_>(i), comboResult);
 		}
 
 		//TODO:Add texture preview;

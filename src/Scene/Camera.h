@@ -37,6 +37,7 @@ namespace OBJ_Viewer
 		glm::mat4 GetViewProjMatrix()const { return m_projectionMatrix * m_viewMatrix; }
 		glm::mat4 GetViewProjNoTranslation()const { return m_projectionMatrix* glm::mat4(glm::mat3(m_viewMatrix)); };
 		glm::vec3 GetCameraPos()const { return this->m_position; }
+        bool IsCameraProjectionPerspective()const { return m_isProjectionPerspective; }
 		void SetProjection(bool isProjectionPerspective = true) { m_isProjectionPerspective = isProjectionPerspective; RecalculateProjection(); }
 	private:
 		void RecalculateViewMatrix();

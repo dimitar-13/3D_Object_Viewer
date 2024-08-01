@@ -58,7 +58,7 @@ OBJ_Viewer::SceneRenderer::~SceneRenderer()
 void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSettings& renderSettings, Framebuffer* outputFrameBuffer)
 {
 	SetUniformMatrixBuffer();
-	
+   
 	if (renderSettings.m_EnableAA)
 		m_multiSampleSceneFrameBuffer.BindFramebuffer();
 	else
@@ -114,18 +114,12 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 
 	if (renderSettings.m_EnableAA)
 	{
-		m_intermidiateFramebuffer.CopyFramebufferContent(m_multiSampleSceneFrameBuffer);
+		m_intermidiateFramebuffer.CopyFramebufferContent(m_multiSampleSceneFrameBuffer,
+            static_cast<FramebufferBitMaskFlags_>(FramebufferBitMaskFlags_kColorBufferBit | FramebufferBitMaskFlags_kDepthBufferBit));
+
 		m_multiSampleSceneFrameBuffer.UnbindFramebuffer();
 
 		m_intermidiateFramebuffer.BindFramebuffer();
-	}
-
-	if (renderSettings.m_isSkyboxOn && m_sceneSkybox != nullptr)
-	{
-		//glDisable(GL_CULL_FACE);
-		auto& skybox_shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kSkyboxShader);
-		m_mainRenderer.RenderSkybox(skybox_shader, *m_sceneSkybox, *m_sceneCamera);
-		//glEnable(GL_CULL_FACE);
 	}
 
 	if (renderSettings.m_isWireGridOn)
@@ -133,6 +127,19 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 		auto& grid_shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kGridShader);
 		m_mainRenderer.RenderGrid(grid_shader, m_screenQuad, *m_sceneCamera, renderSettings.m_gridData);
 	}
+
+    if (renderSettings.m_isSkyboxOn && m_sceneSkybox != nullptr)
+    {
+        //glDisable(GL_CULL_FACE);
+        glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+        glEnable(GL_BLEND);
+        auto& skybox_shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kSkyboxShader);
+        m_mainRenderer.RenderSkybox(skybox_shader, *m_sceneSkybox, *m_sceneCamera);
+        glDisable(GL_BLEND);
+
+        //glEnable(GL_CULL_FACE);
+    }
+
 	m_intermidiateFramebuffer.UnbindFramebuffer();
 
 
@@ -239,6 +246,7 @@ void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 			paths.size(), Skybox::SKYBOX_FACE_COUNT);
 		return;
 	}
+    stbi_set_flip_vertically_on_load(false);
 
 	std::array<TexturePixelReader,Skybox::SKYBOX_FACE_COUNT> skybox_texture_readers = {
 		TexturePixelReader(paths[0].c_str()),
@@ -248,6 +256,9 @@ void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 		TexturePixelReader(paths[4].c_str()),
 		TexturePixelReader(paths[5].c_str())
 	};
+
+    stbi_set_flip_vertically_on_load(true);
+
 	for (const auto& reader : skybox_texture_readers)
 	{
 		if (!reader.isTextureValid())
@@ -259,7 +270,7 @@ void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 	this->m_sceneSkybox.reset(new Skybox(skybox_texture_readers));
 }
 
-void OBJ_Viewer::SceneRenderer::SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with)
+void OBJ_Viewer::SceneRenderer::SwapSkyboxFaces(SkyboxFace_ toSwap, SkyboxFace_ with)
 {
 	this->m_sceneSkybox->SwapSkyboxFaceTextures(toSwap, with);
 }

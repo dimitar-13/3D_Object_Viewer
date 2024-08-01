@@ -96,6 +96,7 @@ void OBJ_Viewer::Renderer::RenderSkybox(const ShaderClass& skyboxShader, const S
 	glActiveTexture(GL_TEXTURE0);
 	skybox.BindSkyboxTexture();
 	skyboxShader.SetUniformSet1Int("skyboxSampler", 0);
+    skyboxShader.SetUniformSet1Int("uIsProjectionPerspective", mainCamera.IsCameraProjectionPerspective());
 	skybox.GetSkyboxVAO().BindBuffer();
 	glDrawElements(GL_TRIANGLES, skybox.GetSkyboxVAO().GetIndexCount(), GL_UNSIGNED_INT, NULL);
 	skybox.GetSkyboxVAO().UnBind();

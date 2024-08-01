@@ -31,7 +31,7 @@ namespace OBJ_Viewer {
 	struct TextureFormatEnumConverter
 	{
 		static constexpr TextureFormat_ GetFormatByChannelCount(int channelCount);
-		static constexpr uint8_t GetChannelCountByFormat(TextureFormat_ format);
+		static constexpr size_t GetChannelCountByFormat(TextureFormat_ format);
 	};
 	struct TextureFileEnumConverter
 	{
@@ -57,10 +57,11 @@ namespace OBJ_Viewer {
 		TexturePixelReader(const char* path);
 		~TexturePixelReader(){ stbi_image_free(m_pixelData); }
 		unsigned char* GetTexturePixelData()const { return m_pixelData; }
+        size_t GetTextureByteSize()const { return static_cast<size_t>(m_textureSize.width) * static_cast<size_t>(m_textureSize.height) * TextureFormatEnumConverter::GetChannelCountByFormat(m_textureFormat); }
 		Size2D GetTextureSize()const { return m_textureSize; }
 		TextureFormat_ GetTextureFormat()const { return m_textureFormat; }
 		bool isTextureValid()const { return m_pixelData != nullptr; }
-		uint8_t GetChannelCount()const { return TextureFormatEnumConverter::GetFormatByChannelCount(m_textureFormat); }
+		uint8_t GetChannelCount()const { return TextureFormatEnumConverter::GetChannelCountByFormat(m_textureFormat); }
 	private:
 		unsigned char* m_pixelData = nullptr;
 		Size2D m_textureSize {};

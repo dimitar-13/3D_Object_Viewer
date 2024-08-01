@@ -5,16 +5,15 @@
 #include "gpu_side/OpenGLBuffer.h"
 #include "Helpers/TextureHelpers.h"
 namespace OBJ_Viewer
-{
-	
-	enum SkyboxFace
+{	
+	enum SkyboxFace_
 	{
-		SKYBOX_FACE_RIGHT = 0,
-		SKYBOX_FACE_LEFT = 1,
-		SKYBOX_FACE_TOP = 2,
-		SKYBOX_FACE_BOTTOM = 3,
-		SKYBOX_FACE_FRONT = 4,
-		SKYBOX_FACE_BACK = 5
+		SkyboxFace_kRight  =  0,
+		SkyboxFace_kLeft   =  1,
+        SkyboxFace_kTop    =  2,
+        SkyboxFace_kBottom =  3,
+        SkyboxFace_kFront  =  4,
+        SkyboxFace_kBack   =  5
 	};
 	class Skybox {
 	public:
@@ -22,13 +21,12 @@ namespace OBJ_Viewer
 		Skybox(const std::array<TexturePixelReader,Skybox::SKYBOX_FACE_COUNT>& textures);
 		~Skybox();
 		void BindSkyboxTexture()const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle); }
-		void SwapSkyboxFaceTextures(SkyboxFace toBeSwapped, SkyboxFace swappedWith);
+		void SwapSkyboxFaceTextures(SkyboxFace_ toBeSwapped, SkyboxFace_ swappedWith);
 		const VertexAttributeObject& GetSkyboxVAO()const { return *m_skyboxVAO; }
-		const std::vector<std::shared_ptr<Texture>>& const GetSkyboxFaceTextures() { return m_faceTextures; }	
-		//TODO:Hide away the pointers make the unique and return the reference to them if needed
-	private:
-		std::vector<std::shared_ptr<Texture>> m_faceTextures;
-		std::vector<OpenGLBuffer> m_PixelBuffers;
+		const std::array<std::shared_ptr<Texture>, SKYBOX_FACE_COUNT>& const GetSkyboxFaceTextures() { return m_faceTextures; }
+    private:
+		std::array<std::shared_ptr<Texture>, SKYBOX_FACE_COUNT> m_faceTextures;
+		std::array<std::unique_ptr<OpenGLBuffer>, SKYBOX_FACE_COUNT> m_PixelBuffers;
 		GLuint m_cubeMapHandle = 0;
 		std::unique_ptr<VertexAttributeObject> m_skyboxVAO;
 		Size2D m_CubeMapTextSize;

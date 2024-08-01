@@ -23,7 +23,7 @@ constexpr OBJ_Viewer::TextureFormat_ OBJ_Viewer::TextureFormatEnumConverter::Get
 	}
 }
 
-constexpr uint8_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat(TextureFormat_ format)
+constexpr size_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat(TextureFormat_ format)
 {
 	switch (format)
 	{
@@ -115,8 +115,8 @@ int OBJ_Viewer::TexturePixelSaver::SaveBitmap(const char* filePath_name, Size2D 
 OBJ_Viewer::TexturePixelReader::TexturePixelReader(const char* path)
 {
 	int channelCount;
-
 	m_pixelData = stbi_load(path, &m_textureSize.width, &m_textureSize.height, &channelCount, 0);
+    
 	if (!m_pixelData)
 	{
 		LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", path);

@@ -4,7 +4,7 @@
 #include "Controls/AppKeyBindings.h"
 
 #define OBJ_VIEWER_IS_Y_VECTOR_FLIPPED(X) std::cos(glm::radians(X)) < 0
-#define ASPECT(X,Y) (float)X / (float)Y
+#define OBJ_VIEWER_SCREEN_ASPECT(X,Y) (float)X / (float)Y
 
 constexpr float kZfar = 100.0f;
 constexpr float kZnear = 0.1f;
@@ -15,7 +15,7 @@ OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app
 	m_app(app),m_cameraCenter(kCameraDefaultOrigin)
 {
 	this->m_zoom = CameraZoom;
-	m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), ASPECT(screenSize.width, screenSize.height), kZnear, kZfar);
+	m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(screenSize.width, screenSize.height), kZnear, kZfar);
 
 	this->m_EulerAngles.m_pitchAngle = 0.0f;
 	this->m_EulerAngles.m_yawAngle = 90.0f;
@@ -106,8 +106,8 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 
 void OBJ_Viewer::Camera::onViewportChanged(SceneViewportResizeEvent& e)
 {
-	const Size2D window_size = e.GetViewportSize();
-	RecalculateProjection(window_size);
+	const Size2D viewport_size = e.GetViewportSize();
+	RecalculateProjection(viewport_size);
 }
 
 void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
@@ -119,14 +119,14 @@ void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 	}
 }
 
-void OBJ_Viewer::Camera::RecalculateProjection(Size2D windowSize)
+void OBJ_Viewer::Camera::RecalculateProjection(Size2D viewport_size)
 {
-	windowSize = (windowSize.width == 0 || windowSize.height == 0) ? m_app.GetSceneViewport().GetViewportSize() : windowSize;
+    viewport_size = (viewport_size.width == 0 || viewport_size.height == 0) ? m_app.GetSceneViewport().GetViewportSize() : viewport_size;
 
 	if (m_isProjectionPerspective)
-		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), ASPECT(windowSize.width, windowSize.height) , kZnear, kZfar);
+		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(viewport_size.width, viewport_size.height) , kZnear, kZfar);
 	else
-		CalculateOthoProjection(windowSize);
+		CalculateOthoProjection(viewport_size);
 }
 
 void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e)
@@ -135,7 +135,7 @@ void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e
 	RecalculateProjection();
 }
 
-void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D windowSize)
+void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D viewport_size)
 {
 	constexpr float kOrthographicScaleFactor = 500.0f;
 
@@ -144,8 +144,8 @@ void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D windowSize)
 	* box defined by the left,right,bottom,top planes so that smaller values will get bigger meaning that since ortho matrix
 	* is just a scale and translate we make the scale bigger by multiplying left,right,bottom,top with the 'orthoScale'.
 	*/
-	m_projectionMatrix = glm::ortho(-((float)windowSize.width / 2) * orthographic_scale, ((float)windowSize.width / 2) * orthographic_scale,
-		-((float)windowSize.height / 2) * orthographic_scale, ((float)windowSize.height / 2) * orthographic_scale, -1.f/ orthographic_scale, kZfar);
+	m_projectionMatrix = glm::ortho(-((float)viewport_size.width / 2) * orthographic_scale, ((float)viewport_size.width / 2) * orthographic_scale,
+		-((float)viewport_size.height / 2) * orthographic_scale, ((float)viewport_size.height / 2) * orthographic_scale, -1.f/ orthographic_scale, kZfar);
 }
 
 

@@ -21,7 +21,7 @@ namespace OBJ_Viewer {
 		/// <param name="renderSettings">The instruction on how to render the scene. </param>
 		/// <param name="outputFrameBuffer">The output framebuffer if none provided is understood to be the default provided by GLFW.</param>
 		void RenderScene(const APP_SETTINGS::RenderStateSettings& renderSettings,Framebuffer* outputFrameBuffer = nullptr);
-		void SwapSkyboxFaces(SkyboxFace toSwap, SkyboxFace with);
+		void SwapSkyboxFaces(SkyboxFace_ toSwap, SkyboxFace_ with);
 		std::weak_ptr<Model> GetSceneModel() { return m_sceneModel; }
 		std::weak_ptr<Skybox> GetSkyboxModel() { return m_sceneSkybox; }
 	private:

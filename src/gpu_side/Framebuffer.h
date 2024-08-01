@@ -12,6 +12,12 @@ namespace OBJ_Viewer {
 		//FRAMEBUFFER_NORMAL_ATTACHMENT = 4,
 		//FRAMEBUFFER_SPECULAR_ATTACHMENT = 8
 	};
+    enum FramebufferBitMaskFlags_
+    {
+        FramebufferBitMaskFlags_kColorBufferBit = GL_COLOR_BUFFER_BIT,
+        FramebufferBitMaskFlags_kDepthBufferBit = GL_DEPTH_BUFFER_BIT
+    };
+
 	class Framebuffer
 	{
 	public:
@@ -26,7 +32,7 @@ namespace OBJ_Viewer {
 		bool isFramebufferValid()const;
 		Size2D GetFramebufferSize()const { return m_framebufferSize; }
 		void ResizeFramebuffer(Size2D newSize);
-		void CopyFramebufferContent(const Framebuffer& framebufferToCopy);
+		void CopyFramebufferContent(const Framebuffer& framebufferToCopy, FramebufferBitMaskFlags_ mask = FramebufferBitMaskFlags_kColorBufferBit);
 		std::vector<pixel_component> GetFramebufferPixels(TextureFormat_ retrieveFormat)const;
 		~Framebuffer();
 	private:

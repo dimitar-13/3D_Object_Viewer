@@ -75,12 +75,12 @@ void OBJ_Viewer::Framebuffer::ResizeFramebuffer(Size2D newSize)
 
 }
 
-void OBJ_Viewer::Framebuffer::CopyFramebufferContent(const Framebuffer& framebufferToCopy)
+void OBJ_Viewer::Framebuffer::CopyFramebufferContent(const Framebuffer& framebufferToCopy, FramebufferBitMaskFlags_ mask)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebufferToCopy.m_framebuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer);
 	glBlitFramebuffer(0, 0, m_framebufferSize.width, m_framebufferSize.height, 0, 0,
-		m_framebufferSize.width, m_framebufferSize.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		m_framebufferSize.width, m_framebufferSize.height, mask, GL_NEAREST);
 }
 
 std::vector<OBJ_Viewer::Framebuffer::pixel_component> OBJ_Viewer::Framebuffer::GetFramebufferPixels(TextureFormat_ retrieveFormat)const

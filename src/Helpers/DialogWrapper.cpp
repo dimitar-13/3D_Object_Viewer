@@ -38,6 +38,7 @@ void OBJ_Viewer::DialogWrapper::OpenDialogSaveFile(const std::string_view& file_
         if (result == NFD_ERROR)
             LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
         isDialogAborted = true;
+        return;
     }
 
     outPaths.push_back(out_path);

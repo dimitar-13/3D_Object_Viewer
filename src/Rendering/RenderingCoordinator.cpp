@@ -75,6 +75,7 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
         m_renderingConfigSettings.m_isWireGridOn && !kEventDataImageData.renderObjectOnly;
 
 	m_application.SubmitSceneViewportSize(OutputImageViewport);
+    m_UILayer->GetInputFramebuffer().ResizeFramebuffer({ OutputImageViewport.width, OutputImageViewport.height });
 
 	m_sceneRenderer->RenderScene(m_renderingConfigSettings, &m_UILayer->GetInputFramebuffer());
 
@@ -86,10 +87,10 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 	m_saveImgResult = 
 		std::async(std::launch::async, TexturePixelSaver::SavePicture, kOutputFilePath, kEventDataImageData.imgSize,
 		is_output_image_with_transparency, output_image_pixel_data, kEventDataImageData.outImgFormat);
-
-
+  
 	//Restore original state
 	m_application.SubmitSceneViewportSize(kPreviousApplicationViewport);
+    m_UILayer->GetInputFramebuffer().ResizeFramebuffer({ kPreviousApplicationViewport.width, kPreviousApplicationViewport.height });
 
     m_renderingConfigSettings.m_isSkyboxOn = kPreviousSkyboxEnableState;
     m_renderingConfigSettings.m_isWireGridOn = kPreviousGridEnableState;

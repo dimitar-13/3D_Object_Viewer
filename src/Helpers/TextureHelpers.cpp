@@ -85,7 +85,6 @@ int OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D im
 int OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	const size_t imageStride = imageSize.width * TextureFormatEnumConverter::GetChannelCountByFormat(saveFormat);
-
 	int result = stbi_write_png(filePath_name, imageSize.width, imageSize.height,
 		TextureFormatEnumConverter::GetChannelCountByFormat(saveFormat),pixelDataToSave, imageStride);
 

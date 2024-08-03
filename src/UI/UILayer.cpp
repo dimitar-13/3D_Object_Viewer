@@ -68,6 +68,7 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 #pragma region Menu bar
 	static bool isScreenshotSettingsWindowOpen = false;
     static bool is_fbx_loading_disabled = true;
+    static bool is_application_controls_window_open = false;
 	if (ImGui::BeginMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -98,6 +99,7 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
         {
             if (ImGui::MenuItem("Application controls."))
             {
+                is_application_controls_window_open = true;
             }
 
             ImGui::EndMenu();
@@ -106,89 +108,113 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 	}
 #pragma endregion
 
+#pragma region Controls window
+    
+    if (is_application_controls_window_open) {
+        if (ImGui::Begin(APP_FOCUS_REGIONS::kUI_ApplicationControlInfoWindowName, &is_application_controls_window_open,
+            ImGuiWindowFlags_NoDocking))
+        {
+            isAppWindowFocused(APP_FOCUS_REGIONS::kUI_ApplicationControlInfoWindowName);
+
+            ImGui::Text("Camera rotation :LMB");
+            ImGui::SetItemTooltip("Hold left mouse button to rotate the camera around.");
+
+            ImGui::Text("Camera shifting :RMB");
+            ImGui::SetItemTooltip("Hold right mouse button to shift the camera around.");
+
+            ImGui::Text("Camera shift reset :'Q' ");
+            ImGui::SetItemTooltip("Press 'Q' to reset the camera shift/pivot point");
+
+            ImGui::Text("Hide UI :'H'");
+            ImGui::SetItemTooltip("Press 'H' to hide or unhide the UI.");       
+        } ImGui::End();
+    }
+#pragma endregion
+
 #pragma region Screenshot window
-	if (isScreenshotSettingsWindowOpen) {
-		if (ImGui::Begin(APP_FOCUS_REGIONS::kUI_WindowScreenshotSettings,&isScreenshotSettingsWindowOpen,ImGuiWindowFlags_NoDocking))
-		{
-			isAppWindowFocused(APP_FOCUS_REGIONS::kUI_WindowScreenshotSettings);
+    if (isScreenshotSettingsWindowOpen) {
+        if (ImGui::Begin(APP_FOCUS_REGIONS::kUI_WindowScreenshotSettings, &isScreenshotSettingsWindowOpen, ImGuiWindowFlags_NoDocking))
+        {
+            isAppWindowFocused(APP_FOCUS_REGIONS::kUI_WindowScreenshotSettings);
             static const std::unordered_map<OBJ_Viewer::ImageFileFormat_, const char*> kUI_ImageFormatLabelMap =
             {
-                {OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kPNG, "PNG"},
-                {OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kJPEG ,"JPEG"},
-                {OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kBMP ,"BMP"},
+                 {OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kPNG, "PNG"},
+                 {OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kJPEG ,"JPEG"},
+                 {OBJ_Viewer::ImageFileFormat_::ImageFileFormat_kBMP ,"BMP"},
 
             };
             static const std::unordered_map<ImageResolutionEnum_, const char*> kUI_ResolutionOptionLabelMap =
             {
-                 {ImageResolutionEnum_::ImageResolutionEnum_k_640_X_480, "SD 640 x 480"},
-                 {ImageResolutionEnum_::ImageResolutionEnum_k_1280_X_720, "HD 1280 x 720"},
-                 {ImageResolutionEnum_::ImageResolutionEnum_k_2560_X_1440,"2K 2560 x 1440"},
-                 {ImageResolutionEnum_::ImageResolutionEnum_k_3840_X_2160,"4K 3840 x 2160"},
-                 {ImageResolutionEnum_::ImageResolutionEnum_kCustom,"Custom"},
+                  {ImageResolutionEnum_::ImageResolutionEnum_k_640_X_480, "SD 640 x 480"},
+                  {ImageResolutionEnum_::ImageResolutionEnum_k_1280_X_720, "HD 1280 x 720"},
+                  {ImageResolutionEnum_::ImageResolutionEnum_k_2560_X_1440,"2K 2560 x 1440"},
+                  {ImageResolutionEnum_::ImageResolutionEnum_k_3840_X_2160,"4K 3840 x 2160"},
+                  {ImageResolutionEnum_::ImageResolutionEnum_kCustom,"Custom"},
             };
 
-			constexpr auto GetResolutionFromEnum = [](ImageResolutionEnum_ val)
-				{
-					switch (val)
-					{
-					case ImageResolutionEnum_k_640_X_480:
-						return Size2D{ 640,480 };
-						break;
-					case ImageResolutionEnum_k_1280_X_720:
-						return Size2D{ 1280,720 };
-						break;
-					case ImageResolutionEnum_k_2560_X_1440:
-						return Size2D{ 2560,1440 };
-						break;
-					case ImageResolutionEnum_k_3840_X_2160:
-						return Size2D{ 3840,2160 };
-						break;
-					case ImageResolutionEnum_kCustom:
-						return Size2D{ 0,0 };
-						break;
-					default:
-						return Size2D{ 0,0 };
-						break;
-					}
-				};
+            constexpr auto GetResolutionFromEnum = [](ImageResolutionEnum_ val)
+                {
+                    switch (val)
+                    {
+                    case ImageResolutionEnum_k_640_X_480:
+                        return Size2D{ 640,480 };
+                        break;
+                    case ImageResolutionEnum_k_1280_X_720:
+                        return Size2D{ 1280,720 };
+                        break;
+                    case ImageResolutionEnum_k_2560_X_1440:
+                        return Size2D{ 2560,1440 };
+                        break;
+                    case ImageResolutionEnum_k_3840_X_2160:
+                        return Size2D{ 3840,2160 };
+                        break;
+                    case ImageResolutionEnum_kCustom:
+                        return Size2D{ 0,0 };
+                        break;
+                    default:
+                        return Size2D{ 0,0 };
+                        break;
+                    }
+                };
 
-			static bool output_image_render_only_object{};
-			static bool render_output_image_with_transparency{};
-			static ImageFileFormat_ currently_selected_image_file_format = ImageFileFormat_::ImageFileFormat_kPNG;
-			static ImageResolutionEnum_ currently_selected_resolution = ImageResolutionEnum_::ImageResolutionEnum_k_2560_X_1440;
-			Size2D imageSize;
+            static bool output_image_render_only_object{};
+            static bool render_output_image_with_transparency{};
+            static ImageFileFormat_ currently_selected_image_file_format = ImageFileFormat_::ImageFileFormat_kPNG;
+            static ImageResolutionEnum_ currently_selected_resolution = ImageResolutionEnum_::ImageResolutionEnum_k_2560_X_1440;
+            Size2D imageSize;
 
-			currently_selected_image_file_format = 
+            currently_selected_image_file_format =
                 RenderComboBox("Format", kUI_ImageFormatLabelMap, currently_selected_image_file_format);
 
-			currently_selected_resolution = 
+            currently_selected_resolution =
                 RenderComboBox("Image resolution", kUI_ResolutionOptionLabelMap, currently_selected_resolution);
 
-			imageSize = GetResolutionFromEnum(currently_selected_resolution);
+            imageSize = GetResolutionFromEnum(currently_selected_resolution);
 
-			if (currently_selected_resolution == ImageResolutionEnum_::ImageResolutionEnum_kCustom)
-			{
-				static Size2D previous_custom_resolution{};
-				ImGui::Text("Custom resolution");
-				ImGui::SameLine();
-				ImGui::InputInt2("## Texture Size", &previous_custom_resolution[0]);
-				imageSize = previous_custom_resolution;
-			}
+            if (currently_selected_resolution == ImageResolutionEnum_::ImageResolutionEnum_kCustom)
+            {
+                static Size2D previous_custom_resolution{};
+                ImGui::Text("Custom resolution");
+                ImGui::SameLine();
+                ImGui::InputInt2("## Texture Size", &previous_custom_resolution[0]);
+                imageSize = previous_custom_resolution;
+            }
 
-			ImGui::Checkbox("Render object only", &output_image_render_only_object);
-			ImGui::SetItemTooltip("Don't render the grid and/or skybox.");
+            ImGui::Checkbox("Render object only", &output_image_render_only_object);
+            ImGui::SetItemTooltip("Don't render the grid and/or skybox.");
 
-			ImGui::Checkbox("Export with transparency", &render_output_image_with_transparency);
-			ImGui::SetItemTooltip("If the file format support it will export the scene with transparency.");
+            ImGui::Checkbox("Export with transparency", &render_output_image_with_transparency);
+            ImGui::SetItemTooltip("If the file format support it will export the scene with transparency.");
 
-			if(ImGui::Button("Take screenshot"))
-			{
+            if (ImGui::Button("Take screenshot"))
+            {
                 ScreenshotEvent e(ImgOutputData{ imageSize ,currently_selected_image_file_format,
                     output_image_render_only_object,render_output_image_with_transparency });
-				m_applicationRef.SubmitEvent(e);			
-			}
-		}ImGui::End();
-	}
+                m_applicationRef.SubmitEvent(e);
+            }         
+        } ImGui::End();
+    }
+	
 #pragma endregion
 
 #pragma region ModelAndRenderingSettings
@@ -515,24 +541,24 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 #pragma endregion
 
 #pragma region  Render scene hierarchy
-				ImGui::Text("Scene hierarchy");
-				constexpr size_t SCENE_OBJECT_COUNT_TEST = 5;
-				for (size_t i = 0; i < SCENE_OBJECT_COUNT_TEST; i++)
-				{
-					ImGui::Text("Name of mesh");
-					ImGui::SameLine();
-					ImGui::PushItemWidth(-1);
-					if (ImGui::RadioButton(std::string("##" + std::to_string(i + 1)).c_str(), true))
-					{
-						LOGGER_LOG_INFO("OBJECT_VISIBILITY IS CHANGED");
-					}
-					ImGui::PopItemWidth();
-				}
+				//ImGui::Text("Scene hierarchy");
+				//constexpr size_t SCENE_OBJECT_COUNT_TEST = 5;
+				//for (size_t i = 0; i < SCENE_OBJECT_COUNT_TEST; i++)
+				//{
+				//	ImGui::Text("Name of mesh");
+				//	ImGui::SameLine();
+				//	ImGui::PushItemWidth(-1);
+				//	if (ImGui::RadioButton(std::string("##" + std::to_string(i + 1)).c_str(), true))
+				//	{
+				//		LOGGER_LOG_INFO("OBJECT_VISIBILITY IS CHANGED");
+				//	}
+				//	ImGui::PopItemWidth();
+				//}
 				ImGui::EndTabItem();
 			}
-#pragma endregion
 
 		}ImGui::EndTabBar();
+#pragma endregion
 	}ImGui::End();
 
 #pragma endregion

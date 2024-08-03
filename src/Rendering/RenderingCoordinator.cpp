@@ -90,6 +90,7 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
   
 	//Restore original state
 	m_application.SubmitSceneViewportSize(kPreviousApplicationViewport);
+    //Change this so that the UI framebuffer listen for resize events
     m_UILayer->GetInputFramebuffer().ResizeFramebuffer({ kPreviousApplicationViewport.width, kPreviousApplicationViewport.height });
 
     m_renderingConfigSettings.m_isSkyboxOn = kPreviousSkyboxEnableState;

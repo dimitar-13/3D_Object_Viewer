@@ -59,13 +59,13 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
 	auto& current_mouse_position = e.GetMousePos();
 #pragma region Check for LMB
-	if (m_applicationInputHandler.isMouseButtonPressed(MouseKey_kLeftMouseButton) &&
+	if (m_applicationInputHandler.isMouseButtonPressed(static_cast<MouseKey_>(AppKeyBinding_kCameraRotation)) &&
 		m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
 		m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
 	}
-	else if (m_applicationInputHandler.isMouseButtonHeld(MouseKey_kLeftMouseButton) &&
+	else if (m_applicationInputHandler.isMouseButtonHeld(static_cast<MouseKey_>(AppKeyBinding_kCameraRotation)) &&
              m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
@@ -75,13 +75,13 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 #pragma endregion
 
 #pragma region  Check for RMB
-	if (m_applicationInputHandler.isMouseButtonPressed(MouseKey_kRightMouseButton) &&
+	if (m_applicationInputHandler.isMouseButtonPressed(static_cast<MouseKey_>(AppKeyBinding_kCameraShifting)) &&
 		m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
 		m_lastMousePos = current_mouse_position;
 	}
-	else if (m_applicationInputHandler.isMouseButtonHeld(MouseKey_kRightMouseButton) &&
+	else if (m_applicationInputHandler.isMouseButtonHeld(static_cast<MouseKey_>(AppKeyBinding_kCameraShifting)) &&
              m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		constexpr float kCameraShiftingSpeed = .005;

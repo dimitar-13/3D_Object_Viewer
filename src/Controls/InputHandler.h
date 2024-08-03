@@ -5,7 +5,6 @@
 #include "Core/Events.h"
 namespace OBJ_Viewer
 {
-	class Application;
 	enum KeyState_ {
 		KeyState_kUnknown,
 		KeyState_kPressed = GLFW_PRESS,
@@ -160,18 +159,15 @@ namespace OBJ_Viewer
 	class InputHandler:public Listener
 	{
 	public:
+        InputHandler() = default;
 		bool isKeyboardPressed(KeyboardKey_ key) { return m_keyboardInputManager.GetKeyState(key) == KeyState_kPressed; }
 		bool isKeyboardKeyHeld(KeyboardKey_ key) { return m_keyboardInputManager.GetKeyState(key) == KeyState_kHeld; }
 		bool isMouseButtonPressed(MouseKey_ mouseButton) { return m_mouseInputManager.GetButtonState(mouseButton) == KeyState_kPressed; }
 		bool isMouseButtonHeld(MouseKey_ mouseButton) { return m_mouseInputManager.GetButtonState(mouseButton) == KeyState_kHeld; }
 		const char* GetCurrentlyFocusedWindow()const { return m_crrentlyFocusedWindowName; }
 		void SetCurrentlyFocusedWindow(const char* windowName){ m_crrentlyFocusedWindowName = windowName; }
-
-		KeyState_ GetKeyState(int keycode);
 	private:
-		friend class Application;
-		InputHandler() = default;
-		InputHandler(InputHandler& copy) = delete;
+		InputHandler(const InputHandler& copy) = delete;
 
 		MouseInputStateManager m_mouseInputManager;
 		KeyboardInputStateManager m_keyboardInputManager;

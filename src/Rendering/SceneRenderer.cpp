@@ -2,12 +2,11 @@
 #include "SceneRenderer.h"
 #include "Renderer.h"
 #include "Core/Application.h"
-#include "Helpers/ModelLoader.h"
 #include "Scene/Skybox.h"
 #include "ShaderPath.h"
-#include "Helpers/MeshGeneratingMethods.h"
 #include "Profiling/AppProfiler.h"
 #include "Helpers/DialogWrapper.h"
+#include "Helpers/ModelGenerator.h"
 
 #pragma region Constants
 constexpr uint8_t kMatrixUniformBufferBindingPoint = 0;
@@ -15,48 +14,35 @@ constexpr uint8_t kLightUniformBufferBindingPoint = 1;
 
 constexpr uint8_t kUniformBufferMatrixCount = 4;
 constexpr size_t kUniformBufferMatrixSizeInBytes = kUniformBufferMatrixCount * sizeof(glm::mat4);
-constexpr size_t kUniformBufferLightSIzeInBytes = OBJ_Viewer::APP_SETTINGS::MAX_LIGHT_COUNT * OBJ_Viewer::APP_SETTINGS::SIZE_OF_LIGHT_IN_BYTES;
+constexpr size_t kUniformBufferLightSIzeInBytes = OBJ_Viewer::APP_SETTINGS::SceneLightInfo::kMaxLightCount 
+* OBJ_Viewer::APP_SETTINGS::SceneLightInfo::kSizeOfLightInBytes;
 #pragma endregion
-OBJ_Viewer::SceneRenderer::SceneRenderer(Application& app,std::shared_ptr<RenderingMediator> mediator) :
+OBJ_Viewer::SceneManager::SceneManager(Application& app) :
 #pragma region Buffer setup
 	m_multiSampleSceneFrameBuffer(app.GetSceneViewport().GetViewportSize(), FramebufferAttachmentsFlags_kColorAttachment, true, 11),
 	m_intermidiateFramebuffer(app.GetSceneViewport().GetViewportSize(), FramebufferAttachmentsFlags_kColorAttachment),
 	m_uniformLightBuffer("LightInfo",kLightUniformBufferBindingPoint , kUniformBufferLightSIzeInBytes, nullptr),
 	m_uniformMatrixBuffer("Matrices",kMatrixUniformBufferBindingPoint,kUniformBufferMatrixSizeInBytes, nullptr),
 #pragma endregion
-	//If this is causing problems see the comment where the definition of the 'GeneratePlaneVAOStack' is.
-	m_screenQuad(GeneratePlaneVAOStack()),
+	m_screenQuad(ModelGenerator::GeneratePlaneVAOStack()),
 	m_app(app)
 {
-
+    constexpr float kDefaultCameraZoom = 5.0f;
 	SetUpUniformBuffers();
-	m_renderingMediator = mediator;
-	m_sceneCamera = std::make_shared<Camera>(5.0f, app.GetSceneViewport().GetViewportSize(), app);
+
+	m_sceneCamera = std::make_shared<Camera>(kDefaultCameraZoom, app.GetGlobalInputHandler(), app.GetSceneViewport());
 	m_app.AddEventListener(m_sceneCamera);
 
-	ModelData data;
-	std::unique_ptr<std::vector<Mesh>> meshVector = std::make_unique<std::vector<Mesh>>();
-	meshVector->emplace_back((std::move(GenerateCubeVAO())));
-
-	//These are not correct
-	data.meshInfo.vertexCount = meshVector->at(0).GetMeshVAO().GetVertexCount();
-	data.meshInfo.triangleCount = data.meshInfo.vertexCount/3;
-	data.meshInfo.faceCount = data.meshInfo.triangleCount/2;
-
-	m_sceneModel = std::make_shared<Model>(meshVector, glm::mat4(1), data);
-
-	m_renderingMediator->SetSceneModel(m_sceneModel);
-	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
-
-	//TODO:Get this somewhere else
-	
-
+	m_sceneModel = ModelGenerator::GenerateCubeModel();
+    std::shared_ptr<Material> default_application_material = std::make_shared<Material>("Application default material");
+    m_sceneRegistry = std::make_shared<MaterialRegistry>(std::vector{ default_application_material });
 }
-OBJ_Viewer::SceneRenderer::~SceneRenderer()
+OBJ_Viewer::SceneManager::~SceneManager()
 {
 }
-void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSettings& renderSettings, Framebuffer* outputFrameBuffer)
+void OBJ_Viewer::SceneManager::RenderScene(const APP_SETTINGS::SceneConfigurationSettings& renderSettings, Framebuffer* outputFrameBuffer)
 {
+    constexpr int kFramebufferClearBitMask = GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT;
 	SetUniformMatrixBuffer();
    
 	if (renderSettings.m_EnableAA)
@@ -65,47 +51,49 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 		m_intermidiateFramebuffer.BindFramebuffer();
 
 
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	ShaderClass* selected_shader_to_use {};
+	glClear(kFramebufferClearBitMask);
 
 	for (const auto& mesh : m_sceneModel->GetModelMeshes())
 	{
 		switch (renderSettings.m_currentRenderingMode)
 		{
 		case APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe:
-			SetUpForWireframeRendering(mesh, renderSettings.wireframeSettings);
-			break;
-
+            if (renderSettings.wireframeSettings.isPointRenderingOn){
+                m_mainRenderer.RenderMeshWireframePoint(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kPointShader),
+                    mesh.GetMeshVAO(), renderSettings.wireframeSettings, m_app.GetSceneViewport().GetViewportMatrix());
+            }
+            else
+            {
+                m_mainRenderer.RenderMeshWireframeLine(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kWireframeShader),
+                    mesh.GetMeshVAO(), renderSettings.wireframeSettings, m_app.GetSceneViewport().GetViewportMatrix());
+            }
+            break;
 		case APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor:
-			selected_shader_to_use = m_shaderLib.GetShaderPtr(ShaderLibarryShaderName_kStudioLightShader);
-			selected_shader_to_use->UseShader();
-			selected_shader_to_use->SetUniformSet3FloatVector("u_Color", renderSettings.m_colorRenderingColor);
-			m_mainRenderer.RenderMesh(*selected_shader_to_use, mesh.GetMeshVAO(), *m_sceneCamera);
+            m_mainRenderer.RenderSolidColor(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kStudioLightShader),
+                mesh.GetMeshVAO(), renderSettings.m_colorRenderingColor);
 			break;
 
 		case APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture:
-			selected_shader_to_use = m_shaderLib.GetShaderPtr(ShaderLibarryShaderName_kSingleTextureShader);
-			selected_shader_to_use->UseShader();
-			if (auto material = mesh.GetMaterial().lock())
-			{
-				if(auto texture = material->GetMaterialTexture(renderSettings.m_curentIndividualTexture).lock())
-					m_mainRenderer.BindMaterialTexture(*selected_shader_to_use, texture, GL_TEXTURE1, "textureToInspect");
-			}
-			m_mainRenderer.RenderMesh(*selected_shader_to_use, mesh.GetMeshVAO(), *m_sceneCamera);
+            m_mainRenderer.RenderMeshSingleTexture(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kSingleTextureShader),
+                mesh, m_sceneRegistry->GetMaterialAtIndex(mesh.GetMaterialIndex()), renderSettings.m_curentIndividualTexture);
 			break;
 
 		case APP_SETTINGS::RenderingMode_::RenderingMode_kUV:
-			selected_shader_to_use = m_shaderLib.GetShaderPtr(ShaderLibarryShaderName_kUVShader);
-			selected_shader_to_use->UseShader();
-			selected_shader_to_use->SetUniformSet1Float("uvScale", renderSettings.m_uvViewSettings.UV_scaleFactor);
-			m_mainRenderer.RenderMesh(*selected_shader_to_use, mesh.GetMeshVAO(), *m_sceneCamera);
+            m_mainRenderer.RenderCheckboardPattern(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kUVShader),
+                mesh.GetMeshVAO(), renderSettings.m_uvViewSettings);
 			break;
+
 		case APP_SETTINGS::RenderingMode_::RenderingMode_kLight:
-			SetUpShaderForLightRendering(mesh, renderSettings.m_MaterialFlags, renderSettings.lightInfo);
+            m_uniformLightBuffer.SendBufferSubData(0, renderSettings.lightInfo.lights.size() * 
+                APP_SETTINGS::SceneLightInfo::kSizeOfLightInBytes,renderSettings.lightInfo.lights.data());
+
+            m_mainRenderer.RenderMeshWithLight(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kLightShader),
+                mesh.GetMeshVAO(), m_sceneRegistry->GetMaterialAtIndex(mesh.GetMaterialIndex()), renderSettings.m_MaterialFlags,
+                renderSettings.lightInfo, m_sceneCamera->GetCameraPos());
 			break;
+
 		case APP_SETTINGS::RenderingMode_kNormalOrientation:
-			selected_shader_to_use = m_shaderLib.GetShaderPtr(ShaderLibarryShaderName_kNormalShader);
-			m_mainRenderer.RenderMesh(*selected_shader_to_use, mesh.GetMeshVAO(), *m_sceneCamera);
+			m_mainRenderer.RenderMesh(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kNormalShader), mesh.GetMeshVAO());
 			break;
 		default:
 			break;
@@ -124,20 +112,14 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 
 	if (renderSettings.m_isWireGridOn)
 	{
-		auto& grid_shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kGridShader);
-		m_mainRenderer.RenderGrid(grid_shader, m_screenQuad, *m_sceneCamera, renderSettings.m_gridData);
+		m_mainRenderer.RenderGrid(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kGridShader),
+            m_screenQuad, m_sceneCamera->GetCameraPos(), renderSettings.m_gridData);
 	}
 
     if (renderSettings.m_isSkyboxOn && m_sceneSkybox != nullptr)
     {
-        //glDisable(GL_CULL_FACE);
-        glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-        glEnable(GL_BLEND);
-        auto& skybox_shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kSkyboxShader);
-        m_mainRenderer.RenderSkybox(skybox_shader, *m_sceneSkybox, *m_sceneCamera);
-        glDisable(GL_BLEND);
-
-        //glEnable(GL_CULL_FACE);
+        m_mainRenderer.RenderSkybox(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kSkyboxShader), *m_sceneSkybox,
+            m_sceneCamera->IsCameraProjectionPerspective());
     }
 
 	m_intermidiateFramebuffer.UnbindFramebuffer();
@@ -146,31 +128,31 @@ void OBJ_Viewer::SceneRenderer::RenderScene(const APP_SETTINGS::RenderStateSetti
 	if (outputFrameBuffer == nullptr)
 	{
 		Framebuffer::BindDefaultFramebuffer();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(kFramebufferClearBitMask);
 		PostProcessScene(renderSettings.m_EnableAA);
 	}
 	else
 	{
 		outputFrameBuffer->BindFramebuffer();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(kFramebufferClearBitMask);
 		PostProcessScene(renderSettings.m_EnableAA);
 		outputFrameBuffer->UnbindFramebuffer();
 	}
 }
 
-void OBJ_Viewer::SceneRenderer::PostProcessScene(bool doFXAA)
+void OBJ_Viewer::SceneManager::PostProcessScene(bool doFXAA)
 {
 	glActiveTexture(GL_TEXTURE1);
 	Texture& framebuffer_texture_for_post_process = m_intermidiateFramebuffer.GetFramebufferTexture();
 
-	const SceneViewport& kCurrent_scene_viewport = m_app.GetSceneViewport_ConstRef();
+	const SceneViewport& kCurrent_scene_viewport = m_app.GetSceneViewport();
 
 	const Size2D kViewport_size = kCurrent_scene_viewport.GetViewportSize();
 
 	glm::vec2 shader_uniform_window_resolution = glm::vec2(kViewport_size.width, kViewport_size.height);
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
 	framebuffer_texture_for_post_process.BindTexture();
 	auto& shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kPostProcessShader);
 	shader.UseShader();
@@ -178,61 +160,12 @@ void OBJ_Viewer::SceneRenderer::PostProcessScene(bool doFXAA)
 	shader.SetUniformSet2FloatVector("u_resolution", shader_uniform_window_resolution);
 	shader.SetUniformSet1Int("u_useAA", doFXAA);
 
-	m_mainRenderer.RenderMesh(shader, m_screenQuad, *m_sceneCamera);
+	m_mainRenderer.RenderMesh(shader, m_screenQuad);
 	framebuffer_texture_for_post_process.UnbindTexture();
 	glDisable(GL_BLEND);
 }
 
-void OBJ_Viewer::SceneRenderer::SetUpShaderForLightRendering(const Mesh& mesh, MaterialFlags materialFlags,
-	APP_SETTINGS::SceneLightInfo lightInfo)
-{
-	auto& shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kLightShader);
-
-	shader.UseShader();
-	m_uniformLightBuffer.SendBufferSubData(0, lightInfo.lights.size() * APP_SETTINGS::SIZE_OF_LIGHT_IN_BYTES, lightInfo.lights.data());
-
-	shader.SetUniformSet1Int("isToonShadingOn",
-		lightInfo.currentLightModel == APP_SETTINGS::LightShadingModel_::LightShadingModel_kToonShading 
-		|| lightInfo.currentLightModel == APP_SETTINGS::LightShadingModel_::LightShadingModel_kRim_and_ToonShading);
-	shader.SetUniformSet1Int("isRimLightOn",
-		lightInfo.currentLightModel == APP_SETTINGS::LightShadingModel_::LightShadingModel_kRimShading ||
-		lightInfo.currentLightModel == APP_SETTINGS::LightShadingModel_::LightShadingModel_kRim_and_ToonShading);
-
-	shader.SetUniformSet3FloatVector("cameraPosition", m_sceneCamera->GetCameraPos());
-	m_mainRenderer.RenderMeshMaterialWithLight(shader, mesh.GetMeshVAO(), *mesh.GetMaterial().lock(), materialFlags, *m_sceneCamera);
-
-}
-
-void OBJ_Viewer::SceneRenderer::SetUpForWireframeRendering(const Mesh& mesh,const APP_SETTINGS::WireFrameSettings& wireframeAppSettings)
-{
-	const glm::mat3& shader_uniform_viewport_matrix = m_app.GetSceneViewport_ConstRef().GetViewportMatrix();
-
-	if (wireframeAppSettings.isPointRenderingOn)
-	{
-
-		auto& shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kPointShader);
-
-		constexpr static float pointSizeOffset = 1.;
-		shader.UseShader();
-		shader.SetUniformSet3FloatVector("u_Color", wireframeAppSettings.lineColor);
-		shader.SetUniformSet3x3FloatMatrix("viewportMatrix", shader_uniform_viewport_matrix);
-		shader.SetUniformSet1Float("pointSize", wireframeAppSettings.lineThickness + pointSizeOffset);
-		m_mainRenderer.RenderMesh(shader, mesh.GetMeshVAO(), *m_sceneCamera);
-	}
-	else
-	{
-		auto& shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kWireframeShader);
-
-		shader.UseShader();
-		shader.SetUniformSet3FloatVector("u_frameColor", wireframeAppSettings.lineColor);
-		shader.SetUniformSet1Float("frameThickness", wireframeAppSettings.lineThickness);
-
-		shader.SetUniformSet3x3FloatMatrix("viewportMatrix", shader_uniform_viewport_matrix);
-		m_mainRenderer.RenderMesh(shader, mesh.GetMeshVAO(), *m_sceneCamera);
-	}
-}
-
-void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
+void OBJ_Viewer::SceneManager::LoadSkybox(std::vector<std::string>& paths)
 {
 
 	if (paths.empty())
@@ -270,25 +203,10 @@ void OBJ_Viewer::SceneRenderer::LoadSkybox(std::vector<std::string>& paths)
 	this->m_sceneSkybox.reset(new Skybox(skybox_texture_readers));
 }
 
-void OBJ_Viewer::SceneRenderer::SwapSkyboxFaces(SkyboxFace_ toSwap, SkyboxFace_ with)
+void OBJ_Viewer::SceneManager::LoadSceneFile(const std::string& path, LoadModelFileType_ model_file_format)
 {
-	this->m_sceneSkybox->SwapSkyboxFaceTextures(toSwap, with);
-}
-void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
-{
-	if (path.empty())
-		return;
-
-	LoadModelFileType_ model_file_format = FileFormatHelper::GetFileFormatFromPath(path);
-	if (m_app.GetScene_RefSettings().m_disableFBXLoading && model_file_format == LoadModelFileType_::LoadModelFileType_kFBX)
-	{
-		LOGGER_LOG_WARN("File at path:{0} was detected to be an fbx and was not loaded.Enable fbx loading to be able to load it.", path);
-		return;
-	}
-
 	ModelLoader model_data_reader (path.c_str(), model_file_format);
 	
-
 	if (!model_data_reader.isFileLoadedSuccessfully())
 	{
 		LOGGER_LOG_WARN("Failed to load model at path {0}", path);
@@ -298,7 +216,7 @@ void OBJ_Viewer::SceneRenderer::LoadModel(const std::string& path)
 	m_sceneRegistry = model_data_reader.GetLoadedMaterialRegistry();
 }
 
-void OBJ_Viewer::SceneRenderer::SetUpUniformBuffers()
+void OBJ_Viewer::SceneManager::SetUpUniformBuffers()
 {
 	m_uniformMatrixBuffer.BindBufferRange(0, kUniformBufferMatrixSizeInBytes);
 
@@ -316,7 +234,7 @@ void OBJ_Viewer::SceneRenderer::SetUpUniformBuffers()
 	m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kLightShader).BindUniformBufferToShader(m_uniformLightBuffer);
 }
 
-void OBJ_Viewer::SceneRenderer::SetUniformMatrixBuffer()
+void OBJ_Viewer::SceneManager::SetUniformMatrixBuffer()
 {
 	glm::mat4 ubo_matrix_array [kUniformBufferMatrixCount] = {};
 	m_sceneCamera->GetViewAndProjectionSeparate(ubo_matrix_array[0], ubo_matrix_array[1]);
@@ -325,13 +243,13 @@ void OBJ_Viewer::SceneRenderer::SetUniformMatrixBuffer()
 	m_uniformMatrixBuffer.SendBufferSubData(0, kUniformBufferMatrixSizeInBytes, ubo_matrix_array);
 }
 
-void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
+void OBJ_Viewer::SceneManager::OnEvent(Event& e)
 {
-	if (e.GetEventCategory() & EventCategory_kAppEvent && e.GetEventType() == EventType_kModelLoad)
-		OnModelLoadEvent(dynamic_cast<EventOnModelLoaded&>(e));
-	else if (e.GetEventCategory() & EventCategory_kAppEvent && e.GetEventType() == EventType_kSkyboxLoad)
+	if (e.GetEventCategory() == EventCategory_kAppEvent && e.GetEventType() == EventType_kScenelLoad)
+		OnSceneLoadEvent(dynamic_cast<EventOnSceneLoad&>(e));
+	else if (e.GetEventCategory() == EventCategory_kAppEvent && e.GetEventType() == EventType_kSkyboxLoad)
 		OnSkyboxLoadEvent(dynamic_cast<EventOnSkyboxLoaded&>(e));
-	else if (e.GetEventCategory() & EventCategory_kAppEvent && e.GetEventType() == EventType_kViewportSizeChanged)
+	else if (e.GetEventCategory() == EventCategory_kAppEvent && e.GetEventType() == EventType_kViewportSizeChanged)
 	{
 		auto& sceneViewportEvent = dynamic_cast<SceneViewportResizeEvent&>(e);
 		const Viewport& newViewport = sceneViewportEvent.GetViewport();
@@ -342,7 +260,7 @@ void OBJ_Viewer::SceneRenderer::OnEvent(Event& e)
 	}
 }
 
-void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
+void OBJ_Viewer::SceneManager::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
 {
 	DialogWrapper dialog;
 	dialog.OpenDialogMultiple("png,jpeg,jpg");
@@ -358,24 +276,30 @@ void OBJ_Viewer::SceneRenderer::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
 	}
 
 	LoadSkybox(m_stringVector);
-	m_renderingMediator->SetSkybox(m_sceneSkybox);
 }
 
-void OBJ_Viewer::SceneRenderer::OnModelLoadEvent(EventOnModelLoaded& e)
+void OBJ_Viewer::SceneManager::OnSceneLoadEvent(EventOnSceneLoad& e)
 {
 	DialogWrapper loadModelDialog;
 	std::string_view filterList = "obj";
 
-	if (!m_app.isFBXLoadingDisabled())
+	if (e.IsFBXDisabled())
 		filterList = "obj,fbx";
 
 	loadModelDialog.OpenDialog(filterList);
 
 	if (loadModelDialog.IsDialogClosed())
 		return;
+    const std::string& model_path = loadModelDialog.GetFirstDialogResult();
+    if (model_path.empty())
+        return;
 
-	LoadModel(loadModelDialog.GetFirstDialogResult());
+    LoadModelFileType_ model_file_format = FileFormatHelper::GetFileFormatFromPath(model_path);
+    if (e.IsFBXDisabled() && model_file_format == LoadModelFileType_::LoadModelFileType_kFBX)
+    {
+        LOGGER_LOG_WARN("File at path:{0} was detected to be an fbx and was not loaded.Enable fbx loading to be able to load it.", model_path);
+        return;
+    }
 
-	m_renderingMediator->SetSceneModel(m_sceneModel);
-	m_renderingMediator->SetSceneMaterialRegistry(m_sceneRegistry);
+	LoadSceneFile(model_path, model_file_format);
 }

@@ -22,11 +22,15 @@ void main()
 }
 #Shader:fragment
 #version 330 core
+
+#include "ColorSpaceUtilityFunctions.glsl"
+
 out vec4 FragColor;
 in vec3 FragCoords;
 
 uniform samplerCube skyboxSampler;
 void main()
 {
-	FragColor = vec4(texture(skyboxSampler,FragCoords).rgb,1);
+
+	FragColor = vec4(toLinear(texture(skyboxSampler,FragCoords)).rgb,1);
 }

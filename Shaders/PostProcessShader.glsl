@@ -13,6 +13,8 @@ void main()
 #Shader:fragment
 #version 330 core
 
+#include "ColorSpaceUtilityFunctions.glsl"
+
 
 #define EDGE_THRESHOLD_MIN 0.0312
 #define EDGE_THRESHOLD_MAX 0.125
@@ -31,14 +33,26 @@ uniform bool u_useAA = true;
 float FromRGBToLuma(vec3 col) {
     return (dot(luma, col));
 }
+vec4 GetColorFXAA();
 
 void main() {
     vec4 sampledPixel = texture(u_framebufferTexture, FragUV);
     
     if (!u_useAA) {
-        FragColor = sampledPixel;
-        return;
+        FragColor = sampledPixel;       
     }
+	else
+	{
+		FragColor = GetColorFXAA();
+	}
+
+	
+	FragColor = fromLinear(FragColor);
+
+}
+vec4 GetColorFXAA()
+{
+    vec4 sampledPixel = texture(u_framebufferTexture, FragUV);
     
     vec2 sizeOfPixel = 1.0 / u_resolution;
     
@@ -59,8 +73,7 @@ void main() {
     
     float lumaRange = maxLuma - minLuma;
     if (lumaRange < max(EDGE_THRESHOLD_MIN, maxLuma * EDGE_THRESHOLD_MAX)) {
-        FragColor = sampledPixel;
-        return;
+        return sampledPixel;
     }
     
     float TL_luma = FromRGBToLuma(textureOffset(u_framebufferTexture, FragUV, ivec2(-1, 1)).rgb);
@@ -167,6 +180,5 @@ void main() {
     
     vec2 finalUV = !isHorizontal ? vec2(FragUV.x + finalOffset * singlePixelOffset, FragUV.y) : vec2(FragUV.x, FragUV.y + finalOffset * singlePixelOffset);
     
-    FragColor = texture(u_framebufferTexture, finalUV);
-
+	return texture(u_framebufferTexture, finalUV);;
 }

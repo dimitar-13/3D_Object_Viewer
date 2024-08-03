@@ -92,7 +92,7 @@ std::unique_ptr<std::vector<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateMe
 		m_ModelData.meshInfo.triangleCount += mesh_reading_thread_result.mesh_Information.triangleCount;
 
 		mesh_vector_result->emplace_back(std::make_unique<VertexAttributeObject>(mesh_reading_thread_result.vertex_data_vector, mesh_reading_thread_result.index_data_vector),
-			m_materialRegistry->GetMaterialAtIndex(mesh_reading_thread_result.mesh_material_ID).lock());
+			mesh_reading_thread_result.mesh_material_ID);
 	}
 
 	return mesh_vector_result;
@@ -197,7 +197,7 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::Load
 	TypeMaterialRepresentation matRepresentation(m_currentlyLoadingType);
 
 	auto AddTextureToMaterialDataIfValid = 
-		[](MaterialData& materialData,MaterialTextures textureEnumKey, std::shared_ptr<Texture> texture) {
+		[](MaterialData& materialData,MaterialTextures_ textureEnumKey, std::shared_ptr<Texture> texture) {
 			if (texture)
 				materialData.m_materialTextures[textureEnumKey] = texture;
 		};
@@ -206,16 +206,16 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::Load
 	{	
 		MaterialData data;
 
-		AddTextureToMaterialDataIfValid(data, MATERIAL_TEXTURE_ALBEDO,
+		AddTextureToMaterialDataIfValid(data, MaterialTextures_kAlbedo,
 			ReadTexture(scene->mMaterials[i], matRepresentation.colorTextureEnum));
 
-		AddTextureToMaterialDataIfValid(data, MATERIAL_TEXTURE_AMBIENT_OCCLUSION,
+		AddTextureToMaterialDataIfValid(data, MaterialTextures_kAmbientOcclusion,
 			ReadTexture(scene->mMaterials[i], matRepresentation.ambientOcclusionEnum));
 
-		AddTextureToMaterialDataIfValid(data, MATERIAL_TEXTURE_NORMAL,
+		AddTextureToMaterialDataIfValid(data, MaterialTextures_kNormal,
 			ReadTexture(scene->mMaterials[i], matRepresentation.normalTextureEnum));
 
-		AddTextureToMaterialDataIfValid(data, MATERIAL_TEXTURE_ROUGHNESS_METALLIC,
+		AddTextureToMaterialDataIfValid(data, MaterialTextures_kMetalic,
 			ReadTexture(scene->mMaterials[i], matRepresentation.specularRoughnessEnum));
 
 		material_vector_result.emplace_back(std::make_shared<Material>(scene->mMaterials[i]->GetName().C_Str(), data));

@@ -10,9 +10,11 @@ OBJ_Viewer::Texture::Texture(const unsigned char* texture_pixel_data, TextureInt
 	m_textureFormat(texture_format), m_textureInternalFormat(texture_internal_format),
 	m_texturePixelDataType(texture_data_type),m_isMultiSample(is_texture_multi_sampled),m_sampleCount(sample_count)
 {
+    
 	m_target = is_texture_multi_sampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 	glGenTextures(1, &this->m_textureHandle);
 	SetTextureProperties(texture_pixel_data);
+    
 }
 
 OBJ_Viewer::Texture::~Texture()

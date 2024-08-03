@@ -7,11 +7,11 @@ namespace OBJ_Viewer
 {
 	class Mesh {
 	public:
-		Mesh(std::unique_ptr<VertexAttributeObject> meshVAo, std::shared_ptr<Material> material = {});
+		Mesh(std::unique_ptr<VertexAttributeObject> meshVAo, size_t material_index = 0);
 		const VertexAttributeObject& GetMeshVAO()const { return *this->m_vao; }
-		const std::weak_ptr<Material> GetMaterial()const { return std::weak_ptr<Material>(m_Material); }
+        size_t GetMaterialIndex()const { return m_meshRegistryMaterialIndex; }
 	private:
-		std::shared_ptr<Material> m_Material;
+        size_t m_meshRegistryMaterialIndex;
 		std::unique_ptr<VertexAttributeObject> m_vao;
 	};
 }

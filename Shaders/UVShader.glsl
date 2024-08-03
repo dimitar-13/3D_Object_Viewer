@@ -39,8 +39,8 @@ void main()
 out vec4 FragColor;
 
 in vec2 FragUV;
-const vec3 GrayCol = vec3(.45);
-const vec3 WhiteCol = vec3(.92);
+const vec3 GrayCol = vec3(.412);
+const vec3 WhiteCol = vec3(1);
 uniform float uvScale;
 
 in VS_OUT_STUDIO_DATA{

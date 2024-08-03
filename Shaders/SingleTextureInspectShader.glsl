@@ -23,13 +23,17 @@ void main()
 #Shader:fragment
 #version 330 core
 
+#include "ColorSpaceUtilityFunctions.glsl"
+
 out vec4 FragColor;
 in vec2 Frag_UV_Coords;
 uniform sampler2D textureToInspect;
+uniform bool uIsTextureInSRGB;
 
 void main()
 {
-	FragColor = texture(textureToInspect,Frag_UV_Coords);
+	vec4 sampledTexel = texture(textureToInspect,Frag_UV_Coords);
+	FragColor = uIsTextureInSRGB ? vec4(toLinear(sampledTexel)) : sampledTexel;
 }
 
 

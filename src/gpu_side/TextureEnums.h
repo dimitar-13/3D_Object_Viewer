@@ -9,13 +9,14 @@ namespace OBJ_Viewer {
 		TextureFormat_kRGB = GL_RGB,
 		TextureFormat_kRGBA = GL_RGBA
 	};
-	enum TextureInternalFormat_ {
-		TextureInternalFormat_kDepth = GL_DEPTH_COMPONENT,
-		TextureInternalFormat_kDepth_and_stencil = GL_DEPTH_STENCIL,
-		TextureInternalFormat_kR = GL_RED,
-		TextureInternalFormat_kRG = GL_RG,
-		TextureInternalFormat_kRGB = GL_RGB,
-		TextureInternalFormat_kRGBA = GL_RGBA,
+    enum TextureInternalFormat_ {
+        TextureInternalFormat_kDepth = GL_DEPTH_COMPONENT,
+        TextureInternalFormat_kDepth_and_stencil = GL_DEPTH_STENCIL,
+        TextureInternalFormat_kR = GL_RED,
+        TextureInternalFormat_kRG = GL_RG,
+        TextureInternalFormat_kRGB = GL_RGB,
+        TextureInternalFormat_kRGBA = GL_RGBA,
+        TextureInternalFormat_kSRGB = GL_SRGB
 	};
 	enum TextureFilter_
 	{

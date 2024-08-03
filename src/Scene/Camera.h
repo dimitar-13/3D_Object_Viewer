@@ -32,7 +32,7 @@ namespace OBJ_Viewer
 	class Camera : public Listener
 	{
 	public:
-		Camera(float CameraZoom,Size2D screenSize, Application& app);
+		Camera(float CameraZoom,InputHandler& application_inputHandlerRef,const SceneViewport& kApplicationViewportManagerRef);
 		void GetViewAndProjectionSeparate(glm::mat4& pView, glm::mat4& pProj)const { pView = m_viewMatrix; pProj = m_projectionMatrix; }
 		glm::mat4 GetViewProjMatrix()const { return m_projectionMatrix * m_viewMatrix; }
 		glm::mat4 GetViewProjNoTranslation()const { return m_projectionMatrix* glm::mat4(glm::mat3(m_viewMatrix)); };
@@ -58,7 +58,8 @@ namespace OBJ_Viewer
 		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
-		Application& m_app;
+		InputHandler& m_applicationInputHandler;
+        const SceneViewport& m_applicationViewportManager;
 
 		glm::vec3 m_cameraCenter;
 		Position2D m_lastMousePos = Position2D{0,0};

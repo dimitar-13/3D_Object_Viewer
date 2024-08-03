@@ -83,13 +83,13 @@ void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, i
 	this->m_windowSize = Size2D{ width,height };
 	if (width == 0 || height == 0)
 	{
-		WindowStateChangedEvent e(Size2D{ width, height }, WINDOW_STATE_MINIMIZED);
+		WindowStateChangedEvent e(Size2D{ width, height }, WindowState_kWindowMinimized);
 		m_onEvent(e);
 		return;
 	}
 	else if (m_windowSize.width == 0 || m_windowSize.height == 0 && (width != 0 || height != 0))
 	{
-		WindowStateChangedEvent e(Size2D{ width, height }, WINDOW_STATE_NORMAL);
+		WindowStateChangedEvent e(Size2D{ width, height }, WindowState_kWIndowStateNormal);
 		m_onEvent(e);
 		return;
 	}

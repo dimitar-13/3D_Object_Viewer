@@ -36,6 +36,8 @@ void main()
 #define MAX_LIGHTS 4
 #define AMBIENT_AMOUNT .1
 
+#include "ColorSpaceUtilityFunctions.glsl"
+
 struct DirectionalLight{
 	vec3 LightDirection;
 	vec3 lightColor;
@@ -87,19 +89,20 @@ const float rimLightPowerFactor = 6;
 float GetRimLightFactor(vec3 CameraToPixel,vec3 fragNormal);
 void main()
 {
+
 	vec3 Color = vec3(0,0,0);
 	
 	vec3 SampledNormals = texture(Mesh_material.normalMap,fragment_in.FragUV).xyz*2. - 1.;
 	
 	vec3 FragNormal = fragment_in.TBN_Mat*SampledNormals;
 	
-	vec3 FragCol = texture(Mesh_material.albedo,fragment_in.FragUV).xyz*Mesh_material.color;
+	vec3 FragCol = toLinear(texture(Mesh_material.albedo,fragment_in.FragUV)).rgb* Mesh_material.color;
 
 	FragCol *= texture(Mesh_material.ambientOcclusion,fragment_in.FragUV).xyz;
 
 	FragLightData data;
 
-	data.FragColor = FragCol;
+	data.FragColor =FragCol;
 	data.FragPosition = fragment_in.FragPosition;
 	data.FragSpecularVal = texture(Mesh_material.roughtness,fragment_in.FragUV).xyz;
 	data.FragNormal = FragNormal;

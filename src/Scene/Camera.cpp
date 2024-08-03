@@ -11,11 +11,16 @@ constexpr float kZnear = 0.1f;
 constexpr float kFieldOfView = 45.0f;
 constexpr glm::vec3 kCameraDefaultOrigin = glm::vec3{0,1.0f,0};
 
-OBJ_Viewer::Camera::Camera(float CameraZoom, Size2D screenSize, Application& app):
-	m_app(app),m_cameraCenter(kCameraDefaultOrigin)
+OBJ_Viewer::Camera::Camera(float CameraZoom,
+    InputHandler& application_inputHandlerRef, const SceneViewport& kApplicationViewportManagerRef):
+    m_applicationInputHandler(application_inputHandlerRef),
+    m_applicationViewportManager(kApplicationViewportManagerRef)
+    , m_cameraCenter(kCameraDefaultOrigin)
 {
 	this->m_zoom = CameraZoom;
-	m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(screenSize.width, screenSize.height), kZnear, kZfar);
+    Size2D viewport_size = m_applicationViewportManager.GetViewportSize();
+	m_projectionMatrix = 
+        glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(viewport_size.width, viewport_size.height), kZnear, kZfar);
 
 	this->m_EulerAngles.m_pitchAngle = 0.0f;
 	this->m_EulerAngles.m_yawAngle = 90.0f;
@@ -43,7 +48,7 @@ void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 
 	if (!m_isProjectionPerspective)
 	{
-		Size2D current_window_size = m_app.GetSceneViewport().GetViewportSize();
+		Size2D current_window_size = m_applicationViewportManager.GetViewportSize();
 		CalculateOthoProjection(current_window_size);
 	}
 
@@ -54,14 +59,14 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 {
 	auto& current_mouse_position = e.GetMousePos();
 #pragma region Check for LMB
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MouseKey_kLeftMouseButton) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
+	if (m_applicationInputHandler.isMouseButtonPressed(MouseKey_kLeftMouseButton) &&
+		m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
 		m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MouseKey_kLeftMouseButton) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
+	else if (m_applicationInputHandler.isMouseButtonHeld(MouseKey_kLeftMouseButton) &&
+             m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
 		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
@@ -70,14 +75,14 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 #pragma endregion
 
 #pragma region  Check for RMB
-	if (m_app.GetGlobalInputHandler().isMouseButtonPressed(MouseKey_kRightMouseButton) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
+	if (m_applicationInputHandler.isMouseButtonPressed(MouseKey_kRightMouseButton) &&
+		m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
 		m_lastMousePos = current_mouse_position;
 	}
-	else if (m_app.GetGlobalInputHandler().isMouseButtonHeld(MouseKey_kRightMouseButton) &&
-		m_app.GetGlobalInputHandler().GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
+	else if (m_applicationInputHandler.isMouseButtonHeld(MouseKey_kRightMouseButton) &&
+             m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		constexpr float kCameraShiftingSpeed = .005;
 		glm::mat3 view_space_no_transform_matrix = glm::mat3(m_viewMatrix);
@@ -121,7 +126,7 @@ void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 
 void OBJ_Viewer::Camera::RecalculateProjection(Size2D viewport_size)
 {
-    viewport_size = (viewport_size.width == 0 || viewport_size.height == 0) ? m_app.GetSceneViewport().GetViewportSize() : viewport_size;
+    viewport_size = (viewport_size.width == 0 || viewport_size.height == 0) ? m_applicationViewportManager.GetViewportSize() : viewport_size;
 
 	if (m_isProjectionPerspective)
 		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(viewport_size.width, viewport_size.height) , kZnear, kZfar);

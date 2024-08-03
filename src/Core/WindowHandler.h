@@ -4,14 +4,13 @@
 #include "CommonAppData.h"
 namespace OBJ_Viewer {
 
-	enum WindowState
+	enum WindowState_
 	{
-		WINDOW_STATE_UKNOWN = 0,
-		WINDOW_STATE_MINIMIZED,
-		WINDOW_STATE_FULL_SCREEN,
-		WINDOW_STATE_NORMAL
+		WindowState_kUnknown,
+		WindowState_kWindowMinimized,
+		WindowState_kWindowFullScreen,
+		WindowState_kWIndowStateNormal
 	};
-	class Application;
 	class Window {
 	public:
 		Window(Size2D windowMetrics, const char* winTitle);
@@ -19,16 +18,13 @@ namespace OBJ_Viewer {
 		Size2D GetWindowSize()const { return this->m_windowSize; }
 		GLFWwindow* GetGLFW_Window()const { return this->m_glfwWindow; }
 		bool isWinContextInitialized() { return  m_glfwWindow != nullptr;}
+        void SetOnEventCallback(const std::function<void(Event&)>& onEventFunc) { m_onEvent = onEventFunc; }
 	private:
 		Size2D m_windowSize;
 		GLFWwindow* m_glfwWindow = nullptr;
 		const char* m_winTitle;
 		std::function<void(Event&)> m_onEvent;
-		WindowState windowState = WINDOW_STATE_NORMAL;
-	private:
-		
-		friend class Application;
-		void SetOnEventCallback(const std::function<void(Event&)>& onEventFunc){ m_onEvent = onEventFunc; }
+		WindowState_ windowState = WindowState_kWIndowStateNormal;	
  	private:
 		void SetWindowCallback();
 		void glfwCursorPositionCallback(GLFWwindow* window, double xpos, double ypos);

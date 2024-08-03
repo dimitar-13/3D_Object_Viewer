@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "SceneRenderer.h" 
 #include "UI/UILayer.h"
-
+#include "SceneConfigurationSettingsStruct.h"
 namespace OBJ_Viewer
 {
 	class RenderingCoordinator : public Listener{
@@ -16,9 +16,10 @@ namespace OBJ_Viewer
 	private:
 		Application& m_application;
 		std::unique_ptr<UILayer> m_UILayer;
-		std::shared_ptr<SceneRenderer> m_sceneRenderer;
-		WindowState m_currentWindowState;
+		std::shared_ptr<SceneManager> m_sceneRenderer;
+		WindowState_ m_currentWindowState;
 		std::future<int> m_saveImgResult;
+        APP_SETTINGS::SceneConfigurationSettings m_renderingConfigSettings{};
 		// Inherited via Listener
 		
 	};

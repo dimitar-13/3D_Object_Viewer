@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "Skybox.h"
-#include "Helpers/MeshGeneratingMethods.h"
+#include "Helpers/ModelGenerator.h"
 
 OBJ_Viewer::Skybox::Skybox(const std::array<TexturePixelReader, Skybox::SKYBOX_FACE_COUNT>& textures):
-	m_skyboxVAO(GenerateCubeVAO(true))
+	m_skyboxVAO(ModelGenerator::GenerateCubeVAO(true))
 {
 
 	const Size2D skybox_texture_size = textures[0].GetTextureSize();

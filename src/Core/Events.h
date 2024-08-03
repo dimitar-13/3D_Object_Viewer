@@ -15,7 +15,7 @@ namespace OBJ_Viewer {
 		EventType_kMouseScrollChanged,
 		EventType_kWindowSizeChanged,
 		EventType_kSkyboxLoad,
-		EventType_kModelLoad,
+		EventType_kScenelLoad,
 		EventType_kFocusedWindowChanged,
 		EventType_kWindowStateChanged,
 		EventType_kCameraProjectionChanged,
@@ -25,9 +25,9 @@ namespace OBJ_Viewer {
 
 	enum EventCategory_
 	{
-		EventCategory_kAppEvent = 1,
-		EventCategory_kInputEvent = 2,
-		EventCategory_kWindowEvent = 4
+		EventCategory_kAppEvent,
+		EventCategory_kInputEvent,
+		EventCategory_kWindowEvent
 	};
 
 	class Event
@@ -43,6 +43,7 @@ namespace OBJ_Viewer {
 	public:
 		virtual void OnEvent(Event& e) = 0;
 	};
+
 	class MousePositionEvent : public Event
 	{
 	public:
@@ -116,60 +117,18 @@ namespace OBJ_Viewer {
 		Size2D m_windowNewSize;
 	};
 
-	class SceneViewportResizeEvent : public Event
-	{
-	public:
-		SceneViewportResizeEvent(const Viewport& newSize) :m_viewport(newSize)
-		{ }
-		EventType_ GetEventType()const override { return EventType_kViewportSizeChanged; }
-		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
+    class ScrollPositionChanged : public Event
+    {
+    public:
+        ScrollPositionChanged(Position2D mousePos) : m_mousePos(mousePos) {
 
-		Size2D GetViewportSize()const { return Size2D{ m_viewport.width,m_viewport.height}; }
-		Size2D GetViewportOffset()const { return Size2D{ m_viewport.x,m_viewport.y }; }
-		const Viewport& GetViewport()const { return m_viewport; }
-	private:
-		Viewport m_viewport;
-	};
+        }
+        EventType_ GetEventType()const override { return EventType_kMouseScrollChanged; }
+        EventCategory_ GetEventCategory()const override { return EventCategory_kInputEvent; }
 
-	class ScrollPositionChanged : public Event
-	{
-	public:
-		ScrollPositionChanged(Position2D mousePos) : m_mousePos(mousePos) {
+        Position2D& GetScrollPosition() { return m_mousePos; }
+    private:
+        Position2D m_mousePos;
+    };
 
-		}
-		EventType_ GetEventType()const override { return EventType_kMouseScrollChanged; }
-		EventCategory_ GetEventCategory()const override { return EventCategory_kInputEvent; }
-
-		Position2D& GetScrollPosition() { return m_mousePos; }
-	private:
-		Position2D m_mousePos;
-	};
-
-	struct ImgOutputData
-	{
-		Size2D imgSize;
-		std::string outPath;
-		ImageFileFormat_ outImgFormat;
-		bool renderObjectOnly;
-		bool allowTransparency;
-	};
-
-	class ScreenshotEvent : public Event
-	{
-	public:
-		ScreenshotEvent(const ImgOutputData& imgOutputData) :
-			m_outputData(imgOutputData)
-		{
-			std::string_view formatString = TextureFileEnumConverter::GetStringTextureFileExtensionFormatFromEnum(m_outputData.outImgFormat);
-			m_outputData.outPath.append(formatString.data());
-			
-		}
-		EventType_ GetEventType()const override { return EventType_kScreenshotButtonPressed; }
-		EventCategory_ GetEventCategory()const override { return EventCategory_kAppEvent; }
-		const ImgOutputData& ImgData()const { return m_outputData; }
-		Size2D GetImageSize()const { return m_outputData.imgSize; }
-		const ImgOutputData& GetOutputData() { return m_outputData; }
-	private:
-		ImgOutputData m_outputData;
-	};
 }

@@ -12,8 +12,8 @@ namespace OBJ_Viewer {
 	struct ModelData
 	{
 		MeshInfo meshInfo;
-		size_t textureCount = 0;
-		std::string modelPath = "Unavailable";
+		size_t textureCount;
+		std::string modelPath;
 	};
 
 	class Model

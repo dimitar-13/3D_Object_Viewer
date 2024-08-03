@@ -26,7 +26,6 @@ namespace OBJ_Viewer {
 	public:
 		SceneViewport(const Viewport& viewport):m_viewport(viewport)
 		{ RecalculateViewportMatrix();}
-
 		Size2D GetViewportOffset()const { return Size2D{ m_viewport.x,m_viewport.y }; }
 		Size2D GetViewportSize()const { return Size2D{ m_viewport.width,m_viewport.height }; }
 		glm::mat3& GetViewportMatrix() { return m_viewPortMatrix; }

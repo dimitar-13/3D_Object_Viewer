@@ -23,7 +23,7 @@ namespace OBJ_Viewer
 		void BindSkyboxTexture()const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMapHandle); }
 		void SwapSkyboxFaceTextures(SkyboxFace_ toBeSwapped, SkyboxFace_ swappedWith);
 		const VertexAttributeObject& GetSkyboxVAO()const { return *m_skyboxVAO; }
-		const std::array<std::shared_ptr<Texture>, SKYBOX_FACE_COUNT>& const GetSkyboxFaceTextures() { return m_faceTextures; }
+		const std::array<std::shared_ptr<Texture>, SKYBOX_FACE_COUNT>&  GetSkyboxFaceTextures()const { return m_faceTextures; }
     private:
 		std::array<std::shared_ptr<Texture>, SKYBOX_FACE_COUNT> m_faceTextures;
 		std::array<std::unique_ptr<OpenGLBuffer>, SKYBOX_FACE_COUNT> m_PixelBuffers;

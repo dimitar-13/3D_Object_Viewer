@@ -42,10 +42,10 @@ namespace OBJ_Viewer {
 		TimerClock m_startTime;
 	};
 #else
-	class Timer
-	{
+    class Timer
+    {
 
-	}
+    };
 
 #endif // OBJ_VIEWER_LEVEL_DEBUG
 }

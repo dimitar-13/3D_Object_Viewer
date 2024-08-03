@@ -2,6 +2,7 @@
 #include "Application.h"
 #include"Rendering/RenderingCoordinator.h"
 
+
 OBJ_Viewer::Application::Application(Window& appWindow):
 	m_window(appWindow),
 	m_sceneViewport(Viewport{ 0,0, appWindow.GetWindowSize().width, appWindow.GetWindowSize().height})
@@ -11,7 +12,7 @@ OBJ_Viewer::Application::Application(Window& appWindow):
 	glViewport(0, 0, appWindow.GetWindowSize().width, appWindow.GetWindowSize().height);
 	InitImGui();
 
-	m_inputHandler = std::shared_ptr<InputHandler>(new InputHandler());
+	m_inputHandler = std::make_shared<InputHandler>();
 	AddEventListener(m_inputHandler);
 	m_appRenderingCoordinator = std::make_shared<RenderingCoordinator>(*this);
 	AddEventListener(m_appRenderingCoordinator);

@@ -120,6 +120,12 @@
     <ClCompile Include="src\Rendering\ShaderLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Helpers\DialogWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\ModelGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\imgui\imgui\imconfig.h">
@@ -176,9 +182,6 @@
     <ClInclude Include="src\Core\Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Helpers\MeshGeneratingMethods.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Helpers\DialogWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -213,9 +216,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\SceneRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Rendering\RenderingMediator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\AppEvent.h">
@@ -269,6 +269,15 @@
     <ClInclude Include="src\Enums\GpuDataTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Rendering\SceneConfigurationSettingsStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enums\MaterialFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers\ModelGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
@@ -283,6 +292,7 @@
     <None Include="Shaders\ClearColorMeshShader.glsl" />
     <None Include="Shaders\NormalOrientationShader.glsl" />
     <None Include="Shaders\ShaderCommonFunctions.glsl" />
+    <None Include="Shaders\ColorSpaceUtilityFunctions.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">

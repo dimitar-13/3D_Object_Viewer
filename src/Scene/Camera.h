@@ -7,26 +7,35 @@
 namespace OBJ_Viewer
 {
 	struct EulerAngles {
-		float m_yawAngle;
-		float m_pitchAngle;
+		float yawAngle;
+		float pitchAngle;
 		EulerAngles& operator+=(const EulerAngles& other) {
-			this->m_yawAngle += other.m_yawAngle;
-			this->m_pitchAngle += other.m_pitchAngle;
+			this->yawAngle += other.yawAngle;
+			this->pitchAngle += other.pitchAngle;
 			return *this;
 		}
 		EulerAngles& operator-(const EulerAngles& other)
 		{
-			this->m_yawAngle -= other.m_yawAngle;
-			this->m_pitchAngle -= other.m_pitchAngle;
+			this->yawAngle -= other.yawAngle;
+			this->pitchAngle -= other.pitchAngle;
 			return *this;
 		}
 	};
 	class EulerAngleHelper {
 	public:
-		EulerAngles calculateEulerAngles(Position2D newMousePosition);
-		void ConstrainAngles(EulerAngles& angle);
+        EulerAngleHelper()
+        {
+            m_EulerAngles.pitchAngle = 0.0f;
+            m_EulerAngles.yawAngle = 90.0f;
+        }
+        EulerAngles GetEulerAngles()const { return m_EulerAngles; }
+        static EulerAngles ConvertMousePositionToAngles(Position2D position_to_convert);
+        void IncreaseEulerAngles(const EulerAngles& angles) { m_EulerAngles += angles; ConstrainAngles(); }
+    private:
+        bool IsAngleWithinBounds(float angle) { return angle >= -360.0f && angle <= 360.0f; }
+		void ConstrainAngles();
 	private:
-		Position2D m_previousMousePosition;
+        EulerAngles m_EulerAngles {};
 	};
 
 	class Camera : public Listener
@@ -40,6 +49,8 @@ namespace OBJ_Viewer
         bool IsCameraProjectionPerspective()const { return m_isProjectionPerspective; }
 		void SetProjection(bool isProjectionPerspective = true) { m_isProjectionPerspective = isProjectionPerspective; RecalculateProjection(); }
 	private:
+        bool IsCameraYVectorFlipped(float pitch_angle);
+        float GetAspectRatio(Size2D size) {return static_cast<float>(size.width) / static_cast<float>(size.height); }
 		void RecalculateViewMatrix();
 		void CalculatePositionVector();
 #pragma region On Event
@@ -55,15 +66,13 @@ namespace OBJ_Viewer
 		float m_zoom;
 		glm::mat4 m_projectionMatrix;
 		glm::mat4 m_viewMatrix;
-		EulerAngles m_EulerAngles;
 		EulerAngleHelper m_EulerAngleHelper;
 		glm::vec3 m_position;
 		InputHandler& m_applicationInputHandler;
         const SceneViewport& m_applicationViewportManager;
-
 		glm::vec3 m_cameraCenter;
-		Position2D m_lastMousePos = Position2D{0,0};
-
+		Position2D m_lastMouseMovementPosition{};
+        Position2D m_lastMouseShiftPosition{};
 		bool m_isProjectionPerspective = true;
 		// Inherited via Listener
 		void OnEvent(Event& e) override;

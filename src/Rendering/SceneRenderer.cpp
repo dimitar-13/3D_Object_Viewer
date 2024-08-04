@@ -252,8 +252,6 @@ void OBJ_Viewer::SceneManager::OnEvent(Event& e)
 	else if (e.GetEventCategory() == EventCategory_kAppEvent && e.GetEventType() == EventType_kViewportSizeChanged)
 	{
 		auto& sceneViewportEvent = dynamic_cast<SceneViewportResizeEvent&>(e);
-		const Viewport& newViewport = sceneViewportEvent.GetViewport();
-		glViewport(newViewport.x, newViewport.y, newViewport.width, newViewport.height);
 
 		m_multiSampleSceneFrameBuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());
 		m_intermidiateFramebuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());

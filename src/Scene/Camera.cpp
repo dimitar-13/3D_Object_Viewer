@@ -3,48 +3,53 @@
 #include "Camera.h"
 #include "Controls/AppKeyBindings.h"
 
-#define OBJ_VIEWER_IS_Y_VECTOR_FLIPPED(X) std::cos(glm::radians(X)) < 0
-#define OBJ_VIEWER_SCREEN_ASPECT(X,Y) (float)X / (float)Y
-
 constexpr float kZfar = 100.0f;
 constexpr float kZnear = 0.1f;
 constexpr float kFieldOfView = 45.0f;
 constexpr glm::vec3 kCameraDefaultOrigin = glm::vec3{0,1.0f,0};
 
-OBJ_Viewer::Camera::Camera(float CameraZoom,
+OBJ_Viewer::Camera::Camera(float camera_zoom,
     InputHandler& application_inputHandlerRef, const SceneViewport& kApplicationViewportManagerRef):
-    m_applicationInputHandler(application_inputHandlerRef),
-    m_applicationViewportManager(kApplicationViewportManagerRef)
-    , m_cameraCenter(kCameraDefaultOrigin)
-{
-	this->m_zoom = CameraZoom;
-    Size2D viewport_size = m_applicationViewportManager.GetViewportSize();
-	m_projectionMatrix = 
-        glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(viewport_size.width, viewport_size.height), kZnear, kZfar);
 
-	this->m_EulerAngles.m_pitchAngle = 0.0f;
-	this->m_EulerAngles.m_yawAngle = 90.0f;
+    m_applicationInputHandler(application_inputHandlerRef),
+    m_applicationViewportManager(kApplicationViewportManagerRef),
+    m_cameraCenter(kCameraDefaultOrigin),
+    m_zoom(camera_zoom)
+{
+    Size2D viewport_size = m_applicationViewportManager.GetViewportSize();
+	m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), GetAspectRatio(viewport_size), kZnear, kZfar);
 
 	//Use to set the x_previous and y_previous of the 'm_EulerAngleHelper' so we can avoid conditions;
-	m_EulerAngleHelper.calculateEulerAngles(Position2D{ this->m_EulerAngles.m_yawAngle,this->m_EulerAngles.m_pitchAngle });
 	CalculatePositionVector();
 
 }
 
 void OBJ_Viewer::Camera::CalculatePositionVector()
 {
-	m_position.y = std::sin(glm::radians(this->m_EulerAngles.m_pitchAngle));
-	m_position.z = std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) * std::sin(glm::radians(-this->m_EulerAngles.m_yawAngle));
-	m_position.x = std::cos(glm::radians(this->m_EulerAngles.m_pitchAngle)) * std::cos(glm::radians(-this->m_EulerAngles.m_yawAngle));
+    const float kPitchAngleInRadians = glm::radians(this->m_EulerAngleHelper.GetEulerAngles().pitchAngle);
+    const float kNegativeYawAngleInRadians = glm::radians(-this->m_EulerAngleHelper.GetEulerAngles().yawAngle);
+
+	m_position.y = std::sin(kPitchAngleInRadians);
+	m_position.z = std::cos(kPitchAngleInRadians) * std::sin(kNegativeYawAngleInRadians);
+	m_position.x = std::cos(kPitchAngleInRadians) * std::cos(kNegativeYawAngleInRadians);
 	m_position = glm::normalize(m_position);
 	RecalculateViewMatrix();
 }
 
 void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 {
-	constexpr float kScrollSensitivity = 0.01f;
-	constexpr float kMaxScrollZoom = 0.002;
-	this->m_zoom += this->m_zoom - e.GetScrollPosition().y <= kMaxScrollZoom ? 0 : -e.GetScrollPosition().y;
+    constexpr float kMinScrollZoom = 0.002f;
+    constexpr float kMaxScrollZoom = 20.0f;
+    constexpr float kScrollRange = kMaxScrollZoom - kMinScrollZoom;
+    constexpr float kAdjustableScrollSensitivityBias = .05f;
+
+    float scroll_delta = this->m_zoom - e.GetScrollPosition().y;
+    const float kAdjustableScrollSensitivity = scroll_delta/ kScrollRange;
+
+    float get_ranged_scroll_amount = scroll_delta <= kMinScrollZoom ||
+        scroll_delta >= kMaxScrollZoom ? 0 : -e.GetScrollPosition().y;
+
+    this->m_zoom += get_ranged_scroll_amount * (kAdjustableScrollSensitivity + kAdjustableScrollSensitivityBias);
 
 	if (!m_isProjectionPerspective)
 	{
@@ -62,14 +67,18 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 	if (m_applicationInputHandler.isMouseButtonPressed(static_cast<MouseKey_>(AppKeyBinding_kCameraRotation)) &&
 		m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
-		//We update the previous x and y position.
-		m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
+        m_lastMouseMovementPosition = current_mouse_position;
 	}
-	else if (m_applicationInputHandler.isMouseButtonHeld(static_cast<MouseKey_>(AppKeyBinding_kCameraRotation)) &&
-             m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
-	{
-		m_EulerAngles += m_EulerAngleHelper.calculateEulerAngles(current_mouse_position);
-		m_EulerAngleHelper.ConstrainAngles(m_EulerAngles);
+    else if (m_applicationInputHandler.isMouseButtonHeld(static_cast<MouseKey_>(AppKeyBinding_kCameraRotation)) &&
+        m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
+    {
+        Position2D mouse_delta = { current_mouse_position.x - m_lastMouseMovementPosition.x,
+            current_mouse_position.y - m_lastMouseMovementPosition.y };
+       
+        m_lastMouseMovementPosition = current_mouse_position;
+
+        m_EulerAngleHelper.IncreaseEulerAngles(EulerAngleHelper::ConvertMousePositionToAngles(mouse_delta));
+
 		CalculatePositionVector();
 	}
 #pragma endregion
@@ -79,7 +88,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
 		//We update the previous x and y position.
-		m_lastMousePos = current_mouse_position;
+		m_lastMouseShiftPosition = current_mouse_position;
 	}
 	else if (m_applicationInputHandler.isMouseButtonHeld(static_cast<MouseKey_>(AppKeyBinding_kCameraShifting)) &&
              m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
@@ -88,7 +97,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		glm::mat3 view_space_no_transform_matrix = glm::mat3(m_viewMatrix);
 		glm::vec3 view_space_delta_vector(0);
 		//We calculate the offset in camera/view space first.
-		Position2D delta = Position2D{ current_mouse_position.x - m_lastMousePos.x,current_mouse_position.y - m_lastMousePos.y};
+		Position2D delta = Position2D{ current_mouse_position.x - m_lastMouseShiftPosition.x,current_mouse_position.y - m_lastMouseShiftPosition.y};
 		view_space_delta_vector.x = delta.x* kCameraShiftingSpeed;
 		//We flip the y since opengl flips its y component 
 		view_space_delta_vector.y = -delta.y* kCameraShiftingSpeed;
@@ -101,7 +110,7 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 		* calculate the movement in view space and then inverse the view matrix to get what the vector will be in world space.
 		*/
 		view_space_delta_vector = glm::transpose(view_space_no_transform_matrix) * view_space_delta_vector;
-		m_lastMousePos = current_mouse_position;
+        m_lastMouseShiftPosition = current_mouse_position;
 		m_cameraCenter += view_space_delta_vector;
 		RecalculateViewMatrix();
 	}
@@ -129,7 +138,7 @@ void OBJ_Viewer::Camera::RecalculateProjection(Size2D viewport_size)
     viewport_size = (viewport_size.width == 0 || viewport_size.height == 0) ? m_applicationViewportManager.GetViewportSize() : viewport_size;
 
 	if (m_isProjectionPerspective)
-		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), OBJ_VIEWER_SCREEN_ASPECT(viewport_size.width, viewport_size.height) , kZnear, kZfar);
+		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), GetAspectRatio(viewport_size) , kZnear, kZfar);
 	else
 		CalculateOthoProjection(viewport_size);
 }
@@ -153,12 +162,23 @@ void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D viewport_size)
 		-((float)viewport_size.height / 2) * orthographic_scale, ((float)viewport_size.height / 2) * orthographic_scale, -1.f/ orthographic_scale, kZfar);
 }
 
+bool OBJ_Viewer::Camera::IsCameraYVectorFlipped(float pitch_angle)
+{
+   // We check the current angle but because of floating point errors when current_angle_in_radiance = +/- 90 or +/- 270
+   // the cos function doesn't return 0 and leads to weird snapping when perfectly perpendicular
+   // that's why we check the next angle and decide if our vector is indeed flipped.
 
+   const float kNextAngleSignedOffsetBias = pitch_angle < 0 ? -1.0f : 1.0f;
+   float current_angle_in_radiance = glm::radians(pitch_angle);
+   float next_angle_in_radiance = glm::radians(pitch_angle + kNextAngleSignedOffsetBias);
+
+   return std::cos(current_angle_in_radiance) < 0 && std::cos(next_angle_in_radiance) < 0;
+}
 
 void OBJ_Viewer::Camera::RecalculateViewMatrix()
 {
 	glm::vec3 up_vector(0, 1, 0);
-	up_vector.y *= OBJ_VIEWER_IS_Y_VECTOR_FLIPPED(this->m_EulerAngles.m_pitchAngle) ? -1 : 1;
+    up_vector.y *= IsCameraYVectorFlipped(this->m_EulerAngleHelper.GetEulerAngles().pitchAngle) ? -1 : 1;
 	m_viewMatrix = glm::lookAt(m_position * m_zoom + m_cameraCenter, m_cameraCenter, up_vector);
 }
 
@@ -187,19 +207,15 @@ void OBJ_Viewer::Camera::OnEvent(Event& e)
 }
 
 
-OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::calculateEulerAngles(Position2D newMousePosition)
+OBJ_Viewer::EulerAngles OBJ_Viewer::EulerAngleHelper::ConvertMousePositionToAngles(Position2D position_to_convert)
 {
-	EulerAngles result = {static_cast<float>(newMousePosition.x - m_previousMousePosition.x),
-		static_cast<float>(newMousePosition.y - m_previousMousePosition.y)};
-	m_previousMousePosition = newMousePosition;
-	ConstrainAngles(result);
-	return result;
+    return EulerAngles{static_cast<float>(position_to_convert.x), static_cast<float>(position_to_convert.y)};
 }
 
-void OBJ_Viewer::EulerAngleHelper::ConstrainAngles(EulerAngles& angle)
+void OBJ_Viewer::EulerAngleHelper::ConstrainAngles()
 {
-	char sing = angle.m_pitchAngle > 0 ? -1 : 1;
-	angle.m_pitchAngle += !(angle.m_pitchAngle >= -360.0f && angle.m_pitchAngle <= 360.0f) ? sing * 360.0f : 0;
-	sing = angle.m_yawAngle > 0 ? -1 : 1;
-	angle.m_yawAngle += !(angle.m_yawAngle >= -360.0f && angle.m_yawAngle <= 360.0f) ? sing * 360.0f : 0;
+	char oposite_angle_sign = this->m_EulerAngles.pitchAngle > 0 ? -1 : 1;
+    this->m_EulerAngles.pitchAngle += !IsAngleWithinBounds(this->m_EulerAngles.pitchAngle) ? oposite_angle_sign * 360.0f : 0;
+	oposite_angle_sign = this->m_EulerAngles.yawAngle > 0 ? -1 : 1;
+    this->m_EulerAngles.yawAngle += !IsAngleWithinBounds(this->m_EulerAngles.yawAngle) ? oposite_angle_sign * 360.0f : 0;
 }

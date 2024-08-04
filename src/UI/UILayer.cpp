@@ -42,6 +42,16 @@ void OBJ_Viewer::UILayer::isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID wind
 		windowID : m_currentlyFocusedWindow;
 }
 
+void OBJ_Viewer::UILayer::OnEvent(Event& e)
+{
+    if (e.GetEventCategory() == EventCategory_kAppEvent && e.GetEventType() == EventType_kViewportSizeChanged)
+    {
+        auto& sceneViewportEvent = dynamic_cast<SceneViewportResizeEvent&>(e);
+        m_UI_inputFramebuffer.ResizeFramebuffer(sceneViewportEvent.GetViewportSize());
+    }
+
+}
+
 void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& scene_config_settings_ref,
     std::weak_ptr<Model> scene_model, std::weak_ptr<MaterialRegistry> material_registry,
     std::weak_ptr<Skybox> scene_skybox)

@@ -75,7 +75,6 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
         m_renderingConfigSettings.m_isWireGridOn && !kEventDataImageData.renderObjectOnly;
 
 	m_application.SubmitSceneViewportSize(OutputImageViewport);
-    m_UILayer->GetInputFramebuffer().ResizeFramebuffer({ OutputImageViewport.width, OutputImageViewport.height });
 
 	m_sceneRenderer->RenderScene(m_renderingConfigSettings, &m_UILayer->GetInputFramebuffer());
 
@@ -90,8 +89,6 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
   
 	//Restore original state
 	m_application.SubmitSceneViewportSize(kPreviousApplicationViewport);
-    //Change this so that the UI framebuffer listen for resize events
-    m_UILayer->GetInputFramebuffer().ResizeFramebuffer({ kPreviousApplicationViewport.width, kPreviousApplicationViewport.height });
 
     m_renderingConfigSettings.m_isSkyboxOn = kPreviousSkyboxEnableState;
     m_renderingConfigSettings.m_isWireGridOn = kPreviousGridEnableState;
@@ -113,5 +110,6 @@ OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application)
 	m_sceneRenderer = std::make_shared<SceneManager>(application);
 	m_application.AddEventListener(m_sceneRenderer);
 	m_UILayer = std::make_unique<UILayer>(m_application);
+    m_application.AddEventListener(m_UILayer);
 
 }

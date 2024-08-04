@@ -5,7 +5,7 @@
 #include "Rendering/SceneConfigurationSettingsStruct.h"
 namespace OBJ_Viewer {
 
-	class UILayer
+	class UILayer : public Listener
 	{
 	public:
         UILayer(Application& appState);
@@ -27,7 +27,10 @@ namespace OBJ_Viewer {
 		Framebuffer m_UI_inputFramebuffer;
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
-	};
+
+        // Inherited via Listener
+        void OnEvent(Event& e) override;
+    };
 	template<typename T>
 	inline T UILayer::RenderComboBox(const std::string& comboLabel, const std::unordered_map<T, const char*>& items,
 		const T& previewItem)

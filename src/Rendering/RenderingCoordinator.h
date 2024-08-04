@@ -15,7 +15,7 @@ namespace OBJ_Viewer
 		void OnEvent(Event& e) override;
 	private:
 		Application& m_application;
-		std::unique_ptr<UILayer> m_UILayer;
+		std::shared_ptr<UILayer> m_UILayer;
 		std::shared_ptr<SceneManager> m_sceneRenderer;
 		WindowState_ m_currentWindowState;
 		std::future<int> m_saveImgResult;

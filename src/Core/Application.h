@@ -27,7 +27,6 @@ namespace OBJ_Viewer {
 		void SubmitEvent(Event& event) { OnEvent(event); }
 		~Application();
 	private:
-		void InitImGui();
 		void OnEvent(Event& winEvent);
 		void OnAppKeyBindPressed(KeyboardKeyEvent& e);
 	private:

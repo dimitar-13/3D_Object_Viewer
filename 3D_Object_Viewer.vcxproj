@@ -149,10 +149,12 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="Dependencies\CMakeLists.txt" />
     <Text Include="Shaders\WireframeShader.glsl">
       <FileType>Document</FileType>
     </Text>
     <ClCompile Include="Dependencies\stbi_image\stb_write_imp.cpp" />
+    <Text Include="src\Enums\CMakeLists.txt" />
     <ClCompile Include="src\Helpers\ModelGenerator.cpp" />
     <ClCompile Include="src\Helpers\DialogWrapper.cpp" />
     <ClCompile Include="src\Rendering\ShaderLibrary.cpp" />
@@ -217,6 +219,17 @@
     <ClCompile Include="src\gpu_side\Texture.cpp" />
     <ClCompile Include="src\UI\UILayer.cpp" />
     <ClCompile Include="src\gpu_side\UniformBuffer.cpp" />
+    <Text Include="src\CMakeLists.txt" />
+    <Text Include="src\Controls\CMakeLists.txt" />
+    <Text Include="src\Core\CMakeLists.txt" />
+    <Text Include="src\gpu_side\CMakeLists.txt" />
+    <Text Include="src\Helpers\CMakeLists.txt" />
+    <Text Include="src\Logging\CMakeLists.txt" />
+    <Text Include="src\pch\CMakeLists.txt" />
+    <Text Include="src\Profiling\CMakeLists.txt" />
+    <Text Include="src\Rendering\CMakeLists.txt" />
+    <Text Include="src\Scene\CMakeLists.txt" />
+    <Text Include="src\UI\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Dependencies\glew\glew-2.2.0\build\vc15\glew_static.vcxproj">
@@ -244,7 +257,7 @@
     <ClInclude Include="src\Controls\KeyboardKeys.h" />
     <ClInclude Include="src\Controls\MouseKeys.h" />
     <ClInclude Include="src\Core\SceneViewport.h" />
-    <ClInclude Include="src\gpu_side\TextureEnums.h" />
+    <ClInclude Include="src\Enums\TextureEnums.h" />
     <ClInclude Include="src\Helpers\FileFromatStruct.h" />
     <ClInclude Include="src\Helpers\TextureHelpers.h" />
     <ClInclude Include="src\Helpers\UnitTransformer.h" />

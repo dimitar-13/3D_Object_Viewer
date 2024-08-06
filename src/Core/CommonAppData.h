@@ -48,7 +48,7 @@ namespace OBJ_Viewer {
 
 	namespace APP_FOCUS_REGIONS {
 		typedef  const char* AppWindowID;
-		constexpr AppWindowID kUI_SceneWindowName = "Scene";
+		constexpr AppWindowID kUI_SceneWindowName = "Scene render window";
 		constexpr AppWindowID kUI_ObjectLoadingWindowName = "Loading panel";
 		constexpr AppWindowID kUI_Model_and_renderingSettingsWindowName = "ModelAndRenderingSettings";
 		constexpr AppWindowID kUI_SceneSettingsWindowName = "Scene setting";

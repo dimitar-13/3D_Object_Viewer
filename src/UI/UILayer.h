@@ -27,7 +27,7 @@ namespace OBJ_Viewer {
 		Framebuffer m_UI_inputFramebuffer;
 		ImGuiWindowFlags m_imGuiWindowFlags;
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;
-
+        bool m_isFirstFrame = true;
         // Inherited via Listener
         void OnEvent(Event& e) override;
     };

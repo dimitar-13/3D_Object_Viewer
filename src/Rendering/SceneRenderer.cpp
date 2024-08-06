@@ -152,7 +152,7 @@ void OBJ_Viewer::SceneManager::PostProcessScene(bool doFXAA)
 	glm::vec2 shader_uniform_window_resolution = glm::vec2(kViewport_size.width, kViewport_size.height);
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_DST_ALPHA);
 	framebuffer_texture_for_post_process.BindTexture();
 	auto& shader = m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kPostProcessShader);
 	shader.UseShader();
@@ -281,7 +281,7 @@ void OBJ_Viewer::SceneManager::OnSceneLoadEvent(EventOnSceneLoad& e)
 	DialogWrapper loadModelDialog;
 	std::string_view filterList = "obj";
 
-	if (e.IsFBXDisabled())
+	if (!e.IsFBXDisabled())
 		filterList = "obj,fbx";
 
 	loadModelDialog.OpenDialog(filterList);

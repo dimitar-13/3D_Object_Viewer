@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "gpu_side/TextureEnums.h"
+#include "Enums/TextureEnums.h"
 #include "Core/CommonAppData.h"
 #include "Logging/App_Logger.h"
 #include "Enums/FIleImageEnums.h"

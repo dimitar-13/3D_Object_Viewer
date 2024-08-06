@@ -79,15 +79,14 @@ void OBJ_Viewer::Window::glfwKeyCallback(GLFWwindow* window, int key, int scanco
 
 void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	int isVisible = glfwGetWindowAttrib(window, GLFW_VISIBLE);
 	this->m_windowSize = Size2D{ width,height };
-	if (width == 0 || height == 0)
+	if (( width == 0 && height == 0 ))
 	{
 		WindowStateChangedEvent e(Size2D{ width, height }, WindowState_kWindowMinimized);
 		m_onEvent(e);
 		return;
 	}
-	else if (m_windowSize.width == 0 || m_windowSize.height == 0 && (width != 0 || height != 0))
+	else if (width != 0 || height != 0)
 	{
 		WindowStateChangedEvent e(Size2D{ width, height }, WindowState_kWIndowStateNormal);
 		m_onEvent(e);

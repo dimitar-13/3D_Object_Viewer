@@ -592,7 +592,9 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 		sceneWinViewport.height = winSize.y;
 
 		m_UI_inputFramebuffer.ResizeFramebuffer(Size2D{ sceneWinViewport.width,sceneWinViewport.height });
-		m_applicationRef.SubmitSceneViewportSize(sceneWinViewport);
+
+        if(!m_isFirstFrame)
+		    m_applicationRef.SubmitSceneViewportSize(sceneWinViewport);
 
 		ImGui::BeginChild("GameRender", winSize,ImGuiChildFlags_None, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
 		ImGui::Image((ImTextureID)m_UI_inputFramebuffer.GetFramebufferTexture().GetTextureHandle(), winSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
@@ -609,7 +611,7 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 #pragma endregion
 
 	m_applicationRef.GetGlobalInputHandler().SetCurrentlyFocusedWindow(m_currentlyFocusedWindow);
-
+    m_isFirstFrame = false;
     //pScene_model->ApplyTransformation(position, scale, glm::vec3(1), 0);
 }
 

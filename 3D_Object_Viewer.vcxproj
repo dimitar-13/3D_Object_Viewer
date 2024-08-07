@@ -243,6 +243,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Config.h.in" />
     <ClInclude Include="src\Helpers\ModelGenerator.h" />
     <ClInclude Include="src\Enums\GpuDataTypes.h" />
     <ClInclude Include="src\Enums\MaterialFlags.h" />

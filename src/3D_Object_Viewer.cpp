@@ -3,6 +3,7 @@
 #include "Controls/InputHandler.h"
 #include "Rendering/RenderingCoordinator.h"
 #include "Logging/App_Logger.h"
+#include "Core/Config.h"
 #include <filesystem>
 #include <sstream>
 
@@ -28,8 +29,7 @@ int main()
 	constexpr int kStartupWindowHeight = 1500;
 	const char* winTitle = "3D_viewer";
 	constexpr OBJ_Viewer::Size2D kWindowStartupSize = { kStartupWindowWidth,kStartupWindowHeight };
-    const std::filesystem::path kCurrentDirPath = std::filesystem::current_path();
-    const std::string kImGUISaveFilePath = kCurrentDirPath.string().append("\\project\\imgui.ini");
+    const std::string kImGUISaveFilePath = OBJ_VIEWER_IMGUI_INI_FILE_PATH;
 
 #pragma endregion
 
@@ -108,6 +108,11 @@ int main()
 	LOGGER_LOG_INFO("App exited successfully.");
 
     ImGui::SaveIniSettingsToDisk(kImGUISaveFilePath.c_str());
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwTerminate();
 
 	return ExitStatus_::ExitStatus_ApplicationExitSuccsess;
 }

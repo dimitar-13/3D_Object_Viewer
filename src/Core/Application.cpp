@@ -37,13 +37,6 @@ void OBJ_Viewer::Application::SubmitSceneViewportSize(const Viewport& newViewpor
 	OnEvent(e);
 }
 
-OBJ_Viewer::Application::~Application()
-{
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-	glfwTerminate();
-}
 void OBJ_Viewer::Application::OnEvent(Event& winEvent)
 {
 	for (uint32_t i = 0; i < m_eventListeners.size(); i++)

@@ -5,5 +5,5 @@ GpuDataTypes.h
 MaterialFlags.h
 TextureEnums.h
 )
-
-target_sources(3D_Object_Viewer PRIVATE  ${ INPUT_HEADERS })
+source_group("Header Files" FILES ${INPUT_HEADERS})
+target_sources(3D_Object_Viewer PRIVATE  ${INPUT_HEADERS})

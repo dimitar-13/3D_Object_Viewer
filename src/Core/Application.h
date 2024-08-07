@@ -25,7 +25,6 @@ namespace OBJ_Viewer {
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
 		void SubmitSceneViewportSize(const Viewport& newViewport);
 		void SubmitEvent(Event& event) { OnEvent(event); }
-		~Application();
 	private:
 		void OnEvent(Event& winEvent);
 		void OnAppKeyBindPressed(KeyboardKeyEvent& e);

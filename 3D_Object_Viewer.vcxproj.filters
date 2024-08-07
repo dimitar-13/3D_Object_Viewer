@@ -278,6 +278,9 @@
     <ClInclude Include="src\Helpers\ModelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Config.h.in">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />

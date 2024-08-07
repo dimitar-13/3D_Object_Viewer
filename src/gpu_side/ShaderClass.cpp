@@ -62,8 +62,7 @@ std::unordered_map<OBJ_Viewer::ShaderSourceType_,std::string> OBJ_Viewer::Shader
     ShaderSourceType_ currently_reading_shader_key {};
 
     std::string shaderPathNoFilename = path;
-    shaderPathNoFilename = shaderPathNoFilename.substr(0, shaderPathNoFilename.find_last_of('\\') + 1);
-    std::replace(shaderPathNoFilename.begin(), shaderPathNoFilename.end(), '\\', '/');
+    shaderPathNoFilename = shaderPathNoFilename.substr(0, shaderPathNoFilename.find_last_of('/') + 1);
 
     while (std::getline(shader_source_file_stream, line))
     {

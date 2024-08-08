@@ -278,7 +278,7 @@
     <ClInclude Include="src\Helpers\ModelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Config.h.in">
+    <ClInclude Include="src\Core\Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -296,6 +296,7 @@
     <None Include="Shaders\NormalOrientationShader.glsl" />
     <None Include="Shaders\ShaderCommonFunctions.glsl" />
     <None Include="Shaders\ColorSpaceUtilityFunctions.glsl" />
+    <None Include="project\imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">

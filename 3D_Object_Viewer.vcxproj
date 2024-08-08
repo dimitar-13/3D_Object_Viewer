@@ -244,7 +244,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Config.h.in" />
+    <ClInclude Include="src\Core\Config.h" />
     <ClInclude Include="src\Helpers\ModelGenerator.h" />
     <ClInclude Include="src\Enums\GpuDataTypes.h" />
     <ClInclude Include="src\Enums\MaterialFlags.h" />
@@ -297,6 +297,7 @@
     <ClInclude Include="src\gpu_side\UniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="project\imgui.ini" />
     <None Include="Shaders\ClearColorMeshShader.glsl" />
     <None Include="Shaders\ColorShader.glsl" />
     <None Include="Shaders\ColorSpaceUtilityFunctions.glsl" />

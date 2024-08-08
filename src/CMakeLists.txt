@@ -99,9 +99,6 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/glm/glm ${CMAKE_BINARY_DIR}
 add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/assimp/assimp ${CMAKE_BINARY_DIR}/assimp)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/spdlog/spdlog ${CMAKE_BINARY_DIR}/spdlog)
 
-
-
-
 target_compile_definitions(3D_Object_Viewer PUBLIC
 	 GLEW_STATIC
 	 $<$<CONFIG:Debug>: OBJ_VIEWER_LEVEL_DEBUG>
@@ -130,6 +127,22 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/bin/$<CONFIG>
     COMMENT "Copying DLL to the current bin output directory"
 )
+
+add_custom_command(
+	TARGET 3D_Object_Viewer
+    POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E make_directory 
+		${CMAKE_BINARY_DIR}/bin/$<CONFIG>/project
+    COMMAND ${CMAKE_COMMAND} -E copy
+	   ${CMAKE_SOURCE_DIR}/../project/imgui.ini
+	   ${CMAKE_SOURCE_DIR}/../project/LICENSE.txt
+	   ${CMAKE_SOURCE_DIR}/../project/README.md
+
+       ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/project/
+    COMMENT "Creating Shaders directory and copying shader files to $<CONFIG> directory."
+)
+
+
 add_custom_target(nfd_project ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/vs2010/nfd.vcxproj)
 add_custom_target(glew_static ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/glew/glew-2.2.0/build/vc15/glew_static.vcxproj)
 

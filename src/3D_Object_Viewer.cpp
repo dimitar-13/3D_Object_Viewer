@@ -4,8 +4,7 @@
 #include "Rendering/RenderingCoordinator.h"
 #include "Logging/App_Logger.h"
 #include "Core/Config.h"
-#include <filesystem>
-#include <sstream>
+
 
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
@@ -13,7 +12,7 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, 
 
 enum ExitStatus_
 {
-	ExitStatus_kOnApplicationCloses= 1,
+	ExitStatus_kOnApplicationCloses = 1,
 	ExitStatus_kGLFW_InitFailed = -1,
 	ExitStatus_kGLEW_InitFailed = -2,
 	ExitStatus_kWindowContextCreationFailed = -3,
@@ -29,8 +28,8 @@ int main()
 	constexpr int kStartupWindowHeight = 1500;
 	const char* winTitle = "3D_viewer";
 	constexpr OBJ_Viewer::Size2D kWindowStartupSize = { kStartupWindowWidth,kStartupWindowHeight };
-    const std::string kImGUISaveFilePath = OBJ_VIEWER_IMGUI_INI_FILE_PATH;
-
+  
+    const std::string kImGUISaveFilePath = OBJ_Viewer::ProjectPathHelper::GetCurrentExecutableFilePath().append("project/imgui.ini");
 #pragma endregion
 
 #pragma region Application dependencies and Window inilizing 

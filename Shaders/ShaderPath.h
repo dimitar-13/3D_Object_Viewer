@@ -7,7 +7,7 @@ namespace OBJ_Viewer {
 	public:
 		static std::string GetConcatShaderPath(const char* shaderFileName)
 		{
-			return OBJ_VIEWER_SHADER_PATH + std::string(shaderFileName);
+			return ProjectPathHelper::GetCurrentExecutableFilePath().append("Shaders/") + std::string(shaderFileName);
 		}
 	};
 }

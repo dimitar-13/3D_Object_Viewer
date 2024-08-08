@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="Dependencies\CMakeLists.txt" />
+    <Text Include="Shaders\CMakeLists.txt" />
     <Text Include="Shaders\WireframeShader.glsl">
       <FileType>Document</FileType>
     </Text>

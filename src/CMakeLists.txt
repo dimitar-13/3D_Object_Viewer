@@ -23,12 +23,16 @@ target_sources(3D_Object_Viewer PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../Shaders/Sha
 source_group("Source Files" FILES 3D_Object_Viewer.cpp)
 source_group("Header Files" FILES ${CMAKE_CURRENT_LIST_DIR}/../Shaders/ShaderPath.h)
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Debug)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Release)
+
 set_target_properties(3D_Object_Viewer PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/Debug
 )
 set_target_properties(3D_Object_Viewer PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/Release
 )
+
 
 set(GLEW_RELEASE ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glew/glew-2.2.0/lib/Release/x64)
 set(GLEW_DEBUG   ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glew/glew-2.2.0/lib/Debug/x64)
@@ -48,6 +52,7 @@ set(DLL_SOURCE_PATH_RELEASE ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/assimp/ass
 
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/pch)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../Shaders  ${CMAKE_BINARY_DIR}/Shaders)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../Dependencies ${CMAKE_BINARY_DIR}/Dependencies)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Controls)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Core)
@@ -60,7 +65,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Rendering)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Scene)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/UI)
 
-
+add_dependencies(3D_Object_Viewer copy_shaders)
 
 target_include_directories(3D_Object_Viewer PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glfw/glfw/include)
 target_include_directories(3D_Object_Viewer PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glew/glew-2.2.0/include)
@@ -115,17 +120,15 @@ target_link_libraries(3D_Object_Viewer
    "$<$<CONFIG:Debug>:assimp-vc143-mtd.lib>"
 )
 
+
 add_custom_command(
     TARGET 3D_Object_Viewer
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_SOURCE_PATH_DEBUG} ${CMAKE_BINARY_DIR}/bin/Debug
-    COMMENT "Copying DLL to debug output directory"
-)
-add_custom_command(
-    TARGET 3D_Object_Viewer
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_SOURCE_PATH_RELEASE} ${CMAKE_BINARY_DIR}/bin/Release
-    COMMENT "Copying DLL to release output directory"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<$<CONFIG:Debug>:${DLL_SOURCE_PATH_DEBUG}>
+        $<$<CONFIG:Release>:${DLL_SOURCE_PATH_RELEASE}>
+        ${CMAKE_BINARY_DIR}/bin/$<CONFIG>
+    COMMENT "Copying DLL to the current bin output directory"
 )
 add_custom_target(nfd_project ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/vs2010/nfd.vcxproj)
 add_custom_target(glew_static ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/glew/glew-2.2.0/build/vc15/glew_static.vcxproj)

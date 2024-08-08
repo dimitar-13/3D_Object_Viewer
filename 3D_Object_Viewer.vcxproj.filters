@@ -324,5 +324,6 @@
     <Text Include="src\Enums\CMakeLists.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="Shaders\CMakeLists.txt" />
   </ItemGroup>
 </Project>

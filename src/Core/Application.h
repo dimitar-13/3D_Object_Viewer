@@ -14,7 +14,7 @@ namespace OBJ_Viewer {
 	class Application
 	{
 	public:
-		Application(Window& appWindow);
+        Application(Window& appWindow);
 		void AppStartRenderLoop();
 		bool isAppInitStatusSuccess()const { return m_appInitStatusSuccsess; }
 		bool isUIHidden()const { return m_isUIHidden; }

@@ -19,6 +19,8 @@ imgui/imgui/imconfig.h
 imgui/imgui/imgui.h
 imgui/imgui/backends/imgui_impl_glfw.h
 imgui/imgui/backends/imgui_impl_opengl3.h
+stbi_image/stb_image_write.h
+stbi_image/stb_image.h
 )
 
 #set_source_files_properties(${INPUT_SOURCES}PROPERTIES COMPILE_FLAGS "/Y-")

@@ -15,8 +15,11 @@ ${CMAKE_CURRENT_SOURCE_DIR}/WireframeShader.glsl
 ${CMAKE_CURRENT_SOURCE_DIR}/ClearColorMeshShader.glsl
 )
 
-source_group(Shaders FILES ${SHADERS_SOURCE})
+
 target_sources(3D_Object_Viewer PRIVATE ${SHADERS_SOURCE})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
+         PREFIX "Shaders"
+         FILES ${SHADERS_SOURCE})
 
 add_custom_target(copy_shaders ALL
        COMMAND ${CMAKE_COMMAND} -E make_directory 

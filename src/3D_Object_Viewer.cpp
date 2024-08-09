@@ -3,13 +3,16 @@
 #include "Controls/InputHandler.h"
 #include "Rendering/RenderingCoordinator.h"
 #include "Logging/App_Logger.h"
+#include "Core/Config.h"
+
+
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
 	GLsizei length, const char* message, const void* userParam);
 
 enum ExitStatus_
 {
-	ExitStatus_kOnApplicationCloses= 1,
+	ExitStatus_kOnApplicationCloses = 1,
 	ExitStatus_kGLFW_InitFailed = -1,
 	ExitStatus_kGLEW_InitFailed = -2,
 	ExitStatus_kWindowContextCreationFailed = -3,
@@ -17,16 +20,16 @@ enum ExitStatus_
 	ExitStatus_ApplicationExitSuccsess = ExitStatus_kOnApplicationCloses
 };
 
-
 int main()
 {
 #pragma region Const startup app data
-
 
 	constexpr int kStartupWindowWidth = 1200;
 	constexpr int kStartupWindowHeight = 1500;
 	const char* winTitle = "3D_viewer";
 	constexpr OBJ_Viewer::Size2D kWindowStartupSize = { kStartupWindowWidth,kStartupWindowHeight };
+  
+    const std::string kImGUISaveFilePath = OBJ_Viewer::ProjectPathHelper::GetCurrentExecutableFilePath().append("project/imgui.ini");
 #pragma endregion
 
 #pragma region Application dependencies and Window inilizing 
@@ -62,6 +65,17 @@ int main()
 
 	stbi_flip_vertically_on_write(true);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.IniFilename = NULL;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
+    ImGui::LoadIniSettingsFromDisk(kImGUISaveFilePath.c_str());
+
+    ImGui_ImplGlfw_InitForOpenGL(appWindow.GetGLFW_Window(), true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
 
 #ifdef OBJ_VIEWER_LEVEL_DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
@@ -92,9 +106,15 @@ int main()
 
 	LOGGER_LOG_INFO("App exited successfully.");
 
+    ImGui::SaveIniSettingsToDisk(kImGUISaveFilePath.c_str());
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwTerminate();
+
 	return ExitStatus_::ExitStatus_ApplicationExitSuccsess;
 }
-
 static void APIENTRY glDebugOutput(GLenum source, GLenum type,
 	unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
 {

@@ -14,7 +14,7 @@ namespace OBJ_Viewer {
 	class Application
 	{
 	public:
-		Application(Window& appWindow);
+        Application(Window& appWindow);
 		void AppStartRenderLoop();
 		bool isAppInitStatusSuccess()const { return m_appInitStatusSuccsess; }
 		bool isUIHidden()const { return m_isUIHidden; }
@@ -25,9 +25,7 @@ namespace OBJ_Viewer {
 		void AddEventListener(std::weak_ptr<Listener> listener) { m_eventListeners.push_back(listener); }
 		void SubmitSceneViewportSize(const Viewport& newViewport);
 		void SubmitEvent(Event& event) { OnEvent(event); }
-		~Application();
 	private:
-		void InitImGui();
 		void OnEvent(Event& winEvent);
 		void OnAppKeyBindPressed(KeyboardKeyEvent& e);
 	private:

@@ -180,5 +180,5 @@ vec4 GetColorFXAA()
     
     vec2 finalUV = !isHorizontal ? vec2(FragUV.x + finalOffset * singlePixelOffset, FragUV.y) : vec2(FragUV.x, FragUV.y + finalOffset * singlePixelOffset);
     
-	return texture(u_framebufferTexture, finalUV);;
+	return texture(u_framebufferTexture, finalUV);
 }

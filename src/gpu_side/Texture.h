@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Core/CommonAppData.h"
-#include "TextureEnums.h"
+#include "Enums/TextureEnums.h"
 #include "Enums/GpuDataTypes.h"
 namespace OBJ_Viewer {
 #pragma region TextureStructs	

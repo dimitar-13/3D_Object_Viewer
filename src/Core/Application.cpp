@@ -10,7 +10,6 @@ OBJ_Viewer::Application::Application(Window& appWindow):
 	m_window.SetOnEventCallback(std::bind(&Application::OnEvent,this, std::placeholders::_1));
 
 	glViewport(0, 0, appWindow.GetWindowSize().width, appWindow.GetWindowSize().height);
-	InitImGui();
 
 	m_inputHandler = std::make_shared<InputHandler>();
 	AddEventListener(m_inputHandler);
@@ -36,25 +35,6 @@ void OBJ_Viewer::Application::SubmitSceneViewportSize(const Viewport& newViewpor
 
 	SceneViewportResizeEvent e(m_sceneViewport.GetViewport());
 	OnEvent(e);
-}
-
-OBJ_Viewer::Application::~Application()
-{
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-	glfwTerminate();
-}
-void OBJ_Viewer::Application::InitImGui()
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
-
-	ImGui_ImplGlfw_InitForOpenGL(this->m_window.GetGLFW_Window(), true);
-	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 void OBJ_Viewer::Application::OnEvent(Event& winEvent)

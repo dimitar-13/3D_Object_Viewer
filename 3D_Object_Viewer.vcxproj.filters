@@ -251,7 +251,7 @@
     <ClInclude Include="src\Helpers\TextureHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gpu_side\TextureEnums.h">
+    <ClInclude Include="src\Enums\TextureEnums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Profiling\AppProfiler.h">
@@ -278,6 +278,15 @@
     <ClInclude Include="src\Helpers\ModelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\stbi_image\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\stbi_image\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ColorShader.glsl" />
@@ -293,6 +302,7 @@
     <None Include="Shaders\NormalOrientationShader.glsl" />
     <None Include="Shaders\ShaderCommonFunctions.glsl" />
     <None Include="Shaders\ColorSpaceUtilityFunctions.glsl" />
+    <None Include="project\imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\WhiteTexture.png">
@@ -306,5 +316,21 @@
     <Text Include="Shaders\WireframeShader.glsl">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="src\CMakeLists.txt" />
+    <Text Include="src\Controls\CMakeLists.txt" />
+    <Text Include="src\Core\CMakeLists.txt" />
+    <Text Include="src\gpu_side\CMakeLists.txt" />
+    <Text Include="src\Helpers\CMakeLists.txt" />
+    <Text Include="src\Logging\CMakeLists.txt" />
+    <Text Include="src\pch\CMakeLists.txt" />
+    <Text Include="src\Profiling\CMakeLists.txt" />
+    <Text Include="src\Rendering\CMakeLists.txt" />
+    <Text Include="src\Scene\CMakeLists.txt" />
+    <Text Include="src\UI\CMakeLists.txt" />
+    <Text Include="Dependencies\CMakeLists.txt" />
+    <Text Include="src\Enums\CMakeLists.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="Shaders\CMakeLists.txt" />
   </ItemGroup>
 </Project>

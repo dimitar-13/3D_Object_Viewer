@@ -166,7 +166,16 @@ add_custom_command(
        ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/project/
     COMMENT "Creating Shaders directory and copying shader files to $<CONFIG> directory."
 )
+add_custom_target(GLFWBuild
+    COMMAND cmake -B${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glfw/glfw/build H${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glfw/glfw
+    COMMAND cmake --build ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glfw/glfw/build
+)
+add_custom_target(AssimpBuild
+    COMMAND cmake -B${CMAKE_CURRENT_LIST_DIR}/../Dependencies/assimp/assimp/build H${CMAKE_CURRENT_LIST_DIR}/../Dependencies/assimp/assimp
+    COMMAND cmake --build ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/assimp/assimp/build
+)
 
+add_dependencies(MyProject GLFWBuild AssimpBuild)
 
 add_custom_target(nfd_project ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/vs2010/nfd.vcxproj)
 add_custom_target(glew_static ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/glew/glew-2.2.0/build/vc15/glew_static.vcxproj)

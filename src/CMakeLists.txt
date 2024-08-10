@@ -21,8 +21,8 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Debug)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Release)
 
 
-set(GLEW_RELEASE ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glew/glew-2.2.0/lib/Release/x64)
-set(GLEW_DEBUG   ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/glew/glew-2.2.0/lib/Debug/x64)
+set(GLEW_RELEASE ${CMAKE_BINARY_DIR}/lib/Release)
+set(GLEW_DEBUG   ${CMAKE_BINARY_DIR}/lib/Debug)
 set(NFD_RELEASE  ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/lib/Release/x64)
 set(NFD_DEBUG    ${CMAKE_CURRENT_LIST_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/lib/Debug/x64)
 
@@ -51,7 +51,8 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Rendering)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Scene)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/UI)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/glfw/glfw ${CMAKE_SOURCE_DIR}/../Dependencies/glfw/glfw/build)
-add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/glm/glm ${CMAKE_SOURCE_DIR}/../Dependencies/glm/glm/build)
+add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/glew/glew-2.2.0/build/cmake ${CMAKE_SOURCE_DIR}/../Dependencies/glew/glew-2.2.0/build/cmake/build)
+add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/glm/glm ${CMAKE_BINARY_DIR}/glm)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/assimp/assimp ${CMAKE_SOURCE_DIR}/../Dependencies/assimp/assimp/build)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../Dependencies/spdlog/spdlog ${CMAKE_SOURCE_DIR}/../Dependencies/spdlog/spdlog/build)
 
@@ -131,8 +132,8 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC opengl32	
 	PUBLIC glfw3.lib
-   "$<$<CONFIG:Release>:glew32s.lib>"
-   "$<$<CONFIG:Debug>:glew32sd.lib>"
+   "$<$<CONFIG:Release>:libglew32.lib>"
+   "$<$<CONFIG:Debug>:libglew32d.lib>"
 
    "$<$<CONFIG:Release>:nfd.lib>"
    "$<$<CONFIG:Debug>:nfd_d.lib>"
@@ -166,8 +167,11 @@ add_custom_command(
     COMMENT "Creating Shaders directory and copying shader files to $<CONFIG> directory."
 )
 
-add_custom_target(nfd_project ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/vs2010/nfd.vcxproj)
-add_custom_target(glew_static ALL DEPENDS ${CMAKE_SOURCE_DIR}/../Dependencies/glew/glew-2.2.0/build/vc15/glew_static.vcxproj)
+include_external_msproject(
+    nfd
+    ${CMAKE_SOURCE_DIR}/../Dependencies/nativefiledialog/nativefiledialog/build/vs2010/nfd.vcxproj
+    TYPE STATIC
+)
 
-add_dependencies(${PROJECT_NAME} glfw glm spdlog assimp glew_static nfd_project copy_shaders )
+add_dependencies(${PROJECT_NAME} glfw glm spdlog assimp glew_s nfd copy_shaders )
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})

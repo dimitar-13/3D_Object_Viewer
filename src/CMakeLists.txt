@@ -131,8 +131,10 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME}
-	PUBLIC opengl32	
-	PUBLIC glfw3.lib
+	PUBLIC opengl32
+   "$<$<CONFIG:Release>:glfw3.lib>"
+   "$<$<CONFIG:Debug>:glfw3d.lib>"
+	
    "$<$<CONFIG:Release>:libglew32.lib>"
    "$<$<CONFIG:Debug>:libglew32d.lib>"
 

@@ -61,3 +61,10 @@ OBJ_Viewer::VertexAttributeObject::VertexAttributeObject(const std::vector<glm::
 	m_vertexData.indexCount = kIndexDataVectorRef.size();
 	m_vertexData.vertexCount = kPostionDataVectorRef.size();
 }
+
+OBJ_Viewer::VertexAttributeObject::~VertexAttributeObject()
+{
+    glDeleteVertexArrays(0, &this->m_vertexAttributeObjHandle);
+    glDeleteBuffers(0, &this->m_vertexBufferObjHandle);
+    glDeleteBuffers(0, &this->m_indexBufferObjHandle);
+}

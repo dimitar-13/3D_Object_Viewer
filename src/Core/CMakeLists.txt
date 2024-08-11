@@ -11,7 +11,7 @@ CommonAppData.h
 Events.h
 SceneViewport.h
 WindowHandler.h
-Config.h
+ProjectPathHelper.h
 )
 
 

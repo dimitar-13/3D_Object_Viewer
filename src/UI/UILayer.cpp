@@ -510,11 +510,11 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 			{
                 if (std::shared_ptr<Model> current_scene_model = scene_model.lock())
                 {
-                    const ModelData& current_model_load_data = current_scene_model->GetModelData();
+                    const ModelUIData& current_model_load_data = current_scene_model->GetModelUIData();
                     ImGui::Text("Model info");
-                    ImGui::Text("Object triangle count:%d", current_model_load_data.meshInfo.triangleCount);
-                    ImGui::Text("Object vertex count:%d", current_model_load_data.meshInfo.vertexCount);
-                    ImGui::Text("Object face count:%d", current_model_load_data.meshInfo.faceCount);
+                    ImGui::Text("Object triangle count:%d", current_model_load_data.modelVertexCountData.triangleCount);
+                    ImGui::Text("Object vertex count:%d", current_model_load_data.modelVertexCountData.vertexCount);
+                    ImGui::Text("Object face count:%d", current_model_load_data.modelVertexCountData.faceCount);
                     ImGui::Text("Texture count:%d", current_model_load_data.textureCount);
 
                     ImGui::Text("File path %s", current_model_load_data.modelPath.c_str());

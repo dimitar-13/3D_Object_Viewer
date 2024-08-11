@@ -87,9 +87,9 @@ std::unique_ptr<std::vector<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateMe
 		m_sceneBoundingBox.min.y = std::min(mesh_reading_thread_result.mesh_bounding_box.min.y,m_sceneBoundingBox.min.y);
 		m_sceneBoundingBox.min.z = std::min(mesh_reading_thread_result.mesh_bounding_box.min.z,m_sceneBoundingBox.min.z);
 
-		m_ModelData.meshInfo.faceCount += mesh_reading_thread_result.mesh_Information.faceCount;
-		m_ModelData.meshInfo.vertexCount += mesh_reading_thread_result.mesh_Information.vertexCount;
-		m_ModelData.meshInfo.triangleCount += mesh_reading_thread_result.mesh_Information.triangleCount;
+		m_ModelData.modelVertexCountData.faceCount += mesh_reading_thread_result.mesh_Information.faceCount;
+		m_ModelData.modelVertexCountData.vertexCount += mesh_reading_thread_result.mesh_Information.vertexCount;
+		m_ModelData.modelVertexCountData.triangleCount += mesh_reading_thread_result.mesh_Information.triangleCount;
 
 		mesh_vector_result->emplace_back(std::make_unique<VertexAttributeObject>(mesh_reading_thread_result.vertex_data_vector, mesh_reading_thread_result.index_data_vector),
 			mesh_reading_thread_result.mesh_material_ID);
@@ -199,7 +199,7 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::Load
 	auto AddTextureToMaterialDataIfValid = 
 		[](MaterialData& materialData,MaterialTextures_ textureEnumKey, std::shared_ptr<Texture> texture) {
 			if (texture)
-				materialData.m_materialTextures[textureEnumKey] = texture;
+				materialData.materialTextures[textureEnumKey] = texture;
 		};
 
 	for (size_t i =0; i < scene->mNumMaterials;i++)

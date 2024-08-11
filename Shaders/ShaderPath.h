@@ -1,6 +1,5 @@
 #pragma once
-#include <filesystem>
-#include "Core/Config.h"
+#include "Core/ProjectPathHelper.h"
 namespace OBJ_Viewer {
 	
 	class ShaderAssetHelper {

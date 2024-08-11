@@ -9,8 +9,8 @@ std::unique_ptr<OBJ_Viewer::Model> OBJ_Viewer::ModelGenerator::GenerateCubeModel
     const char* kDefaultPath = "Unavailable";
     constexpr size_t kDefaultTextureCount = 0;
 
-    constexpr MeshInfo kCubeMeshInfo = { kCubeVertexCount, kCubeFaceCount, kCubeTriangleCount };
-    ModelData kModel_data = ModelData{ kCubeMeshInfo,kDefaultTextureCount,kDefaultPath };
+    constexpr ModelVertexData kCubeMeshInfo = { kCubeVertexCount, kCubeFaceCount, kCubeTriangleCount };
+    ModelUIData kModel_data = ModelUIData{ kCubeMeshInfo,kDefaultTextureCount,kDefaultPath };
 
     std::unique_ptr<Model> result_model;
 

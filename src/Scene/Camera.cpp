@@ -33,7 +33,7 @@ void OBJ_Viewer::Camera::CalculatePositionVector()
 	m_position.z = std::cos(kPitchAngleInRadians) * std::sin(kNegativeYawAngleInRadians);
 	m_position.x = std::cos(kPitchAngleInRadians) * std::cos(kNegativeYawAngleInRadians);
 	m_position = glm::normalize(m_position);
-	RecalculateViewMatrix();
+	CalculateViewMatrix();
 }
 
 void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
@@ -57,7 +57,7 @@ void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 		CalculateOthoProjection(current_window_size);
 	}
 
-	RecalculateViewMatrix();
+	CalculateViewMatrix();
 }
 
 void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
@@ -93,26 +93,9 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
 	else if (m_applicationInputHandler.isMouseButtonHeld(static_cast<MouseKey_>(AppKeyBinding_kCameraShifting)) &&
              m_applicationInputHandler.GetCurrentlyFocusedWindow() == APP_FOCUS_REGIONS::kUI_SceneWindowName)
 	{
-		constexpr float kCameraShiftingSpeed = .005;
-		glm::mat3 view_space_no_transform_matrix = glm::mat3(m_viewMatrix);
-		glm::vec3 view_space_delta_vector(0);
-		//We calculate the offset in camera/view space first.
-		Position2D delta = Position2D{ current_mouse_position.x - m_lastMouseShiftPosition.x,current_mouse_position.y - m_lastMouseShiftPosition.y};
-		view_space_delta_vector.x = delta.x* kCameraShiftingSpeed;
-		//We flip the y since opengl flips its y component 
-		view_space_delta_vector.y = -delta.y* kCameraShiftingSpeed;
-		//TL;DR: We use transpose as a cheap inverse since the "viewSpaceOrthogonalVectors" is a 3 orthogonal vector matrix
-		//and then we bring our viewSpace delta into word space.
-		/*Why we do it like this ? 
-		* To pan/shift a camera we wish to move the screen up or down problem is that up/down and right/left is different for the camera
-		* since the camera Z axis is always the cameras front in view space we know that there is a plane perpendicular on the camera Z
-		* axis that we can move. To find where we camera up/down and right/left in world space we have to find this plane. The best approach is to 
-		* calculate the movement in view space and then inverse the view matrix to get what the vector will be in world space.
-		*/
-		view_space_delta_vector = glm::transpose(view_space_no_transform_matrix) * view_space_delta_vector;
+		m_cameraCenter += CalculateMouseOffsetInWorldSpace(m_lastMouseShiftPosition, current_mouse_position);
         m_lastMouseShiftPosition = current_mouse_position;
-		m_cameraCenter += view_space_delta_vector;
-		RecalculateViewMatrix();
+		CalculateViewMatrix();
 	}
 #pragma endregion
 
@@ -129,7 +112,7 @@ void OBJ_Viewer::Camera::onKeyPressedEvent(KeyboardKeyEvent& e)
 	if (e.GetKeyCode() == AppKeyBinding_::AppKeyBinding_kResetCameraPivot)
 	{
 		m_cameraCenter = kCameraDefaultOrigin;
-		RecalculateViewMatrix();
+		CalculateViewMatrix();
 	}
 }
 
@@ -141,6 +124,27 @@ void OBJ_Viewer::Camera::RecalculateProjection(Size2D viewport_size)
 		m_projectionMatrix = glm::perspective(glm::radians(kFieldOfView), GetAspectRatio(viewport_size) , kZnear, kZfar);
 	else
 		CalculateOthoProjection(viewport_size);
+}
+
+glm::vec3 OBJ_Viewer::Camera::CalculateMouseOffsetInWorldSpace(Position2D& previous_mouse_position, Position2D& current_mouse_position)
+{
+    constexpr float kCameraShiftingSpeed = .005;
+    glm::mat3 view_space_no_transform_matrix = glm::mat3(m_viewMatrix);
+    glm::vec3 view_space_delta_vector(0);
+    //We calculate the offset in camera/view space first.
+    Position2D delta = Position2D{ current_mouse_position.x - previous_mouse_position.x,current_mouse_position.y - previous_mouse_position.y };
+    view_space_delta_vector.x = delta.x * kCameraShiftingSpeed;
+    //We flip the y since OpenGL flips its y component 
+    view_space_delta_vector.y = -delta.y * kCameraShiftingSpeed;
+    //TL;DR: We use transpose as a cheap inverse since the "viewSpaceOrthogonalVectors" is a 3 orthogonal vector matrix
+    //and then we bring our viewSpace delta into word space.
+    /*Why we do it like this ?
+    * To pan/shift a camera we wish to move the screen up or down problem is that up/down and right/left is different for the camera
+    * since the camera Z axis is always the cameras front in view space we know that there is a plane perpendicular on the camera Z
+    * axis that we can move. To find where we camera up/down and right/left in world space we have to find this plane. The best approach is to
+    * calculate the movement in view space and then inverse the view matrix to get what the vector will be in world space.
+    */
+    return glm::transpose(view_space_no_transform_matrix) * view_space_delta_vector;
 }
 
 void OBJ_Viewer::Camera::OnProjectionModeChanged(EventCameraProjectionChanged& e)
@@ -175,7 +179,7 @@ bool OBJ_Viewer::Camera::IsCameraYVectorFlipped(float pitch_angle)
    return std::cos(current_angle_in_radiance) < 0 && std::cos(next_angle_in_radiance) < 0;
 }
 
-void OBJ_Viewer::Camera::RecalculateViewMatrix()
+void OBJ_Viewer::Camera::CalculateViewMatrix()
 {
 	glm::vec3 up_vector(0, 1, 0);
     up_vector.y *= IsCameraYVectorFlipped(this->m_EulerAngleHelper.GetEulerAngles().pitchAngle) ? -1 : 1;

@@ -278,7 +278,7 @@
     <ClInclude Include="src\Helpers\ModelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Config.h">
+    <ClInclude Include="src\Core\ProjectPathHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies\stbi_image\stb_image.h">

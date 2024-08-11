@@ -266,7 +266,7 @@ void OBJ_Viewer::SceneManager::OnSkyboxLoadEvent(EventOnSkyboxLoaded& e)
 	if (dialog.IsDialogClosed())
 		return;
 
-	auto& VecPaths = dialog.GetDialogResult();
+	auto& VecPaths = dialog.GetDialogPaths();
 	std::vector<std::string> m_stringVector(VecPaths.size());
 	for (uint32_t i = 0; i < VecPaths.size(); i++)
 	{

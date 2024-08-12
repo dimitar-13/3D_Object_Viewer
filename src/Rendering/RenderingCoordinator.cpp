@@ -15,7 +15,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 	while (!glfwWindowShouldClose(application_GLFW_window))
 	{
 		if (m_currentWindowState != WindowState_kWindowMinimized) {
-            if (!m_application.isUIHidden())
+            if (!m_application.IsUIHidden())
             {
 				m_UILayer->RenderUI(m_renderingConfigSettings,m_sceneRenderer->GetSceneModel(), m_sceneRenderer->GetSceneRegistry(),
                     m_sceneRenderer->GetSkyboxModel());
@@ -36,7 +36,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 	//We set the apha to 0 here in case we want to do blender with the grid.
 	glClearColor(0, 0, 0, 0);
 
-	if (m_application.isUIHidden())
+	if (m_application.IsUIHidden())
 	{
 		m_sceneRenderer->RenderScene(m_renderingConfigSettings);
 	}
@@ -47,7 +47,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEvent& e)
 {
-    const ImgOutputData& kEventDataImageData = e.ImgData();
+    const ImgOutputData& kEventDataImageData = e.GetScreenshotEventData();
     //App state saving
     const bool kPreviousSkyboxEnableState = m_renderingConfigSettings.m_isSkyboxOn;
     const bool kPreviousGridEnableState = m_renderingConfigSettings.m_isWireGridOn;

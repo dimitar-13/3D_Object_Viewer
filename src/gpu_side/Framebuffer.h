@@ -5,6 +5,9 @@
 
 namespace OBJ_Viewer {
 
+    /**
+     * @brief Reserved for deferred rendering framebuffer.
+     */
 	enum FramebufferAttachmentsFlags_
 	{
 		FramebufferAttachmentsFlags_kColorAttachment = 1,
@@ -12,10 +15,24 @@ namespace OBJ_Viewer {
 		//FRAMEBUFFER_NORMAL_ATTACHMENT = 4,
 		//FRAMEBUFFER_SPECULAR_ATTACHMENT = 8
 	};
+    /**
+     * @brief Enum representing framebuffer pixel information flags.
+     *
+     * This enum is used to specify which parts of the framebuffer data are affected when copying or manipulating
+     * framebuffer data. It helps in defining the operations to be performed on different components of the framebuffer.
+     *
+     * - `FramebufferBitMaskFlags_kColorBufferBit`: Indicates that the color buffer should be affected. This flag is used
+     *   when you want to copy or modify the color data in the framebuffer.
+     * - `FramebufferBitMaskFlags_kDepthBufferBit`: Indicates that the depth buffer should be affected. This flag is used
+     *   when you want to copy or modify the depth data in the framebuffer.
+     *
+     * These flags can be combined using bitwise OR operations to specify multiple buffer types simultaneously.
+     *
+     */
     enum FramebufferBitMaskFlags_
     {
-        FramebufferBitMaskFlags_kColorBufferBit = GL_COLOR_BUFFER_BIT,
-        FramebufferBitMaskFlags_kDepthBufferBit = GL_DEPTH_BUFFER_BIT
+        FramebufferBitMaskFlags_kColorBufferBit = GL_COLOR_BUFFER_BIT, ///< Copy the color buffer.
+        FramebufferBitMaskFlags_kDepthBufferBit = GL_DEPTH_BUFFER_BIT  ///< Copy the depth buffer.
     };
     /**
      * @brief Class for creating and managing a framebuffer.

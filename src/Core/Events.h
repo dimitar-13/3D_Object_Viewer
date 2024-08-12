@@ -29,12 +29,37 @@ namespace OBJ_Viewer {
 		EventCategory_kInputEvent,
 		EventCategory_kWindowEvent
 	};
-
+    /**
+     * @brief Event interface used by the application.
+     *
+     * This class is a interface for every application event. You must implement it
+     * if you want to add your custom event to the app.
+     */
 	class Event
 	{
 	public:
 		Event() = default;
+        /**
+         * @brief Retrieves the specific type of the event.
+         *
+         * This function exist for 2 reasons:
+         * - To identify the event class/type.
+         * - To make other events a polymorphic types (for a polymorphic type a class must override a function 
+         * that's why we override instead of keeping the 'EventType_' and 'EventCategory_' as member variables. )
+         * 
+         * @returns The type of the event as defined by the enum `EventType_`.
+         */
 		virtual EventType_ GetEventType()const = 0;
+        /**
+         * @brief Retrieves the specific type of the event.
+         *
+         * This function exist for 2 reasons:
+         * - To identify the event class/type.
+         * - To make other events a polymorphic types (for a polymorphic type a class must override a function
+         * that's why we override instead of keeping the 'EventType_' and 'EventCategory_' as member variables. )
+         *
+         * @returns The type of the event as defined by the enum `EventCategory_`.
+         */
 		virtual EventCategory_ GetEventCategory()const = 0;
 	};
 

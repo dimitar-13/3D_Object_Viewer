@@ -3,8 +3,8 @@
 #include "Helpers/TextureHelpers.h"
 OBJ_Viewer::Renderer::Renderer()
 {
-	m_defaultWhiteTexture = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
-	m_defaultNormal = CreateDefaultTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/Normal_Map_dummy_texture.jpg");
+	m_defaultWhiteTexture = CreateDummyTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
+	m_defaultNormal = CreateDummyTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/Normal_Map_dummy_texture.jpg");
 }
 void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO)
 {
@@ -54,7 +54,7 @@ void OBJ_Viewer::Renderer::RenderMeshSingleTexture(const ShaderClass& single_tex
 }
 
 
-void OBJ_Viewer::Renderer::RenderSolidColor(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO, const glm::vec3& color)
+void OBJ_Viewer::Renderer::RenderStudioWithLight(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO, const glm::vec3& color)
 {
     shaderToUse.UseShader();
     shaderToUse.SetUniformSet3FloatVector("u_Color", color);
@@ -62,7 +62,7 @@ void OBJ_Viewer::Renderer::RenderSolidColor(const ShaderClass& shaderToUse, cons
 }
 
 void OBJ_Viewer::Renderer::RenderMeshWithLight(const ShaderClass& light_shader, const VertexAttributeObject& meshVAO,
-    std::weak_ptr<Material> mesh_material, MaterialRenderingFalgs_ materialFlags,
+    std::weak_ptr<Material> mesh_material, MaterialRenderingFlags_ materialFlags,
     APP_SETTINGS::SceneLightInfo lightInfo,const glm::vec3& camera_position)
 {
     light_shader.UseShader();
@@ -90,7 +90,7 @@ void OBJ_Viewer::Renderer::RenderCheckboardPattern(const ShaderClass& checkerboa
 }
 
 void OBJ_Viewer::Renderer::BindMeshMaterialToShader(const ShaderClass& shaderToUse,
-	const Material& material,MaterialRenderingFalgs_ renderMaterialFlags)
+	const Material& material,MaterialRenderingFlags_ renderMaterialFlags)
 {
     bool is_albedo_texture_present_and_enabled =
         !material.GetMaterialTexture(MaterialTextures_kAlbedo).expired() && 
@@ -133,7 +133,7 @@ void OBJ_Viewer::Renderer::BindMeshMaterialToShader(const ShaderClass& shaderToU
     shaderToUse.SetUniformSet1Float("Mesh_material.specular", material.GetMaterialRoughness());
 }
 
-void OBJ_Viewer::Renderer::RenderGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& grid_VAO,
+void OBJ_Viewer::Renderer::RenderInfiniteGrid(const ShaderClass& shaderToUse, const VertexAttributeObject& grid_VAO,
     const glm::vec3& camera_position,
     const APP_SETTINGS::GridData gridInfo)
 {
@@ -183,9 +183,11 @@ void OBJ_Viewer::Renderer::BindMaterialTextureToShader(const ShaderClass& shader
 	glActiveTexture(textureUnit);
 	textureToBind.BindTexture();
 	shaderToUse.SetUniformSet1Int(textureName, textureUnit - GL_TEXTURE0);
+    textureToBind.UnbindTexture();
+
 }
 
-std::unique_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDefaultTexture(const std::string& path)
+std::unique_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDummyTexture(const std::string& path)
 {
 	TexturePixelReader reader(path.c_str());
 	TextureBuilder builder;

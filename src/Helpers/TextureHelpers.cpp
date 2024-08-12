@@ -19,6 +19,7 @@ constexpr OBJ_Viewer::TextureFormat_ OBJ_Viewer::TextureFormatEnumConverter::Get
 		return TextureFormat_kRGBA;
 		break;
 	default:
+        return TextureFormat_kUnknown;
 		break;
 	}
 }
@@ -27,9 +28,6 @@ constexpr size_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat
 {
 	switch (format)
 	{
-	case OBJ_Viewer::TextureFormat_kUnknown:
-		return 0;
-		break;
 	case OBJ_Viewer::TextureFormat_kR:
 		return 1;
 		break;
@@ -42,7 +40,8 @@ constexpr size_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat
 	case OBJ_Viewer::TextureFormat_kRGBA:
 		return 4;
 		break;
-	default:
+    case OBJ_Viewer::TextureFormat_kUnknown:
+        return 0;
 		break;
 	}
 }
@@ -50,7 +49,7 @@ constexpr size_t OBJ_Viewer::TextureFormatEnumConverter::GetChannelCountByFormat
 
 #pragma region Image saver src
 
-int OBJ_Viewer::TexturePixelSaver::SavePicture(std::string filePath_name, Size2D imageSize,TextureFormat_ textureChanelFormat,
+bool OBJ_Viewer::TexturePixelSaver::SavePicture(std::string filePath_name, Size2D imageSize,TextureFormat_ textureChanelFormat,
 	std::shared_ptr<std::vector<unsigned char>> pixelDataToSave, ImageFileFormat_ imageSaveFormat)
 {
 	switch (imageSaveFormat)
@@ -69,7 +68,7 @@ int OBJ_Viewer::TexturePixelSaver::SavePicture(std::string filePath_name, Size2D
 	}
 }
 
-int OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
+bool OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	constexpr int JPEG_QUALITY = 50;
 	int result = stbi_write_jpg(filePath_name, imageSize.width, imageSize.height,
@@ -82,7 +81,7 @@ int OBJ_Viewer::TexturePixelSaver::SaveJPEG(const char* filePath_name, Size2D im
 	return result;
 }
 
-int OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
+bool OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	const size_t imageStride = imageSize.width * TextureFormatEnumConverter::GetChannelCountByFormat(saveFormat);
 	int result = stbi_write_png(filePath_name, imageSize.width, imageSize.height,
@@ -94,7 +93,7 @@ int OBJ_Viewer::TexturePixelSaver::SavePNG(const char* filePath_name, Size2D ima
 	}
 	return result;
 }
-int OBJ_Viewer::TexturePixelSaver::SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
+bool OBJ_Viewer::TexturePixelSaver::SaveBitmap(const char* filePath_name, Size2D imageSize, TextureFormat_ saveFormat, void* pixelDataToSave)
 {
 	const size_t imageStride = imageSize.width * TextureFormatEnumConverter::GetChannelCountByFormat(saveFormat);
 
@@ -111,14 +110,14 @@ int OBJ_Viewer::TexturePixelSaver::SaveBitmap(const char* filePath_name, Size2D 
 
 #pragma region Pixel reader src
 
-OBJ_Viewer::TexturePixelReader::TexturePixelReader(const char* path)
+OBJ_Viewer::TexturePixelReader::TexturePixelReader(const char* texture_absolute_path)
 {
 	int channelCount;
-	m_pixelData = stbi_load(path, &m_textureSize.width, &m_textureSize.height, &channelCount, 0);
+	m_pixelData = stbi_load(texture_absolute_path, &m_textureSize.width, &m_textureSize.height, &channelCount, 0);
     
 	if (!m_pixelData)
 	{
-		LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", path);
+		LOGGER_LOG_ERROR("STBI_IMAGE failed to read or allocate texture at path:'{0}'", texture_absolute_path);
 		m_textureFormat = TextureFormat_kUnknown;
 		m_textureSize = { 0,0 };
 		return;

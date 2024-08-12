@@ -77,7 +77,7 @@ namespace OBJ_Viewer {
             bool m_EnableAA = true;
             RenderingMode_ m_currentRenderingMode = RenderingMode_kSolidColor;
             glm::vec3 m_colorRenderingColor = glm::vec3(1);
-            MaterialRenderingFalgs_ m_MaterialFlags = MaterialRenderingFalgs_kAll;
+            MaterialRenderingFlags_ m_MaterialFlags = MaterialRenderingFalgs_kAll;
 
             MaterialTextures_ m_curentIndividualTexture = MaterialTextures_kAlbedo;
             UV_ViewAppSetting m_uvViewSettings;

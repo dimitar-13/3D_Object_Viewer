@@ -69,7 +69,7 @@ void OBJ_Viewer::SceneManager::RenderScene(const APP_SETTINGS::SceneConfiguratio
             }
             break;
 		case APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor:
-            m_mainRenderer.RenderSolidColor(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kStudioLightShader),
+            m_mainRenderer.RenderStudioWithLight(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kStudioLightShader),
                 mesh.GetMeshVAO(), renderSettings.m_colorRenderingColor);
 			break;
 
@@ -112,7 +112,7 @@ void OBJ_Viewer::SceneManager::RenderScene(const APP_SETTINGS::SceneConfiguratio
 
 	if (renderSettings.m_isWireGridOn)
 	{
-		m_mainRenderer.RenderGrid(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kGridShader),
+		m_mainRenderer.RenderInfiniteGrid(m_shaderLib.GetShaderRef(ShaderLibarryShaderName_kGridShader),
             m_screenQuad, m_sceneCamera->GetCameraPos(), renderSettings.m_gridData);
 	}
 

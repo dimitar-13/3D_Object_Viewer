@@ -336,10 +336,10 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 				ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
 
 				scene_config_settings_ref.m_MaterialFlags = MaterialRenderingFalgs_kNone;
-				scene_config_settings_ref.m_MaterialFlags = isAlbedoOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kAlbedoIsOn) : scene_config_settings_ref.m_MaterialFlags;
-				scene_config_settings_ref.m_MaterialFlags = isNormalOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kNormalMapIsOn) : scene_config_settings_ref.m_MaterialFlags;
-				scene_config_settings_ref.m_MaterialFlags = isRoughnessOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kSpecularIsOn) : scene_config_settings_ref.m_MaterialFlags;
-				scene_config_settings_ref.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kAmbientOcclusionIsOn) : scene_config_settings_ref.m_MaterialFlags;
+				scene_config_settings_ref.m_MaterialFlags = isAlbedoOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kAlbedoIsOn) : scene_config_settings_ref.m_MaterialFlags;
+				scene_config_settings_ref.m_MaterialFlags = isNormalOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kNormalMapIsOn) : scene_config_settings_ref.m_MaterialFlags;
+				scene_config_settings_ref.m_MaterialFlags = isRoughnessOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kSpecularIsOn) : scene_config_settings_ref.m_MaterialFlags;
+				scene_config_settings_ref.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kAmbientOcclusionIsOn) : scene_config_settings_ref.m_MaterialFlags;
 				break;
 
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture:

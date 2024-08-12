@@ -53,7 +53,7 @@ int main()
 
 	OBJ_Viewer::Window appWindow(kWindowStartupSize, winTitle);
 
-	if (!appWindow.isWinContextInitialized())
+	if (!appWindow.IsWinContextInitialized())
 	{
 		LOGGER_LOG_FATAL("GLFW failed to create a valid window context.");
 
@@ -99,7 +99,7 @@ int main()
 
 	OBJ_Viewer::Application app(appWindow);
 
-	if (!app.isAppInitStatusSuccess())
+	if (!app.IsAppInitStatusSuccess())
 	{
 		app.~Application();
 		LOGGER_LOG_FATAL("App failed to launch successfully");

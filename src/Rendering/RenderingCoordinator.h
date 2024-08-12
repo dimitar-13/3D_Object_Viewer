@@ -18,7 +18,7 @@ namespace OBJ_Viewer
 		std::shared_ptr<UILayer> m_UILayer;
 		std::shared_ptr<SceneManager> m_sceneRenderer;
 		WindowState_ m_currentWindowState;
-		std::future<int> m_saveImgResult;
+		std::future<bool> m_saveImgResult;
         APP_SETTINGS::SceneConfigurationSettings m_renderingConfigSettings{};
 		// Inherited via Listener
 		

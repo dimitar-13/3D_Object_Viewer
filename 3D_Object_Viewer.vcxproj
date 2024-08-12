@@ -247,6 +247,7 @@
     <ClInclude Include="Dependencies\stbi_image\stb_image.h" />
     <ClInclude Include="Dependencies\stbi_image\stb_image_write.h" />
     <ClInclude Include="src\Core\ProjectPathHelper.h" />
+    <ClInclude Include="src\Enums\OpenGLBufferType.h" />
     <ClInclude Include="src\Helpers\ModelGenerator.h" />
     <ClInclude Include="src\Enums\GpuDataTypes.h" />
     <ClInclude Include="src\Enums\MaterialFlags.h" />

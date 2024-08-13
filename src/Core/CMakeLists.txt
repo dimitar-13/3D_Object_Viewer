@@ -8,10 +8,11 @@ set(INPUT_HEADERS
 AppEvent.h
 Application.h
 CommonAppData.h
-Events.h
+WindowEvents.h
 SceneViewport.h
 WindowHandler.h
 ProjectPathHelper.h
+Event.h
 )
 
 

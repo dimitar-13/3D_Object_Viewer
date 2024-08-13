@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Core/Events.h"
+#include "Core/WindowEvents.h"
 #include "Controls/InputHandler.h"
 #include "Core/WindowHandler.h"
 #include "Core/AppEvent.h"
@@ -214,7 +214,7 @@ namespace OBJ_Viewer
          * @return A `glm::vec3` representing the mouse offset in world space.
          *
          */
-        glm::vec3 CalculateMouseOffsetInWorldSpace(Position2D& previous_mouse_position, Position2D& current_mouse_position);
+        glm::vec3 CalculateMouseOffsetInWorldSpace(const Position2D& previous_mouse_position, const Position2D& current_mouse_position);
 
 #pragma region On Event
         /**

@@ -126,7 +126,7 @@ void OBJ_Viewer::Camera::RecalculateProjection(Size2D viewport_size)
 		CalculateOthoProjection(viewport_size);
 }
 
-glm::vec3 OBJ_Viewer::Camera::CalculateMouseOffsetInWorldSpace(Position2D& previous_mouse_position, Position2D& current_mouse_position)
+glm::vec3 OBJ_Viewer::Camera::CalculateMouseOffsetInWorldSpace(const Position2D& previous_mouse_position,const Position2D& current_mouse_position)
 {
     constexpr float kCameraShiftingSpeed = .005;
     glm::mat3 view_space_no_transform_matrix = glm::mat3(m_viewMatrix);

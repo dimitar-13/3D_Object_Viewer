@@ -38,8 +38,11 @@ OBJ_Viewer::UILayer::UILayer(Application& application_ref):
 
 void OBJ_Viewer::UILayer::isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID windowID)
 {
-	m_currentlyFocusedWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-		windowID : m_currentlyFocusedWindow;
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+    {
+        m_currentlyFocusedWindow = windowID;
+        m_applicationRef.GetGlobalInputHandler().SetCurrentlyFocusedWindow(m_currentlyFocusedWindow);
+    }
 }
 
 void OBJ_Viewer::UILayer::OnEvent(Event& e)
@@ -610,7 +613,6 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #pragma endregion
 
-	m_applicationRef.GetGlobalInputHandler().SetCurrentlyFocusedWindow(m_currentlyFocusedWindow);
     m_isFirstFrame = false;
     //pScene_model->ApplyTransformation(position, scale, glm::vec3(1), 0);
 }
@@ -619,12 +621,49 @@ void OBJ_Viewer::UILayer::RenderMaterial_LabelTexturePair(const std::shared_ptr<
 	MaterialTextures_ textureType,const char* textureLabelName)
 {
 #pragma region Style settings
-	static constexpr float spacing = 100.f;
+    /**
+     * A little context.
+     * The below calculations are done because some labels can be longer then others.
+     * A prime example is a 'Ambient Occlusion' and 'Albedo'.
+     * 
+     * If we just make them on the same line with some offset will look like this:
+     * 
+     * offset: 3 spaces
+     *
+     * <Ambient Occlusion>___[Image Position]
+     * <Albedo>___[Image Position]
+     * 
+     * Instead we get the right border of the panel/window and calculate the image position that way
+     * 
+     * Panel Start                                       Panel end
+     * | <Ambient Occlusion>___[Image Position]          |
+     * | <Albedo>___[Image Position]                     |
+     * |            <--image_size-->                     |
+     * <----------------currentWindowSize---------------->
+     * 
+     *  By subtracting the currentWindowSize with the image_size we get where the position of the image needs to be
+     *  so that will be near the right Panel end.
+     
+     * If this still doesn't make sense you can think of this as if 
+     * the currentWindowSize is where the panel ends then by subtracting the image_size is like saying:
+     * "Ok move image_size amount from you current position currentWindowSize". 
+     * 
+     * |                                                 |
+     * <----------------currentWindowSize>|<--image_size->
+     *                                    The position that the window needs to start from.
+     *
+     * We also add some margin to have some more control.
+     * 
+     * | <Ambient Occlusion><----------->[Image Position]<-margin->|
+     * | <Albedo><---------------------->[Image Position]<-margin->|
+     * 
+     */
+
 	constexpr uint8_t RIGHT_SIDE_IMAGE_MARGIN = 10;
 	static constexpr GLuint TEXTURE_HANDLE_ID_NONE = 0;
-	static constexpr ImVec2 textSize = { 70,70 };
+	static constexpr ImVec2 image_size = { 70,70 };
 	const ImVec2 currentWindowSize = ImGui::GetWindowSize();
-	const float IMAGE_TEXT_INDEPENDENT_POSITION = currentWindowSize.x - textSize.x - RIGHT_SIDE_IMAGE_MARGIN;
+	const float IMAGE_TEXT_INDEPENDENT_POSITION = currentWindowSize.x - image_size.x - RIGHT_SIDE_IMAGE_MARGIN;
 #pragma endregion
 
 	ImGui::Text(textureLabelName);
@@ -633,7 +672,7 @@ void OBJ_Viewer::UILayer::RenderMaterial_LabelTexturePair(const std::shared_ptr<
 		material->GetMaterialTexture(textureType).expired() ? TEXTURE_HANDLE_ID_NONE :
 		material->GetMaterialTexture(textureType).lock()->GetTextureHandle();
 
-	ImGui::Image((ImTextureID)textureID, textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+	ImGui::Image((ImTextureID)textureID, image_size, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 }
 
 void OBJ_Viewer::UILayer::RenderSkyboxSettings(std::weak_ptr<Skybox> scene_skybox)
@@ -670,12 +709,12 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings(std::weak_ptr<Skybox> scene_skybo
 	}
 }
 
-void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3 *pColor, glm::vec3* pPosition)
+void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3 *pColor, glm::vec3* pLightDirection)
 {
 	ImGui::ColorPicker3(std::string("Light color:" + std::to_string(lightIndex)).c_str(),&(*pColor)[0]);
 	ImGui::NewLine();
-	ImGui::VSliderFloat(std::string("Light direction.x:" + std::to_string(lightIndex)).c_str(), { 50,50}, &(pPosition->x), -1.f, 1.f);
-	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->y), -1.f, 1.f);
-	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->z), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.x:" + std::to_string(lightIndex)).c_str(), { 50,50}, &(pLightDirection->x), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pLightDirection->y), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pLightDirection->z), -1.f, 1.f);
 
 }

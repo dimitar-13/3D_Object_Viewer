@@ -515,9 +515,9 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
                 {
                     const ModelUIData& current_model_load_data = current_scene_model->GetModelUIData();
                     ImGui::Text("Model info");
-                    ImGui::Text("Object triangle count:%d", current_model_load_data.modelVertexCountData.triangleCount);
-                    ImGui::Text("Object vertex count:%d", current_model_load_data.modelVertexCountData.vertexCount);
-                    ImGui::Text("Object face count:%d", current_model_load_data.modelVertexCountData.faceCount);
+                    ImGui::Text("Object triangle count:%zu", current_model_load_data.modelVertexCountData.triangleCount);
+                    ImGui::Text("Object vertex count:%zu", current_model_load_data.modelVertexCountData.vertexCount);
+                    ImGui::Text("Object face count:%zu", current_model_load_data.modelVertexCountData.faceCount);
                     ImGui::Text("Texture count:%d", current_model_load_data.textureCount);
 
                     ImGui::Text("File path %s", current_model_load_data.modelPath.c_str());

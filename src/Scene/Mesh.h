@@ -41,7 +41,7 @@ namespace OBJ_Viewer
          *
          * @returns A constant reference to the `VertexAttributeObject` of the mesh.
          */
-		const VertexAttributeObject& GetMeshVAO()const { return *this->m_vao; }
+		const VertexAttributeObject& GetMeshVAO()const { return *this->m_MeshVertexAttributeObject; }
         /**
          * @brief Retrieves the material index associated with the mesh.
          *
@@ -52,8 +52,8 @@ namespace OBJ_Viewer
          */
         size_t GetMaterialIndex()const { return m_meshRegistryMaterialIndex; }
 	private:
-        size_t m_meshRegistryMaterialIndex;
-		std::unique_ptr<VertexAttributeObject> m_vao;
+        size_t m_meshRegistryMaterialIndex;                                 ///< The mesh material ID stored in the 'MaterialRegistry'.
+		std::unique_ptr<VertexAttributeObject> m_MeshVertexAttributeObject; ///< The vertex attribute object of the mash that is used for rendering.
 	};
 }
 

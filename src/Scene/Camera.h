@@ -6,9 +6,15 @@
 #include "Core/AppEvent.h"
 namespace OBJ_Viewer
 {
+    /**
+     * @brief Named structure representing EulerAngles.
+     * 
+     * This structure is nothing specific is just named structure representing 2 angles.
+     */
 	struct EulerAngles {
-		float yawAngle;
-		float pitchAngle;
+		float yawAngle;     ///< Euler yaw angle describes rotations around the UP/Down axis.
+		float pitchAngle;   ///< Euler pitch angle describes rotations around the Front/Back and Left/Right axis.
+
 		EulerAngles& operator+=(const EulerAngles& other) {
 			this->yawAngle += other.yawAngle;
 			this->pitchAngle += other.pitchAngle;
@@ -21,21 +27,71 @@ namespace OBJ_Viewer
 			return *this;
 		}
 	};
+
+    /**
+     * @brief Helper class for calculating and managing Euler angles.
+     *
+     * This class provides utilities for working with Euler angles, specifically adjusting angles, and constraining them
+     * within valid bounds[-360;360]. Euler angles typically represent rotations in 3D space along the pitch,
+     * yaw, and roll axes.
+     *
+     * The class initializes the pitch angle to 0.0f and the yaw angle to 90.0f by default.
+     *
+     * @note The class ensures that Euler angles are kept within the range of -360 to 360 degrees.
+     */
 	class EulerAngleHelper {
 	public:
+        /**
+         * @brief Constructor that initializes default Euler angles.
+         *
+         * Initializes the pitch angle to 0.0f and the yaw angle to 90.0f.
+         */
         EulerAngleHelper()
         {
             m_EulerAngles.pitchAngle = 0.0f;
             m_EulerAngles.yawAngle = 90.0f;
         }
+        /**
+         * @brief Retrieves the current Euler angles.
+         *
+         * @return The current Euler angles stored in the helper.
+         */
         EulerAngles GetEulerAngles()const { return m_EulerAngles; }
+        /**
+         * @brief A static cast from 1 data type to another since.
+         *
+         * Since 'Position2D' is a double and EulerAngles are float this function just do a simple static cast and 
+         * creates a 'EulerAngles' from the provided position_to_convert.
+         * 
+         * @param position_to_convert The 2D position to be converted.
+         * @return The staticly casted to EulerAngles position.
+         */
         static EulerAngles ConvertMousePositionToAngles(Position2D position_to_convert);
+        /**
+         * @brief Increases the current Euler angles by the specified amounts.
+         *
+         * Adds the provided Euler angles to the current angles and then constrains them
+         * within the valid range using the 'ConstrainAngles()'.
+         *
+         * @param angles The Euler angles to add.
+         */
         void IncreaseEulerAngles(const EulerAngles& angles) { m_EulerAngles += angles; ConstrainAngles(); }
     private:
+        /**
+         * @brief Checks if an angle is within the valid range of -360 to 360 degrees.
+         *
+         * @param angle The angle to check.
+         * @return True if the angle is within bounds, false otherwise.
+         */
         bool IsAngleWithinBounds(float angle) { return angle >= -360.0f && angle <= 360.0f; }
+        /**
+         * @brief Constrains the Euler angles within the range of -360 to 360 degrees.
+         *
+         * Ensures that the pitch, yaw, and roll angles do not exceed the valid range.
+         */
 		void ConstrainAngles();
 	private:
-        EulerAngles m_EulerAngles {};
+        EulerAngles m_EulerAngles {}; ///< Stores the current Euler angles.
 	};
 
     /**
@@ -97,14 +153,14 @@ namespace OBJ_Viewer
          * camera.GetViewAndProjectionSeparate(viewMatrix, projectionMatrix);
          * // Now viewMatrix and projectionMatrix contain the current view and projection matrices respectively.
          */
-		void GetViewAndProjectionSeparate(glm::mat4& pView, glm::mat4& pProj)const { pView = m_viewMatrix; pProj = m_projectionMatrix; }
+		void GetViewAndProjectionSeparate(glm::mat4& pView, glm::mat4& pProj)const { pView = m_ViewMatrix; pProj = m_ProjectionMatrix; }
         /**
          * @brief Returns the product of the projection*view matrix multiplication.
          *
          * @note A dumb note but its called 'ViewProj' and not 'ProjView' because matrix multiplication is from right to left.
          * @returns 4x4 matrix that is the product of projection*view matrix multiplication.
          */
-		glm::mat4 GetViewProjMatrix()const { return m_projectionMatrix * m_viewMatrix; }
+		glm::mat4 GetViewProjMatrix()const { return m_ProjectionMatrix * m_ViewMatrix; }
         /**
          * @brief Returns the product of the projection*view(without translation) matrix multiplication.
          *
@@ -112,19 +168,19 @@ namespace OBJ_Viewer
          * 
          * @returns 4x4 matrix that is the product of projection*view(without translation) matrix multiplication.
          */
-		glm::mat4 GetViewProjNoTranslation()const { return m_projectionMatrix* glm::mat4(glm::mat3(m_viewMatrix)); }
+		glm::mat4 GetViewProjNoTranslation()const { return m_ProjectionMatrix* glm::mat4(glm::mat3(m_ViewMatrix)); }
         /**
          * @brief Returns the camera position 
          * 
          * @returns The camera position in world space.
          */
-		glm::vec3 GetCameraPos()const { return this->m_position; }
+		glm::vec3 GetCameraPos()const { return this->m_CurrentCameraPosition; }
         /**
          * @brief Returns true if projection is perspective.
          *
          * @returns Returns true if projection is perspective and false if its orthographic.
          */
-        bool IsCameraProjectionPerspective()const { return m_isProjectionPerspective; }
+        bool IsCameraProjectionPerspective()const { return m_IsProjectionPerspective; }
 	private:
         /**
          * @brief Utility function for understanding if the Y vector is flipped.
@@ -218,6 +274,20 @@ namespace OBJ_Viewer
 
 #pragma region On Event
         /**
+         * @brief Handles events by delegating them to specific event handler functions.
+         *
+         * This function is called when an event occurs. It processes the event by dispatching it to the appropriate
+         * handler function based on the type of event. This delegation allows for modular handling of various event types
+         * and ensures that each type of event is processed by the corresponding handler function.
+         *
+         * The `OnEvent` function is overridden from the `Listener` interface, which is designed to handle different kinds
+         * of events, such as input events, system events, or custom application events.
+         *
+         * @param e The event object that contains information about the event. The function uses this object to determine
+         *          the event type and dispatch it to the appropriate handler.
+         */
+        void OnEvent(Event& e) override;
+        /**
          * @brief Handles scroll change events to update the camera's zoom level.
          *
          * This method is triggered when a scroll event occurs. It calculates the new zoom level based on the event data
@@ -278,19 +348,17 @@ namespace OBJ_Viewer
 		void OnProjectionModeChanged(EventCameraProjectionChanged& e);
 #pragma endregion
 	private:
-		float m_zoom;
-		glm::mat4 m_projectionMatrix;
-		glm::mat4 m_viewMatrix;
-		EulerAngleHelper m_EulerAngleHelper;
-		glm::vec3 m_position;
-		InputHandler& m_applicationInputHandler;
-        const SceneViewport& m_applicationViewportManager;
-		glm::vec3 m_cameraCenter;
-		Position2D m_lastMouseMovementPosition{};
-        Position2D m_lastMouseShiftPosition{};
-		bool m_isProjectionPerspective = true;
-		// Inherited via Listener
-		void OnEvent(Event& e) override;
+		float m_CurrentCameraZoomAmount;                    ///< Current camera zoom amount.
+		glm::mat4 m_ProjectionMatrix;                       ///< Current camera projection matrix(it can be both perspective or orthographic.)
+		glm::mat4 m_ViewMatrix;                             ///< Current camera view matrix.
+		EulerAngleHelper m_EulerAngleHelper;                ///< Helper class for calculating camera mouse offsets.
+		glm::vec3 m_CurrentCameraPosition;                  ///< The current camera world position.
+		InputHandler& m_ApplicationInputHandlerRef;         ///< Reference to the application input handler.
+        const SceneViewport& m_ApplicationSceneViewportRef; ///< Const Reference to the application scene viewport manager.
+		glm::vec3 m_CameraLookAtPivot;                      ///< Current camera look at pivot point(or world center).        
+		Position2D m_lastMouseMovementPosition{};           ///< Last mouse position stored after a left mouse button was held or pressed.
+        Position2D m_lastMouseShiftPosition{};              ///< Last mouse position stored after a right mouse button was held or pressed.
+		bool m_IsProjectionPerspective = true;              ///< Is the camera projection perspective flag.
 	};
 }
 

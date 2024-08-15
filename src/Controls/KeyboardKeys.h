@@ -2,6 +2,9 @@
 #include "pch.h"
 namespace OBJ_Viewer
 {
+    /**
+     * @brief Enum using the GLFW key macros for type safety. 
+     */
 	enum KeyboardKey_
 	{
 		KeyboardKey_kSpace				= GLFW_KEY_SPACE,

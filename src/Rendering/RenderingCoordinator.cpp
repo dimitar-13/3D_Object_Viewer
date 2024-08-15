@@ -17,8 +17,8 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 		if (m_currentWindowState != WindowState_kWindowMinimized) {
             if (!m_application.IsUIHidden())
             {
-				m_UILayer->RenderUI(m_renderingConfigSettings,m_sceneRenderer->GetSceneModel(), m_sceneRenderer->GetSceneRegistry(),
-                    m_sceneRenderer->GetSkyboxModel());
+				m_UILayer->RenderUI(m_renderingConfigSettings,m_SceneManager->GetSceneModel(), m_SceneManager->GetSceneRegistry(),
+                    m_SceneManager->GetSkyboxModel());
             }
 
 			RenderScene();
@@ -38,10 +38,10 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 	if (m_application.IsUIHidden())
 	{
-		m_sceneRenderer->RenderScene(m_renderingConfigSettings);
+		m_SceneManager->RenderScene(m_renderingConfigSettings);
 	}
 	else
-		m_sceneRenderer->RenderScene(m_renderingConfigSettings, &m_UILayer->GetInputFramebuffer());
+		m_SceneManager->RenderScene(m_renderingConfigSettings, &m_UILayer->GetInputFramebuffer());
 
 }
 
@@ -49,8 +49,8 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 {
     const ImgOutputData& kEventDataImageData = e.GetScreenshotEventData();
     //App state saving
-    const bool kPreviousSkyboxEnableState = m_renderingConfigSettings.m_isSkyboxOn;
-    const bool kPreviousGridEnableState = m_renderingConfigSettings.m_isWireGridOn;
+    const bool kPreviousSkyboxEnableState = m_renderingConfigSettings.IsSkyboxOn;
+    const bool kPreviousGridEnableState = m_renderingConfigSettings.IsWireGridOn;
     const Viewport& kPreviousApplicationViewport = m_application.GetSceneViewport().GetViewport();
 
     DialogWrapper dialogFolderPath;
@@ -69,14 +69,14 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 	OutputImageViewport.height = kEventDataImageData.imgSize.height;
 
 	//Change app state
-    m_renderingConfigSettings.m_isSkyboxOn =
-        m_renderingConfigSettings.m_isSkyboxOn && !kEventDataImageData.renderObjectOnly;
-    m_renderingConfigSettings.m_isWireGridOn =
-        m_renderingConfigSettings.m_isWireGridOn && !kEventDataImageData.renderObjectOnly;
+    m_renderingConfigSettings.IsSkyboxOn =
+        m_renderingConfigSettings.IsSkyboxOn && !kEventDataImageData.renderObjectOnly;
+    m_renderingConfigSettings.IsWireGridOn =
+        m_renderingConfigSettings.IsWireGridOn && !kEventDataImageData.renderObjectOnly;
 
 	m_application.SubmitSceneViewportSize(OutputImageViewport);
 
-	m_sceneRenderer->RenderScene(m_renderingConfigSettings, &m_UILayer->GetInputFramebuffer());
+	m_SceneManager->RenderScene(m_renderingConfigSettings, &m_UILayer->GetInputFramebuffer());
 
 	glFinish();
 	
@@ -90,8 +90,8 @@ void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEve
 	//Restore original state
 	m_application.SubmitSceneViewportSize(kPreviousApplicationViewport);
 
-    m_renderingConfigSettings.m_isSkyboxOn = kPreviousSkyboxEnableState;
-    m_renderingConfigSettings.m_isWireGridOn = kPreviousGridEnableState;
+    m_renderingConfigSettings.IsSkyboxOn = kPreviousSkyboxEnableState;
+    m_renderingConfigSettings.IsWireGridOn = kPreviousGridEnableState;
 
 }
 
@@ -107,8 +107,8 @@ void OBJ_Viewer::RenderingCoordinator::OnEvent(Event& e)
 OBJ_Viewer::RenderingCoordinator::RenderingCoordinator(Application& application):
 	m_application(application)
 {
-	m_sceneRenderer = std::make_shared<SceneManager>(application);
-	m_application.AddEventListener(m_sceneRenderer);
+	m_SceneManager = std::make_shared<SceneManager>(application);
+	m_application.AddEventListener(m_SceneManager);
 	m_UILayer = std::make_unique<UILayer>(m_application);
     m_application.AddEventListener(m_UILayer);
 

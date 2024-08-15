@@ -6,30 +6,97 @@ namespace OBJ_Viewer {
     /**
      * @brief Enum used to get shader from the 'ShaderLibrary' class.
      * 
-     * - ShaderLibraryShaderName_kUnknown:          For debugging.
-     * - ShaderLibraryShaderName_kStudioLightShader: Shader representing studio light effect.  
-     * - ShaderLibraryShaderName_kGridShader:        Shader for rendering the grid    
-     * - ShaderLibraryShaderName_kSkyboxShader: 
-     * - ShaderLibraryShaderName_kLightShader: 
-     * - ShaderLibraryShaderName_kWireframeShader: 
-     * - ShaderLibraryShaderName_kPointShader: 
-     * - ShaderLibraryShaderName_kUVShader: 
-     * - ShaderLibraryShaderName_kSingleTextureShader: 
-     * - ShaderLibraryShaderName_kPostProcessShader: 
-     * - ShaderLibraryShaderName_kNormalShader: 
+     * - ShaderLibraryShaderName_kUnknown:                  For debugging.
+     * - ShaderLibraryShaderName_kStudioLightShader:        Shader representing studio light effect.  
+     * - ShaderLibraryShaderName_kGridShader:               Shader for rendering the grid.
+     * - ShaderLibraryShaderName_kSkyboxShader:             Shader for rendering the skybox.   
+     * - ShaderLibraryShaderName_kLightShader:              Shader for rendering mesh with light calculations.
+     * - ShaderLibraryShaderName_kWireframeShader:          Shader for rendering with wireframe(lines) on top of the mesh.
+     * - ShaderLibraryShaderName_kPointShader:              Shader for rendering with wireframe(points) on top of the mesh.
+     * - ShaderLibraryShaderName_kUVShader:                 Shader for rendering checkerboard pattern for UV inspection.
+     * - ShaderLibraryShaderName_kSingleTextureShader:      Shader for rendering a single texture.
+     * - ShaderLibraryShaderName_kPostProcessShader:        Shader for post-processing the final image.
+     * - ShaderLibraryShaderName_kNormalShader:             Shader for displaying normal direction.
      */
 	enum ShaderLibraryShaderName_
 	{
-		ShaderLibraryShaderName_kUnknown,
+		ShaderLibraryShaderName_kUnknown, ///< For debugging.
+        /**
+         * The shader from this enum will render the object with studio light only.
+         *
+         * Studio light is like popular 3D modelling software blender way of shading when in modeling mode. Where
+         * front faces/pixels are lit up and the one back are darker.
+         */
 		ShaderLibraryShaderName_kStudioLightShader,
+        /**
+         * The shader from this enum renders a 3D infinite grid onto a full screen quad.
+         *
+         * The shader from this enum should be used on a full screen quad because its designed for it.
+         */
 		ShaderLibraryShaderName_kGridShader,
+        /**
+         * The shader from this enum will render cubemap texture on a normalize device coordinate(NDC) cube.
+         * 
+         * This shader is designed for a NDC cube.
+         */
 		ShaderLibraryShaderName_kSkyboxShader,
+        /**
+         * The shader from this enum will render a mesh using light calculations.
+         * 
+         * The shader works in linier space so it transforms the texture that are not in linear(albedo/color) and proceeds to 
+         * do the light calculations. 
+         * The shader have 4 different calculation modes:
+         *  - Blin-Phong light shading model.
+         *  - Toon light shading model.
+         *  - Rim light shading model
+         *  - Toon + Rim light shading model.
+         * They are toggled by a uniform.
+         * 
+         * All of the outputted pixel colors from this shader are in linier space.
+         */
 		ShaderLibraryShaderName_kLightShader,
+        /**
+         * The shader from this enum renders a solid wireframe(with lines) on top of a mesh.
+         *
+         * The shader is from the nvidia white papers:
+         * https://developer.download.nvidia.com/SDK/10/direct3d/Source/SolidWireframe/Doc/SolidWireframe.pdf
+         */
 		ShaderLibraryShaderName_kWireframeShader,
+        /**
+         * The shader from this enum renders a solid wireframe(with points) on top of a mesh.
+         *
+         * This is modified version of nvidia white papers wireframe shader but for rendering points.
+         * 
+         * nvidia white papers:https://developer.download.nvidia.com/SDK/10/direct3d/Source/SolidWireframe/Doc/SolidWireframe.pdf
+         */
 		ShaderLibraryShaderName_kPointShader,
+        /**
+         * The shader from this enum will render anti-aliased checkerboard pattern on top of a mesh.
+         *
+         * The pattern is generated.
+         */
 		ShaderLibraryShaderName_kUVShader,
+        /**
+         * The shader from this enum will render a mesh with the selected texture.
+         * 
+         * The shader wont do any light calculation but just render a mesh with a texture from the material. If there is no texture
+         * then it will be simply black(for now). The shader assumes that the albedo map is in sRGB space and it will convert it back to linier
+         * if the texture is not albedo/color is understood to be in linier space and it wont be converted to linier.
+         */
 		ShaderLibraryShaderName_kSingleTextureShader,
+        /**
+         * The shader from this enum do post-processing on a image/scene.
+         * 
+         * This shader should be used on a full screen quad because its designed for it. This shader assumes that all of the pixels are
+         * in liner color space and at the end will transform them in sRGB. The shader also can do fast approximate anti-aliasing if enabled.
+         */
 		ShaderLibraryShaderName_kPostProcessShader,
+        /**
+         * The shader from this enum renders a mesh and colors blue the pixels if the normals are facing the correct way.
+         *
+         * The shader renders any mesh and determines if the normals are facing the correct way. If they are not then they are colored 
+         * red and if they are then they are colored blue.
+         */
 		ShaderLibraryShaderName_kNormalShader,
 	};
 

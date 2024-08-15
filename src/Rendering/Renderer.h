@@ -206,7 +206,7 @@ namespace OBJ_Viewer {
         void BindMaterialTextureToShader(const ShaderClass& shaderToUse,const Texture& textureToBind,
             GLenum textureUnit, const char* textureName);
 	private:
-		std::unique_ptr <Texture> m_defaultWhiteTexture;
-		std::unique_ptr <Texture> m_defaultNormal;
+		std::unique_ptr <Texture> m_defaultWhiteTexture; ///< 1x1 white RGB texture used as dummy texture for albedo,ambient occlusion and specular.
+		std::unique_ptr <Texture> m_defaultNormal;      ///< 1x1 blue RGB texture used dummy texture for normal map.
 	};
 }

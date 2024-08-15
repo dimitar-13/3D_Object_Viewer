@@ -3,13 +3,6 @@
 #include "gpu_side/UniformBuffer.h"
 namespace OBJ_Viewer
 {
-	enum ShaderSourceType_
-	{
-		ShaderSourceType_kUknown,
-		ShaderSourceType_kVertex = GL_VERTEX_SHADER,
-		ShaderSourceType_kFragment = GL_FRAGMENT_SHADER,
-		ShaderSourceType_kGeometry = GL_GEOMETRY_SHADER
-	};
     /**
      * @brief Class for managing and interacting with OpenGL shaders.
      *
@@ -43,6 +36,21 @@ namespace OBJ_Viewer
      */
 	class ShaderClass
 	{
+    private:
+        /**
+         * @brief Enum used by the ShaderClass.
+         *
+         * This enum is used when reading from a single file. When we read a single shader file we extract at least 2 shaders vertex and fragment.
+         * When we read the shaders we store the shader code in a hash map and using this enum we can access the each individual shader.
+         * By also making it use the OpenGL macros we can make it type safe.
+         */
+        enum ShaderSourceType_
+        {
+            ShaderSourceType_kUknown,                           ///< Used for debugging.
+            ShaderSourceType_kVertex = GL_VERTEX_SHADER,        ///< Represent the OpenGL macro 'GL_VERTEX_SHADER'.
+            ShaderSourceType_kFragment = GL_FRAGMENT_SHADER,    ///< Represent the OpenGL macro 'GL_FRAGMENT_SHADER'.
+            ShaderSourceType_kGeometry = GL_GEOMETRY_SHADER     ///< Represent the OpenGL macro 'GL_GEOMETRY_SHADER'.
+        };
 	public:
         /**
          * @brief Constructs a shader program from the provided shader file path.
@@ -127,7 +135,9 @@ namespace OBJ_Viewer
          * @note This function assumes that the uniform buffer name matches the name of the uniform block in the shader code.
          */
         void BindUniformBufferToShader(const UniformBuffer& uniform_buffer)const;
-		
+		/**
+         * Currently not used. 
+         */
         std::vector<std::string> GetShaderUniformList()const;
         /**
          * @brief Binds the shader program for use in the OpenGL context.
@@ -238,8 +248,8 @@ namespace OBJ_Viewer
          */
 		GLint FindUniform(const char* name_of_uniform)const;
 	private:
-		int m_shaderHandle;
-		mutable std::unordered_map<std::string, int> m_uniformHash;
+		int m_shaderHandle;                                             ///< OpenGL shader handle/ID use this for shader related API calls.
+		mutable std::unordered_map<std::string, int> m_uniformHash;     ///< Shader uniform hash for faster searches.
 	};
 }
 

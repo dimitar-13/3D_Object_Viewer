@@ -8,19 +8,6 @@
 
 namespace OBJ_Viewer
 {
-	struct BoundingBox
-	{
-		glm::vec3 max = glm::vec3(-std::numeric_limits<float>::min());
-		glm::vec3 min = glm::vec3(std::numeric_limits<float>::max());
-	};
-	struct ReadMeshData
-	{
-		unsigned int mesh_material_ID;
-		ModelVertexData mesh_Information;
-		std::vector<Vertex> vertex_data_vector;
-		std::vector<VertexAttributeObject::IndexDataType> index_data_vector;
-		BoundingBox mesh_bounding_box;
-	};
     /**
      * @brief A class that reads a 3D scene/model using Assimp.
      *
@@ -34,6 +21,36 @@ namespace OBJ_Viewer
      */
 	class ModelLoader
 	{
+    private:
+#pragma region Loder specific structs
+        /**
+         * @brief Structure representing a 3D bounding box.
+         *
+         * This structure defines a bounding box in 3D space using minimum and maximum corner points.
+         * The default values for `min` and `max` are set to encompass the entire range of float values,
+         * effectively representing an infinite bounding box until updated with actual values.
+         */
+        struct BoundingBox
+        {
+            glm::vec3 max = glm::vec3(-std::numeric_limits<float>::min()); ///< Max recorded value.
+            glm::vec3 min = glm::vec3(std::numeric_limits<float>::max());  ///< Min record value.
+        };
+
+        /**
+         * @brief Structure representing the result of a mesh reading operation in a threaded context.
+         *
+         * This structure is used to hold all relevant data extracted from a mesh file during a threaded read operation.
+         * It contains material IDs, vertex and index data, as well as a bounding box for the mesh.
+         */
+        struct ReadMeshThreadResult
+        {
+            unsigned int mesh_material_ID;                                          ///< The mesh material ID used in the scene file and the MaterialRegistry.
+            ModelVertexData mesh_Information;                                       ///< Mesh information    
+            std::vector<Vertex> vertex_data_vector;                                 ///< Mesh vertex data array.
+            std::vector<VertexAttributeObject::IndexDataType> index_data_vector;    ///< Mesh index data array.
+            BoundingBox mesh_bounding_box;                                          ///< Per-mesh bounding box.
+        };
+#pragma endregion
 	public:
         /**
          * @brief Constructs a ModelLoader that reads a 3D scene file (obj, fbx, etc.) and creates
@@ -64,7 +81,7 @@ namespace OBJ_Viewer
         /**
         * @brief Returns true if file was loaded without any errors otherwise returns false.
         * 
-        * If the file was not valid or assimp failed to find the path this will return false.
+        * @returns Returns false if the file was not valid or assimp failed to find the path otherwise returns true.
         */
 		bool isFileLoadedSuccessfully() { return (m_loadedScene != nullptr); }
 	private:
@@ -86,6 +103,16 @@ namespace OBJ_Viewer
          * @param scene The Assimp scene representing the imported 3D file.
          */
 		void ReadNode(aiNode* node,const aiScene* scene);
+        /**
+         * @brief Normalizes and scales the scene to fit a specific application size.
+         *
+         * This function performs several transformations to adjust the scene's scale and position:
+         * - Normalization: Computes the bounding box of the scene using its minimum and maximum extents, and normalizes the scene's size to fit within a predefined application-specific size.
+         * - Centering: Moves the scene's world position to the coordinates `{0, 1, 0}` to ensure that the scene is centered appropriately within the application.
+         * - Model Matrix Update: Applies these transformations to the model matrix, which is used to construct the final model. The model matrix incorporates normalization and positioning adjustments.
+         *
+         * The final model matrix reflects these transformations, allowing the scene to be properly scaled and positioned within the application context.
+         */
 		void PostProcessScene();
         /**
          * @brief Reads and converts Assimp mesh data into `ReadMeshData`.
@@ -104,10 +131,58 @@ namespace OBJ_Viewer
          * @param MeshTransform The transformation matrix (model matrix) to be applied to the mesh.
          * @return A `ReadMeshData` structure containing the processed vertex and index data.
          */
-		ReadMeshData ReadMesh(const aiMesh* assimpMesh,const glm::mat4 MeshTransform);
+		ReadMeshThreadResult ReadMesh(const aiMesh* assimpMesh,const glm::mat4 MeshTransform);
+        /**
+         * @brief Reads and loads all materials from the provided scene.
+         *
+         * This function iterates through all the materials in the given `aiScene` and attempts to read and load
+         * the associated textures for each material. If a texture is successfully read, it is added to the material;
+         * otherwise, the function skips the texture. The function specifically handles textures of types defined in
+         * the `MaterialTextures_` enumeration.
+         *
+         * @param scene Pointer to the `aiScene` object that contains the materials to be loaded.
+         *
+         * @return A vector of shared pointers to `Material` objects, each representing a material with its
+         *         associated textures loaded from the scene. If a material does not have textures or fails to load,
+         *         it will not be included in the returned vector.
+         */
 		std::vector<std::shared_ptr<Material>> LoadSceneMaterials(const aiScene* scene);
+        /**
+         * @brief Creates a array of meshes and returns it.
+         *
+         * This function gets the result from each of the 'ReadMesh()' and constructs a Mesh class.
+         * The function also compares max and the min recorded x,y,z components from each ReadMesh result and gets the biggest and smallest.
+         * 
+         * This function is not asynchronies because OpenGL API calls are designed to work on a single thread.
+         * 
+         * @returns A owning pointer to a created Mesh array.
+         */
 		std::unique_ptr<std::vector<Mesh>> CreateMeshArray();
+        /**
+         * @brief Reads a texture from the 3D scene file based on the specified texture type.
+         *
+         * This function attempts to locate and read a texture of a given type from the material data of a loaded 3D scene file.
+         *
+         * @param mat Pointer to the Assimp material object that contains texture information.
+         * @param type The type of the texture to read (e.g., diffuse, specular) as defined by the `aiTextureType` enumeration.
+         *
+         * @return A `std::shared_ptr<OBJ_Viewer::Texture>` to the successfully read texture. If the texture type does not exist in the material
+         *         or if the texture fails to be read, the function returns a null pointer.
+         *
+         * @note If the specified texture type is not present or the reading process encounters an error, the function will return `nullptr`.
+         *       When a texture is successfully read, it is returned as a `shared_ptr` to manage its lifetime properly.
+         */
 		std::shared_ptr<OBJ_Viewer::Texture> ReadTexture(aiMaterial* mat, aiTextureType type);
+        /**
+         * @brief Returns the texture path.
+         * 
+         * This function takes a texture path and check if its absolute if its not it returns the
+         * concatenated string (model path + relative to model path texture path).
+         *
+         * This is done because if the texture is not relative to a 3D model file file. This can happen if the texture, used by the 3D file, is not in
+         * the same directory then as the 3D model file. In this case the texture path will be absolute but if not the texture path will be relative. 
+         *  This function accounts for that by returning the correct path.
+         */
 		std::string GetTrueTexturePathString(const aiString& texturePath)const;
         /**
          * @brief Converts an Assimp 4x4 matrix to a `glm::mat4` object.
@@ -120,8 +195,24 @@ namespace OBJ_Viewer
          */
 		glm::mat4 AssimpToGlmMatrix4x4(const aiMatrix4x4& matrix);
 	private:
+        /**
+         * @brief Structure representing material texture types based on model file format.
+         *
+         * This structure maps different model file formats to their corresponding texture types used in materials.
+         * It sets the texture types for color, normal, ambient occlusion, and specular roughness based on the model file type.
+         */
 		struct TypeMaterialRepresentation
 		{
+            /**
+             * @brief Constructs a `TypeMaterialRepresentation` object based on the model file type.
+             *
+             * The constructor initializes the texture type enums based on the provided model file format:
+             * - OBJ: Uses specific texture types associated with OBJ files.
+             * - FBX: Uses different texture types associated with FBX files.
+             * - Unknown: Used for debugging.
+             *
+             * @param typeOFModel The type of model file (e.g., OBJ, FBX).
+             */
 			TypeMaterialRepresentation(LoadModelFileType_ typeOFModel)
 			{
 				switch (typeOFModel)
@@ -148,22 +239,22 @@ namespace OBJ_Viewer
 					break;
 				}
 			}
-			aiTextureType colorTextureEnum;
-			aiTextureType normalTextureEnum;
-			aiTextureType ambientOcclusionEnum;
-			aiTextureType specularRoughnessEnum;
+			aiTextureType colorTextureEnum;       ///< Texture type for color (diffuse) maps.
+            aiTextureType normalTextureEnum;      ///< Texture type for normal maps.
+            aiTextureType ambientOcclusionEnum;   ///< Texture type for ambient occlusion maps.
+            aiTextureType specularRoughnessEnum;  ///< Texture type for specular and roughness maps.
+      
 		};
 	private:
-		MaterialRegistry* m_materialRegistry = nullptr;
-		Model* m_loadedScene = nullptr;
-		ModelUIData m_ModelData;
-		std::string m_modelPath;
-		LoadModelFileType_ m_currentlyLoadingType;
-		std::future<std::vector<std::shared_ptr<Material>>> m_materialRegistryThread;
-		std::vector<std::future<ReadMeshData>> m_meshThreadResults;
+		MaterialRegistry* m_materialRegistry = nullptr;                                 ///< Pointer to the material registry that is to be loaded.
+		Model* m_loadedScene = nullptr;                                                 ///< Pointer to the scene/3D model to be loaded.          
+		ModelUIData m_ModelData;                                                        ///< Extracted model UI data.
+		std::string m_modelPath;                                                        ///< Received model path with the file name removed(this should be absolute depending on the Constructor call.).
+		LoadModelFileType_ m_currentlyLoadingType;                                      ///< Currently loading file type(fbx,obj etc.). See 'LoadModelFileType_' for more information.
+		std::vector<std::future<ReadMeshThreadResult>> m_meshThreadResults;             ///< Read mesh threads result.
 #pragma region Post-proccess variables
-		BoundingBox m_sceneBoundingBox{};
-		glm::mat4 m_SceneAppNormalizeMatrix = glm::mat4(1);;
+		BoundingBox m_sceneBoundingBox{};                                               ///< Bounding box used for scene post-processing.
+		glm::mat4 m_SceneAppNormalizeMatrix = glm::mat4(1);                             ///< Scene normalization matrix created by the 'PostProcessScene()' function.
 #pragma endregion
 	};
 }

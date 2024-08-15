@@ -245,9 +245,9 @@ namespace OBJ_Viewer {
          */
 		size_t GetTextureChannelCount()const { return TextureFormatEnumConverter::GetChannelCountByFormat(m_textureFormat); }
 	private:
-        unsigned char* m_pixelData = nullptr;
-		Size2D m_textureSize {};
-		TextureFormat_ m_textureFormat{};
+        unsigned char* m_pixelData = nullptr;   ///< The read pixel data.
+		Size2D m_textureSize {};                ///< The read texture size.
+		TextureFormat_ m_textureFormat{};       ///< The texture pixel format(RGB,RGBA etc.).
 	};
 	
 }

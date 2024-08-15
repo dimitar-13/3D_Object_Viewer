@@ -184,7 +184,6 @@ void OBJ_Viewer::Renderer::BindMaterialTextureToShader(const ShaderClass& shader
 	textureToBind.BindTexture();
 	shaderToUse.SetUniformSet1Int(textureName, textureUnit - GL_TEXTURE0);
     textureToBind.UnbindTexture();
-
 }
 
 std::unique_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDummyTexture(const std::string& path)

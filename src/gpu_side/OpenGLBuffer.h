@@ -115,8 +115,8 @@ namespace OBJ_Viewer {
         */
 		~OpenGLBuffer();
 	private:
-		GLuint m_bufferHandle;
-		BufferData m_data;
+		GLuint m_bufferHandle; ///< OpenGL buffer handle/ID use this for buffer related API calls.
+		BufferData m_data;     ///< Buffer information data structure.
 	};
 }
 

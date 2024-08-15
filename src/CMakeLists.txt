@@ -71,6 +71,7 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Scene")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/UI")
 
 #Adding project build dependencies
+set(BUILD_SHARED_LIBS ON)
 add_subdirectory("${PROJECT_DEPENDENCY_FOLDER}/assimp/assimp" "${PROJECT_DEPENDENCY_FOLDER}/assimp/assimp/build")
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory("${PROJECT_DEPENDENCY_FOLDER}/glm/glm" "${CMAKE_BINARY_DIR}/glm")

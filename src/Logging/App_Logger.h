@@ -55,7 +55,7 @@ namespace OBJ_Viewer
          */
 		static std::shared_ptr<spdlog::logger> GetAppConsole() { return s_appConsole; }
 	private:
-		static std::shared_ptr<spdlog::logger> s_appConsole;
+		static std::shared_ptr<spdlog::logger> s_appConsole; ///< spdLog logging debug console.
 	};
 }
 #ifdef OBJ_VIEWER_LEVEL_DEBUG

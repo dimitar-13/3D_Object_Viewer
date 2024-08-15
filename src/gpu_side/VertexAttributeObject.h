@@ -2,19 +2,20 @@
 #include "pch.h"
 namespace OBJ_Viewer
 {
+    /**
+     * @brief Structure representing a single vertex.
+     *
+     * The structure represent a single vertex of a mesh and 
+     * it's designed to be used by most of the application shaders.
+     */
 	struct Vertex
 	{
-		glm::vec3 position;
-		glm::vec2 uvCoords;
-		glm::vec3 normal;
-		glm::vec3 tangent;
-		//TODO:Add more
+		glm::vec3 position;   ///< The vertex local position.
+		glm::vec2 uvCoords;   ///< The vertex UV coordinates.
+		glm::vec3 normal;     ///< The vertex normal vector. Also used for calculating the Tangent Bi-tangent Normal(TBN) matrix.
+		glm::vec3 tangent;    ///< The vertex tangent vector used for calculating the Tangent Bi-tangent Normal(TBN) matrix.
 	};
-	struct VertexAttribData
-	{
-		size_t indexCount;
-		size_t vertexCount;
-	};
+
     /**
      * @brief Class for creating and managing a GPU-based Vertex Attribute Object (VAO).
      *
@@ -60,11 +61,11 @@ namespace OBJ_Viewer
         /**
          * @brief Retrieves the index count of the vertex attribute object. 
         */
-		size_t GetIndexCount()const { return this->m_vertexData.indexCount; }
+		size_t GetIndexCount()const { return this->m_indexCount; }
         /**
          * @brief Retrieves the vertex count of the vertex attribute object.
         */
-		size_t GetVertexCount()const { return this->m_vertexData.vertexCount; }
+		size_t GetVertexCount()const { return this->m_vertexCount; }
         /**
          * @brief Binds the Vertex Attribute Object (VAO).
          *
@@ -84,10 +85,11 @@ namespace OBJ_Viewer
         */
         ~VertexAttributeObject();
 	private:
-		GLuint m_vertexBufferObjHandle;
-		GLuint m_vertexAttributeObjHandle;
-		GLuint m_indexBufferObjHandle;
-		VertexAttribData m_vertexData;
+		GLuint m_vertexBufferObjHandle;         ///< Vertex buffer handle/ID. The vertex buffer holds our vertex data in a GPU resource. Use this for vertex buffer related API calls.
+		GLuint m_vertexAttributeObjHandle;      ///< Vertex attribute object(VAO) handle/ID. This represents our shader vertex layout. Use this for VAO related API calls.
+		GLuint m_indexBufferObjHandle;          ///< Index buffer handle/ID. The index buffer holds the index data so that we can repeat the same vertices instead of coping them. Use this for index buffer related API calls or for index drawing.        
+        size_t m_indexCount;                    ///< Index count(how many indicies we have stored in the index buffer).
+        size_t m_vertexCount;                   ///< Vertex count(how many vertices we have stored in the vertex buffer).
 	};
 }
 

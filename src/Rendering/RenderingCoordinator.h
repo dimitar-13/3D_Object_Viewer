@@ -49,18 +49,43 @@ namespace OBJ_Viewer
          */
 		void RenderLoop();
 	private:
+        /**
+         * @brief Determines witch framebuffer to use for the scene rendering and calls the 'm_SceneManager' for the actual rendering.
+         *
+         * Based on if the UI is hidden or not this function will use the default or UI framebuffer respectively as a parameter to
+         * the render scene in the 'm_SceneManager' member.
+         */
 		void RenderScene();
+        /**
+         * @brief Handles the screenshot event.
+         *
+         * This function handle the screenshot event by resizing the framebuffers and changing some application state then 
+         * it renders the scene and extract the pixel data and passes the data to a static function(not in this class) to do the 
+         * image saving asynchronously. It reset the application and framebuffers previous state and continues with the render loop.
+         * 
+         * @note The image saving is asynchronously and the std::future is stored in the 'm_saveImgResult'.
+         *       The result of the image saving is not checked or used and even if it fails it still considered as correctly handled event.
+         * 
+         * @param e The screenshot event containing how to save/take the screenshot.
+         */
 		void onEventTakeScreenshot(const ScreenshotEvent& e);
+        /**
+         * @brief Handles incoming events by delegating them to appropriate handlers.
+         *
+         * This function is inherited from the 'Listener' interface and is responsible for processing events that occur
+         * within the application. Depending on the type of event, it delegates the event to specific handling functions
+         * designed to manage that particular event.
+         *
+         * @param e The event object that contains information about the specific event that occurred.
+         */
 		void OnEvent(Event& e) override;
 	private:
-		Application& m_application;
-		std::shared_ptr<UILayer> m_UILayer;
-		std::shared_ptr<SceneManager> m_sceneRenderer;
-		WindowState_ m_currentWindowState;
-		std::future<bool> m_saveImgResult;
-        APP_SETTINGS::SceneConfigurationSettings m_renderingConfigSettings{};
-		// Inherited via Listener
-		
+		Application& m_application;                                             ///< Application ref.
+		std::shared_ptr<UILayer> m_UILayer;                                     ///< Class for rendering the UI and retrieving the information submited by the user.
+		std::shared_ptr<SceneManager> m_SceneManager;                           ///< Scene manager representing the 3D scene.
+		WindowState_ m_currentWindowState;                                      ///< Current window state see 'WindowState_'.
+		std::future<bool> m_saveImgResult;                                      ///< Save image thread result.
+        APP_SETTINGS::SceneConfigurationSettings m_renderingConfigSettings{};   ///< The application rendering configuration data struct used by the UI and the render.	
 	};
 }
 

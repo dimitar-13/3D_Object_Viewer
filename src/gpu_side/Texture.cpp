@@ -17,13 +17,11 @@ OBJ_Viewer::Texture::Texture(const unsigned char* texture_pixel_data, TextureInt
     
 }
 
-OBJ_Viewer::Texture::~Texture()
-{
-	glDeleteTextures(1, &this->m_textureHandle);
-}
-
 void OBJ_Viewer::Texture::ResizeTexture(Size2D new_texture_size)
 {
+    if (m_textureSize.width == new_texture_size.width && m_textureSize.height == new_texture_size.height)
+        return;
+
 	this->m_textureSize = new_texture_size;
 	SetTextureProperties(nullptr);
 }

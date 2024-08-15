@@ -83,9 +83,9 @@ namespace OBJ_Viewer {
         */
 		GLuint GetBindingPoint()const { return m_bindingPoint; }
 	private:
-		GLuint m_bufferHandle;
-		GLuint m_bindingPoint;
-		std::string m_BufferName;
+		GLuint m_bufferHandle;     ///< The OpenGL buffer handle/ID use this for buffer related API calls.
+		GLuint m_bindingPoint;     ///< Buffer binding point see the OpenGL docs for more info.
+		std::string m_BufferName;  ///< The shader name of the buffer.
 	};
 }
 

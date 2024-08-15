@@ -53,6 +53,7 @@ namespace OBJ_Viewer {
          * This constructor initializes a GPU-based framebuffer resource. Depending on the provided parameters,
          * the framebuffer can be either single-sampled or multi-sampled.
          * You can call 'isFramebufferValid' to check if the creation of the framebuffer succeeded.
+         * The framebuffer consist of a color and depth texture.
          * 
          * @param size The initial size of the framebuffer in pixels.
          * @param attachmentFlags Currently not used, reserved for specifying framebuffer attachment types.
@@ -70,7 +71,7 @@ namespace OBJ_Viewer {
          *
          * @return The OpenGL handle (GLuint) of the framebuffer.
          */
-		GLuint GetFramebufferHandle()const { return this->m_framebuffer; }
+		GLuint GetFramebufferHandle()const { return this->m_Framebuffer; }
         /**
          * @brief Retrieves the texture associated with the framebuffer.
          *
@@ -79,7 +80,7 @@ namespace OBJ_Viewer {
          *
          * @return A reference to the `Texture` object associated with the framebuffer.
         */
-		Texture& GetFramebufferTexture()const { return *this->m_texture; }
+		Texture& GetFramebufferTexture()const { return *this->m_FramebufferColorAttachmentTexture; }
         /**
          * @brief Binds this framebuffer as the active framebuffer.
          *
@@ -87,7 +88,7 @@ namespace OBJ_Viewer {
          * Subsequent framebuffer operations (e.g., reading or writing) will target this framebuffer until another
          * framebuffer is bound.
          */
-		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_framebuffer); }
+		void BindFramebuffer()const { glBindFramebuffer(GL_FRAMEBUFFER, this->m_Framebuffer); }
         /**
          * @brief Binds the default framebuffer (screen framebuffer).
          *
@@ -134,7 +135,7 @@ namespace OBJ_Viewer {
         /**
         * @brief Returns the current size of the framebuffer.
         */
-		Size2D GetFramebufferSize()const { return m_framebufferSize; }
+		Size2D GetFramebufferSize()const { return m_FramebufferSize; }
         /**
          * @brief Resizes the framebuffer using the newSize.
          * 
@@ -180,12 +181,12 @@ namespace OBJ_Viewer {
          */
 		~Framebuffer();
 	private:
-		GLuint m_framebuffer;
-		GLuint m_readBuffer;
-		Size2D m_framebufferSize;
-		bool m_isMultiSample = false;
-		uint8_t m_sampleCount = 4;
-		std::unique_ptr<Texture> m_texture;
+		GLuint m_Framebuffer;                                         ///< OpenGL framebuffer handle/ID use this for framebuffer related API calls.
+		GLuint m_ReadBuffer;                                          ///< OpenGL readonly render buffer handle/ID used for framebuffer depth.Use this for render buffer related API calls.
+		Size2D m_FramebufferSize;                                     ///< Current size of the framebuffer(By framebuffer size is understood size of the attachment textures in the framebuffer color,depth etc.)
+		bool m_IsMultiSample = false;                                 ///< A flag representing if our framebuffer is multi-sampled or not.
+		uint8_t m_SampleCount = 4;                                    ///< Sample count for a used when we have a multi-sampled buffer otherwise ignored.
+		std::unique_ptr<Texture> m_FramebufferColorAttachmentTexture; ///< The framebuffer color attachment texture.
 	};
 }
 

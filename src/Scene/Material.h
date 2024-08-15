@@ -21,9 +21,9 @@ namespace OBJ_Viewer {
      */
 	struct MaterialData
 	{
-		std::unordered_map< MaterialTextures_, std::shared_ptr<Texture>> materialTextures;
-		glm::vec3 color = { 1,1,1 };
-		float roughness = 64.f;
+		std::unordered_map< MaterialTextures_, std::shared_ptr<Texture>> materialTextures; ///< Material texture hash.
+		glm::vec3 color = { 1,1,1 };                                                       ///< Additional color of the material(currently not configurable).
+		float roughness = 64.f;                                                            ///< Additional roughness of the material(currently not configurable).
 	};
 
     /**
@@ -83,8 +83,8 @@ namespace OBJ_Viewer {
          */
 		const std::string& GetMaterialName()const { return m_materialName; }
 	private:
-		MaterialData m_materialInfo; 
-		std::string m_materialName;
+		MaterialData m_materialInfo; ///< Material info variable of structure 'MaterialData'.
+		std::string m_materialName;  ///< The scene material name(The name of the material assigned in the 3D scene file.).
 	};
 }
 

@@ -3,11 +3,19 @@
 
 namespace OBJ_Viewer {
 
+    /**
+     * @brief Enum representing different 3D file formats.
+     * 
+     * Currently supported:
+     *  - LoadModelFileType_kUnknown: For debugging.
+     *  - LoadModelFileType_kOBJ: OBJ file format.
+     *  - LoadModelFileType_kFBX: FBX file format.
+     */
 	enum LoadModelFileType_
 	{
-		LoadModelFileType_kUnknown,
-		LoadModelFileType_kOBJ,
-		LoadModelFileType_kFBX
+		LoadModelFileType_kUnknown, ///< For debugging.
+		LoadModelFileType_kOBJ,     ///< OBJ file format.
+		LoadModelFileType_kFBX      ///< FBX file format.
 	};
     /**
      * @brief Utility class for working with the  LoadModelFileType_ enum.

@@ -144,6 +144,6 @@ namespace OBJ_Viewer {
 		const std::vector<std::string>& GetDialogPaths() const { return m_dialogResultOutputPaths; }
 	private:
 		std::vector<std::string> m_dialogResultOutputPaths; ///< Vector that represents the dialog result output paths.
-		bool m_IsDialogFailedOrClosed = false; ///< Represents if the dialog was closed due to error or user closed it.
+		bool m_IsDialogFailedOrClosed = false;              ///< Represents if the dialog was closed due to error or user closed it.
 	};
 }

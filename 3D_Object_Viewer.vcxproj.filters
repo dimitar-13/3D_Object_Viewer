@@ -179,7 +179,7 @@
     <ClInclude Include="Shaders\ShaderPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Events.h">
+    <ClInclude Include="src\Core\WindowEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Helpers\DialogWrapper.h">
@@ -278,13 +278,22 @@
     <ClInclude Include="src\Helpers\ModelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Config.h">
+    <ClInclude Include="src\Core\ProjectPathHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies\stbi_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies\stbi_image\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enums\OpenGLBufferType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enums\EventTypeCategoryEnums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -18,7 +18,7 @@ void OBJ_Viewer::Window::SetWindowCallback()
 	/*
 	When you have a object lets say A and that object have member functions lets say foo.Every non-static member function has an invincible parameter
 	that is the reference to the object A ,holding/owning the function.Might make more sense to think it as: if objects of classes can have different members/values
-	different from one another and we can access those values via the object doesn't it make sense that for a class non-static function the word this is the reference itself.
+	different from one another and we can access those values via the object doesn't it make sense that for a class non-static function the word 'this' is the reference itself.
 	Hope I didn't make this confusing if someone reads this comment.
 	*/
 	glfwSetWindowUserPointer(m_glfwWindow, reinterpret_cast<void*>(this));
@@ -88,7 +88,7 @@ void OBJ_Viewer::Window::glfwWindowSizeCallback(GLFWwindow* window, int width, i
 	}
 	else if (width != 0 || height != 0)
 	{
-		WindowStateChangedEvent e(Size2D{ width, height }, WindowState_kWIndowStateNormal);
+		WindowStateChangedEvent e(Size2D{ width, height }, WindowState_kWindowStateNormal);
 		m_onEvent(e);
 		return;
 	}

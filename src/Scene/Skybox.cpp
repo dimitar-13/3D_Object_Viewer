@@ -9,10 +9,10 @@ OBJ_Viewer::Skybox::Skybox(const std::array<TexturePixelReader, Skybox::SKYBOX_F
 	const Size2D skybox_texture_size = textures[0].GetTextureSize();
 
 	const size_t kSkyboxPixelBufferByteSize = static_cast<size_t>(skybox_texture_size.height)
-		* static_cast<size_t>(skybox_texture_size.width) * textures[0].GetChannelCount();
+		* static_cast<size_t>(skybox_texture_size.width) * textures[0].GetTextureChannelCount();
 
 	BufferData pixel_buffer_info;
-	pixel_buffer_info.type = BufferType_kPixelUnpackBuffer;
+	pixel_buffer_info.type_of_buffer = BufferType_kPixelUnpackBuffer;
 	pixel_buffer_info.usageType = BufferUsageType_kStreamDraw;
 	pixel_buffer_info.bufferSize = kSkyboxPixelBufferByteSize;
 

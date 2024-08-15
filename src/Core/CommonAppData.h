@@ -1,14 +1,20 @@
 #pragma once
 #include "pch.h"
 namespace OBJ_Viewer {
+    /**
+     * @brief Application structure for 2D sizes.
+     *
+     * Structure used across the application for sizes.
+     */
 	struct Size2D
 	{
 		int width;
 		int height;
 
-		//It sounded complex but when I look at glm impl I felt dumb.
 		int& operator [](size_t index)
 		{
+            //It sounded complex but when I look at glm impl I felt dumb.
+
 			switch (index)
 			{
 			case 0:
@@ -22,8 +28,7 @@ namespace OBJ_Viewer {
 				break;
 			}
 		}
-
-		/*int& const operator [](size_t index)
+        const int& operator [](size_t index) const
 		{
 			switch (index)
 			{
@@ -37,17 +42,24 @@ namespace OBJ_Viewer {
 				assert("Index out of range;");
 				break;
 			}
-		}*/
-
+		}
 	};
+    /**
+     * @brief Application structure used for 2D positions.
+     * 
+     * Structure mainly used for mouse and scroll positions.
+     */
 	struct Position2D
 	{
-		double x;
-		double y;
+		double x; ///< The x position.
+		double y; ///< The y position.
 	};
 
+    /**
+     * @brief Namespace representing the UI panels and their names.  
+     */
 	namespace APP_FOCUS_REGIONS {
-		typedef  const char* AppWindowID;
+		typedef const char* AppWindowID;
 		constexpr AppWindowID kUI_SceneWindowName = "Scene render window";
 		constexpr AppWindowID kUI_ObjectLoadingWindowName = "Loading panel";
 		constexpr AppWindowID kUI_Model_and_renderingSettingsWindowName = "ModelAndRenderingSettings";

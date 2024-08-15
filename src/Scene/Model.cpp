@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Model.h"
 
-OBJ_Viewer::Model::Model(std::unique_ptr<std::vector<Mesh>>& meshes,const glm::mat4& modelMatrix,const ModelData& data):
-	m_ModelMatrix(modelMatrix), m_data(data),m_meshes(std::move(meshes))
+OBJ_Viewer::Model::Model(std::unique_ptr<std::vector<Mesh>>& meshes,const glm::mat4& modelMatrix,const ModelUIData& data):
+	m_ModelMatrix(modelMatrix), m_CurrentModelUIData(data),m_meshes(std::move(meshes))
 {
 }
 

@@ -9,11 +9,11 @@ void OBJ_Viewer::DialogWrapper::OpenDialog(const std::string_view& filterLIst)
     if (result != NFD_OKAY) {
         if (result == NFD_ERROR)
             LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
-        isDialogAborted = true;
+        m_IsDialogFailedOrClosed = true;
         return;
     }
 
-    outPaths.push_back(out_path);
+    m_dialogResultOutputPaths.push_back(out_path);
     free(out_path);
 }
 void OBJ_Viewer::DialogWrapper::OpenDialogSavePath(const std::string_view& filterLIst)
@@ -24,9 +24,9 @@ void OBJ_Viewer::DialogWrapper::OpenDialogSavePath(const std::string_view& filte
     if (result != NFD_OKAY) {
         if (result == NFD_ERROR)
             LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
-        isDialogAborted = true;
+        m_IsDialogFailedOrClosed = true;
     }
-    outPaths.push_back(out_path);
+    m_dialogResultOutputPaths.push_back(out_path);
     free(out_path);
 }
 void OBJ_Viewer::DialogWrapper::OpenDialogSaveFile(const std::string_view& file_save_format)
@@ -37,14 +37,14 @@ void OBJ_Viewer::DialogWrapper::OpenDialogSaveFile(const std::string_view& file_
     if (result != NFD_OKAY) {
         if (result == NFD_ERROR)
             LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
-        isDialogAborted = true;
+        m_IsDialogFailedOrClosed = true;
         return;
     }
 
-    outPaths.push_back(out_path);
-    const size_t kCurrentElementIndex = outPaths.size() - 1;
-    outPaths[kCurrentElementIndex] += '.';
-    outPaths[kCurrentElementIndex].append(file_save_format.data());
+    m_dialogResultOutputPaths.push_back(out_path);
+    const size_t kCurrentElementIndex = m_dialogResultOutputPaths.size() - 1;
+    m_dialogResultOutputPaths[kCurrentElementIndex] += '.';
+    m_dialogResultOutputPaths[kCurrentElementIndex].append(file_save_format.data());
 
     free(out_path);
 }
@@ -56,13 +56,13 @@ void OBJ_Viewer::DialogWrapper::OpenDialogMultiple(const std::string_view& filte
     if (result != NFD_OKAY) {
         if (result == NFD_ERROR)
             LOGGER_LOG_ERROR("NDF error:{0}", NFD_GetError());
-        isDialogAborted = true;
+        m_IsDialogFailedOrClosed = true;
         return;
     }
-    outPaths.resize(paths.count);
+    m_dialogResultOutputPaths.resize(paths.count);
     nfdchar_t* pathPtr = paths.buf;
-    for (size_t i = 0; i < outPaths.size(); i++) {
-        outPaths[i] = pathPtr + paths.indices[i];
+    for (size_t i = 0; i < m_dialogResultOutputPaths.size(); i++) {
+        m_dialogResultOutputPaths[i] = pathPtr + paths.indices[i];
     }
     free(pathPtr);
 }

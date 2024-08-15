@@ -38,8 +38,11 @@ OBJ_Viewer::UILayer::UILayer(Application& application_ref):
 
 void OBJ_Viewer::UILayer::isAppWindowFocused(APP_FOCUS_REGIONS::AppWindowID windowID)
 {
-	m_currentlyFocusedWindow = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) ?
-		windowID : m_currentlyFocusedWindow;
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+    {
+        m_currentlyFocusedWindow = windowID;
+        m_applicationRef.GetGlobalInputHandler().SetCurrentlyFocusedWindow(m_currentlyFocusedWindow);
+    }
 }
 
 void OBJ_Viewer::UILayer::OnEvent(Event& e)
@@ -264,44 +267,44 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 #pragma region Rendering Modes 
 
 			if (ImGui::RadioButton("Wireframe",
-				scene_config_settings_ref.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe))
+				scene_config_settings_ref.CurrentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe))
 			{
-				scene_config_settings_ref.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe;
+				scene_config_settings_ref.CurrentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe;
 			}
 			ImGui::SetItemTooltip("Renders wireframe of the 3D model.");
 
 			if (ImGui::RadioButton("Normal orientation",
-				scene_config_settings_ref.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation))
+				scene_config_settings_ref.CurrentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation))
 			{
-				scene_config_settings_ref.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation;
+				scene_config_settings_ref.CurrentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation;
 			}
 			ImGui::SetItemTooltip("Color each face based on the orientation of the normal red if its inwards and blue if outwards.");
 
 			if (ImGui::RadioButton("Clear color rendering",
-				scene_config_settings_ref.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor))
+				scene_config_settings_ref.CurrentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor))
 			{
-				scene_config_settings_ref.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor;
+				scene_config_settings_ref.CurrentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor;
 			}
 			ImGui::SetItemTooltip("Renders the mesh using a single color.");
 
 			if (ImGui::RadioButton("Individual textures",
-				scene_config_settings_ref.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture))
+				scene_config_settings_ref.CurrentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture))
 			{
-				scene_config_settings_ref.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture;
+				scene_config_settings_ref.CurrentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture;
 			}
 			ImGui::SetItemTooltip("Renders only single selected texture.");
 
 			if (ImGui::RadioButton("Uv mode",
-				scene_config_settings_ref.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kUV))
+				scene_config_settings_ref.CurrentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kUV))
 			{
-				scene_config_settings_ref.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kUV;
+				scene_config_settings_ref.CurrentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kUV;
 			}
 			ImGui::SetItemTooltip("Renders checkerboard texture for UV inspection.");
 
 			if (ImGui::RadioButton("Light rendering",
-				scene_config_settings_ref.m_currentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kLight))
+				scene_config_settings_ref.CurrentRenderingMode == APP_SETTINGS::RenderingMode_::RenderingMode_kLight))
 			{
-				scene_config_settings_ref.m_currentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kLight;
+				scene_config_settings_ref.CurrentRenderingMode = APP_SETTINGS::RenderingMode_::RenderingMode_kLight;
 			}
 			ImGui::SetItemTooltip("Render the 3D object with light calculations.");
 #pragma endregion
@@ -309,19 +312,19 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 			ImGui::Separator();
 			ImGui::Text("Mode settings.");
 
-			switch (scene_config_settings_ref.m_currentRenderingMode)
+			switch (scene_config_settings_ref.CurrentRenderingMode)
 			{
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kWireframe:
-				ImGui::InputFloat("Wire line Thickness", &scene_config_settings_ref.wireframeSettings.lineThickness);
-				ImGui::ColorPicker3("Line color", &(scene_config_settings_ref.wireframeSettings.lineColor)[0]);
-				ImGui::Checkbox("Render points", &scene_config_settings_ref.wireframeSettings.isPointRenderingOn);
+				ImGui::InputFloat("Wire line Thickness", &scene_config_settings_ref.WireframeSettings.lineThickness);
+				ImGui::ColorPicker3("Line color", &(scene_config_settings_ref.WireframeSettings.lineColor)[0]);
+				ImGui::Checkbox("Render points", &scene_config_settings_ref.WireframeSettings.isPointRenderingOn);
 				break;
 
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kLight:
-				static bool isAlbedoOn = scene_config_settings_ref.m_MaterialFlags & MaterialRenderingFalgs_kAlbedoIsOn;
-				static bool isNormalOn = scene_config_settings_ref.m_MaterialFlags & MaterialRenderingFalgs_kSpecularIsOn;
-				static bool isRoughnessOn = scene_config_settings_ref.m_MaterialFlags & MaterialRenderingFalgs_kNormalMapIsOn;
-				static bool isAmbientOcclusionOn = scene_config_settings_ref.m_MaterialFlags & MaterialRenderingFalgs_kAmbientOcclusionIsOn;
+				static bool isAlbedoOn = scene_config_settings_ref.MaterialFlags & MaterialRenderingFalgs_kAlbedoIsOn;
+				static bool isNormalOn = scene_config_settings_ref.MaterialFlags & MaterialRenderingFalgs_kSpecularIsOn;
+				static bool isRoughnessOn = scene_config_settings_ref.MaterialFlags & MaterialRenderingFalgs_kNormalMapIsOn;
+				static bool isAmbientOcclusionOn = scene_config_settings_ref.MaterialFlags & MaterialRenderingFalgs_kAmbientOcclusionIsOn;
 
 				ImGui::Checkbox("Albedo?", &isAlbedoOn);
 				ImGui::SetItemTooltip("Should the model display with the albedo/color texture.");
@@ -335,45 +338,45 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 				ImGui::Checkbox("Ambient occlusion?", &isAmbientOcclusionOn);
 				ImGui::SetItemTooltip("Should the model display with the ambient occlusion texture.");
 
-				scene_config_settings_ref.m_MaterialFlags = MaterialRenderingFalgs_kNone;
-				scene_config_settings_ref.m_MaterialFlags = isAlbedoOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kAlbedoIsOn) : scene_config_settings_ref.m_MaterialFlags;
-				scene_config_settings_ref.m_MaterialFlags = isNormalOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kNormalMapIsOn) : scene_config_settings_ref.m_MaterialFlags;
-				scene_config_settings_ref.m_MaterialFlags = isRoughnessOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kSpecularIsOn) : scene_config_settings_ref.m_MaterialFlags;
-				scene_config_settings_ref.m_MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialRenderingFalgs_>(scene_config_settings_ref.m_MaterialFlags | MaterialRenderingFalgs_kAmbientOcclusionIsOn) : scene_config_settings_ref.m_MaterialFlags;
+				scene_config_settings_ref.MaterialFlags = MaterialRenderingFalgs_kNone;
+				scene_config_settings_ref.MaterialFlags = isAlbedoOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.MaterialFlags | MaterialRenderingFalgs_kAlbedoIsOn) : scene_config_settings_ref.MaterialFlags;
+				scene_config_settings_ref.MaterialFlags = isNormalOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.MaterialFlags | MaterialRenderingFalgs_kNormalMapIsOn) : scene_config_settings_ref.MaterialFlags;
+				scene_config_settings_ref.MaterialFlags = isRoughnessOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.MaterialFlags | MaterialRenderingFalgs_kSpecularIsOn) : scene_config_settings_ref.MaterialFlags;
+				scene_config_settings_ref.MaterialFlags = isAmbientOcclusionOn ? static_cast<MaterialRenderingFlags_>(scene_config_settings_ref.MaterialFlags | MaterialRenderingFalgs_kAmbientOcclusionIsOn) : scene_config_settings_ref.MaterialFlags;
 				break;
 
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kIndividualTexture:
 				static bool selectedTexture;
 
 				if (ImGui::RadioButton("Color texture",
-					scene_config_settings_ref.m_curentIndividualTexture == MaterialTextures_kAlbedo))
+					scene_config_settings_ref.CurentIndividualTexture == MaterialTextures_kAlbedo))
 				{
-					scene_config_settings_ref.m_curentIndividualTexture = MaterialTextures_kAlbedo;
+					scene_config_settings_ref.CurentIndividualTexture = MaterialTextures_kAlbedo;
 				}
 				if (ImGui::RadioButton("Normal texture",
-					scene_config_settings_ref.m_curentIndividualTexture == MaterialTextures_kNormal))
+					scene_config_settings_ref.CurentIndividualTexture == MaterialTextures_kNormal))
 				{
-					scene_config_settings_ref.m_curentIndividualTexture = MaterialTextures_kNormal;
+					scene_config_settings_ref.CurentIndividualTexture = MaterialTextures_kNormal;
 				}
 				if (ImGui::RadioButton("Specular/Metallic texture",
-					scene_config_settings_ref.m_curentIndividualTexture == MaterialTextures_kMetalic))
+					scene_config_settings_ref.CurentIndividualTexture == MaterialTextures_kMetalic))
 				{
-					scene_config_settings_ref.m_curentIndividualTexture = MaterialTextures_kMetalic;
+					scene_config_settings_ref.CurentIndividualTexture = MaterialTextures_kMetalic;
 				}
 				if (ImGui::RadioButton("Ambient occlusion",
-					scene_config_settings_ref.m_curentIndividualTexture == MaterialTextures_kAmbientOcclusion))
+					scene_config_settings_ref.CurentIndividualTexture == MaterialTextures_kAmbientOcclusion))
 				{
-					scene_config_settings_ref.m_curentIndividualTexture = MaterialTextures_kAmbientOcclusion;
+					scene_config_settings_ref.CurentIndividualTexture = MaterialTextures_kAmbientOcclusion;
 				}
 				break;
 
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kUV:
-				ImGui::SliderFloat("Uv scale", &scene_config_settings_ref.m_uvViewSettings.UV_scaleFactor,
+				ImGui::SliderFloat("Uv scale", &scene_config_settings_ref.UVViewSettings.UV_scaleFactor,
                     APP_SETTINGS::UV_ViewAppSetting::kUV_MinScaling, APP_SETTINGS::UV_ViewAppSetting::kUV_MaxScaling);
 				break;
 
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kSolidColor:
-				ImGui::ColorPicker3("Mesh color", &scene_config_settings_ref.m_colorRenderingColor[0]);
+				ImGui::ColorPicker3("Mesh color", &scene_config_settings_ref.StudioLightShadingColor[0]);
 				break;
 
 			case APP_SETTINGS::RenderingMode_::RenderingMode_kNormalOrientation:
@@ -404,15 +407,15 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 #pragma region Grid settings
 				if (ImGui::CollapsingHeader("World grid settings."))
 				{
-					ImGui::Checkbox("UseWorldGrid?", &scene_config_settings_ref.m_isWireGridOn);
-					if (scene_config_settings_ref.m_isWireGridOn)
+					ImGui::Checkbox("UseWorldGrid?", &scene_config_settings_ref.IsWireGridOn);
+					if (scene_config_settings_ref.IsWireGridOn)
 					{
-						ImGui::SliderFloat("Grid scale", &scene_config_settings_ref.m_gridData.gridScale,
+						ImGui::SliderFloat("Grid scale", &scene_config_settings_ref.GridData.gridScale,
                             APP_SETTINGS::GridData::kGridMinScale,
                             APP_SETTINGS::GridData::kGridMaxScale);
 
-						ImGui::ColorPicker4("Grid color", &scene_config_settings_ref.m_gridData.gridLineColor[0]);
-						ImGui::Checkbox("Shade axis.", &scene_config_settings_ref.m_gridData.isAxisShaded);
+						ImGui::ColorPicker4("Grid color", &scene_config_settings_ref.GridData.gridLineColor[0]);
+						ImGui::Checkbox("Shade axis.", &scene_config_settings_ref.GridData.isAxisShaded);
 					}
 				}
 #pragma endregion
@@ -439,29 +442,29 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
                       {APP_SETTINGS::LightShadingModel_kRimShading,"Rim light shading"},
                       {APP_SETTINGS::LightShadingModel_kRim_and_ToonShading,"Rim + toon shading"} };
 
-                    APP_SETTINGS::LightShadingModel_ current_light_model = scene_config_settings_ref.lightInfo.currentLightModel;
+                    APP_SETTINGS::LightShadingModel_ current_light_model = scene_config_settings_ref.LightInfo.currentLightModel;
                     
-                    scene_config_settings_ref.lightInfo.currentLightModel = 
+                    scene_config_settings_ref.LightInfo.currentLightModel = 
                         RenderComboBox("Shading mode", kShadingModeKeyValueComboBoxHash, current_light_model);
 
-					ImGui::InputInt("Light count", &scene_config_settings_ref.lightInfo.lightCount);
+					ImGui::InputInt("Light count", &scene_config_settings_ref.LightInfo.lightCount);
 
-                    adjustLightCount(scene_config_settings_ref.lightInfo.lightCount);
+                    adjustLightCount(scene_config_settings_ref.LightInfo.lightCount);
 
 					for (uint32_t i = 0; i < APP_SETTINGS::SceneLightInfo::kMaxLightCount; i++)
 					{
-						if (i < scene_config_settings_ref.lightInfo.lightCount)
+						if (i < scene_config_settings_ref.LightInfo.lightCount)
 						{
 							if (ImGui::CollapsingHeader(std::string("Light " + std::to_string(i + 1)).c_str()))
 							{
 								RenderLightSettingsPanel(i,
-									&scene_config_settings_ref.lightInfo.lights[i].color,
-									&scene_config_settings_ref.lightInfo.lights[i].direction);
+									&scene_config_settings_ref.LightInfo.lights[i].color,
+									&scene_config_settings_ref.LightInfo.lights[i].direction);
 							}
 						}
 						else
 						{
-							scene_config_settings_ref.lightInfo.lights[i].color = glm::vec3(0);
+							scene_config_settings_ref.LightInfo.lights[i].color = glm::vec3(0);
 						}
 					}
 				}
@@ -472,9 +475,9 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 				{
                     ImGui::Separator();
 
-					ImGui::Checkbox("Enable skybox?", &scene_config_settings_ref.m_isSkyboxOn);
+					ImGui::Checkbox("Enable skybox?", &scene_config_settings_ref.IsSkyboxOn);
 
-					if (scene_config_settings_ref.m_isSkyboxOn)
+					if (scene_config_settings_ref.IsSkyboxOn)
 					{
                         if (ImGui::Button("Load skybox textures."))
                         {
@@ -498,7 +501,7 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 				}
 
 				ImGui::SetItemTooltip("Current projection mode is:%s", is_current_projection_perspective ? "Perspective" : "Orthographic");
-				ImGui::Checkbox("Enable AA", &scene_config_settings_ref.m_EnableAA);
+				ImGui::Checkbox("Enable AA", &scene_config_settings_ref.EnableScneAntiAliasing);
 				ImGui::SetItemTooltip("Enable scene Anti-aliasing(AA).The scene AA is using MSAA + FXAA");
 #pragma endregion
 
@@ -510,11 +513,11 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 			{
                 if (std::shared_ptr<Model> current_scene_model = scene_model.lock())
                 {
-                    const ModelData& current_model_load_data = current_scene_model->GetModelData();
+                    const ModelUIData& current_model_load_data = current_scene_model->GetModelUIData();
                     ImGui::Text("Model info");
-                    ImGui::Text("Object triangle count:%d", current_model_load_data.meshInfo.triangleCount);
-                    ImGui::Text("Object vertex count:%d", current_model_load_data.meshInfo.vertexCount);
-                    ImGui::Text("Object face count:%d", current_model_load_data.meshInfo.faceCount);
+                    ImGui::Text("Object triangle count:%zu", current_model_load_data.modelVertexCountData.triangleCount);
+                    ImGui::Text("Object vertex count:%zu", current_model_load_data.modelVertexCountData.vertexCount);
+                    ImGui::Text("Object face count:%zu", current_model_load_data.modelVertexCountData.faceCount);
                     ImGui::Text("Texture count:%d", current_model_load_data.textureCount);
 
                     ImGui::Text("File path %s", current_model_load_data.modelPath.c_str());
@@ -610,7 +613,6 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #pragma endregion
 
-	m_applicationRef.GetGlobalInputHandler().SetCurrentlyFocusedWindow(m_currentlyFocusedWindow);
     m_isFirstFrame = false;
     //pScene_model->ApplyTransformation(position, scale, glm::vec3(1), 0);
 }
@@ -619,12 +621,49 @@ void OBJ_Viewer::UILayer::RenderMaterial_LabelTexturePair(const std::shared_ptr<
 	MaterialTextures_ textureType,const char* textureLabelName)
 {
 #pragma region Style settings
-	static constexpr float spacing = 100.f;
+    /**
+     * A little context.
+     * The below calculations are done because some labels can be longer then others.
+     * A prime example is a 'Ambient Occlusion' and 'Albedo'.
+     * 
+     * If we just make them on the same line with some offset will look like this:
+     * 
+     * offset: 3 spaces
+     *
+     * <Ambient Occlusion>___[Image Position]
+     * <Albedo>___[Image Position]
+     * 
+     * Instead we get the right border of the panel/window and calculate the image position that way
+     * 
+     * Panel Start                                       Panel end
+     * | <Ambient Occlusion>___[Image Position]          |
+     * | <Albedo>___[Image Position]                     |
+     * |            <--image_size-->                     |
+     * <----------------currentWindowSize---------------->
+     * 
+     *  By subtracting the currentWindowSize with the image_size we get where the position of the image needs to be
+     *  so that will be near the right Panel end.
+     
+     * If this still doesn't make sense you can think of this as if 
+     * the currentWindowSize is where the panel ends then by subtracting the image_size is like saying:
+     * "Ok move image_size amount from you current position currentWindowSize". 
+     * 
+     * |                                                 |
+     * <----------------currentWindowSize>|<--image_size->
+     *                                    The position that the window needs to start from.
+     *
+     * We also add some margin to have some more control.
+     * 
+     * | <Ambient Occlusion><----------->[Image Position]<-margin->|
+     * | <Albedo><---------------------->[Image Position]<-margin->|
+     * 
+     */
+
 	constexpr uint8_t RIGHT_SIDE_IMAGE_MARGIN = 10;
 	static constexpr GLuint TEXTURE_HANDLE_ID_NONE = 0;
-	static constexpr ImVec2 textSize = { 70,70 };
+	static constexpr ImVec2 image_size = { 70,70 };
 	const ImVec2 currentWindowSize = ImGui::GetWindowSize();
-	const float IMAGE_TEXT_INDEPENDENT_POSITION = currentWindowSize.x - textSize.x - RIGHT_SIDE_IMAGE_MARGIN;
+	const float IMAGE_TEXT_INDEPENDENT_POSITION = currentWindowSize.x - image_size.x - RIGHT_SIDE_IMAGE_MARGIN;
 #pragma endregion
 
 	ImGui::Text(textureLabelName);
@@ -633,7 +672,7 @@ void OBJ_Viewer::UILayer::RenderMaterial_LabelTexturePair(const std::shared_ptr<
 		material->GetMaterialTexture(textureType).expired() ? TEXTURE_HANDLE_ID_NONE :
 		material->GetMaterialTexture(textureType).lock()->GetTextureHandle();
 
-	ImGui::Image((ImTextureID)textureID, textSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+	ImGui::Image((ImTextureID)textureID, image_size, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 }
 
 void OBJ_Viewer::UILayer::RenderSkyboxSettings(std::weak_ptr<Skybox> scene_skybox)
@@ -670,12 +709,12 @@ void OBJ_Viewer::UILayer::RenderSkyboxSettings(std::weak_ptr<Skybox> scene_skybo
 	}
 }
 
-void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3 *pColor, glm::vec3* pPosition)
+void OBJ_Viewer::UILayer::RenderLightSettingsPanel(uint32_t lightIndex,glm::vec3 *pColor, glm::vec3* pLightDirection)
 {
 	ImGui::ColorPicker3(std::string("Light color:" + std::to_string(lightIndex)).c_str(),&(*pColor)[0]);
 	ImGui::NewLine();
-	ImGui::VSliderFloat(std::string("Light direction.x:" + std::to_string(lightIndex)).c_str(), { 50,50}, &(pPosition->x), -1.f, 1.f);
-	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->y), -1.f, 1.f);
-	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pPosition->z), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.x:" + std::to_string(lightIndex)).c_str(), { 50,50}, &(pLightDirection->x), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.y:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pLightDirection->y), -1.f, 1.f);
+	ImGui::VSliderFloat(std::string("Light direction.z:" + std::to_string(lightIndex)).c_str(), { 50,50 }, &(pLightDirection->z), -1.f, 1.f);
 
 }

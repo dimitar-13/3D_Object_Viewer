@@ -16,7 +16,7 @@ OBJ_Viewer::Application::Application(Window& appWindow):
 	m_appRenderingCoordinator = std::make_shared<RenderingCoordinator>(*this);
 	AddEventListener(m_appRenderingCoordinator);
 
-	m_appInitStatusSuccsess = true;
+	m_appInitStatusSuccess = true;
 }
 
 void OBJ_Viewer::Application::AppStartRenderLoop()

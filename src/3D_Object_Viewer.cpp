@@ -3,7 +3,7 @@
 #include "Controls/InputHandler.h"
 #include "Rendering/RenderingCoordinator.h"
 #include "Logging/App_Logger.h"
-#include "Core/Config.h"
+#include "Core/ProjectPathHelper.h"
 
 
 
@@ -17,6 +17,7 @@ enum ExitStatus_
 	ExitStatus_kGLEW_InitFailed = -2,
 	ExitStatus_kWindowContextCreationFailed = -3,
 	ExitStatus_kApplicationCreationFailled = -4,
+    ExistStatus_kImGuiIniFileWasNotFound = -5,
 	ExitStatus_ApplicationExitSuccsess = ExitStatus_kOnApplicationCloses
 };
 
@@ -30,11 +31,19 @@ int main()
 	constexpr OBJ_Viewer::Size2D kWindowStartupSize = { kStartupWindowWidth,kStartupWindowHeight };
   
     const std::string kImGUISaveFilePath = OBJ_Viewer::ProjectPathHelper::GetCurrentExecutableFilePath().append("project/imgui.ini");
+
 #pragma endregion
 
 #pragma region Application dependencies and Window inilizing 
 
 	OBJ_Viewer::Logger::init();
+
+    if (!std::filesystem::exists(kImGUISaveFilePath))
+    {
+        LOGGER_LOG_FATAL("imgui.ini file was not found in expected directory. The expected directory was:'{0}'", kImGUISaveFilePath);
+        return ExistStatus_kImGuiIniFileWasNotFound;
+    }
+
 	if (glfwInit() == GLFW_FALSE)
 	{
 		LOGGER_LOG_FATAL("GLFW failed to initialize");
@@ -44,7 +53,7 @@ int main()
 
 	OBJ_Viewer::Window appWindow(kWindowStartupSize, winTitle);
 
-	if (!appWindow.isWinContextInitialized())
+	if (!appWindow.IsWinContextInitialized())
 	{
 		LOGGER_LOG_FATAL("GLFW failed to create a valid window context.");
 
@@ -72,7 +81,6 @@ int main()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
     ImGui::LoadIniSettingsFromDisk(kImGUISaveFilePath.c_str());
-
     ImGui_ImplGlfw_InitForOpenGL(appWindow.GetGLFW_Window(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
@@ -91,7 +99,7 @@ int main()
 
 	OBJ_Viewer::Application app(appWindow);
 
-	if (!app.isAppInitStatusSuccess())
+	if (!app.IsAppInitStatusSuccess())
 	{
 		app.~Application();
 		LOGGER_LOG_FATAL("App failed to launch successfully");

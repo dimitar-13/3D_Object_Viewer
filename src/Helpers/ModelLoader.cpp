@@ -77,7 +77,7 @@ std::unique_ptr<std::vector<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateMe
 
 	for (size_t i = 0; i < m_meshThreadResults.size(); i++)
 	{
-		const ReadMeshData& mesh_reading_thread_result = m_meshThreadResults[i].get();
+		const ReadMeshThreadResult& mesh_reading_thread_result = m_meshThreadResults[i].get();
 
 		m_sceneBoundingBox.max.x = std::max(mesh_reading_thread_result.mesh_bounding_box.max.x,m_sceneBoundingBox.max.x);
 		m_sceneBoundingBox.max.y = std::max(mesh_reading_thread_result.mesh_bounding_box.max.y,m_sceneBoundingBox.max.y);
@@ -87,9 +87,9 @@ std::unique_ptr<std::vector<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateMe
 		m_sceneBoundingBox.min.y = std::min(mesh_reading_thread_result.mesh_bounding_box.min.y,m_sceneBoundingBox.min.y);
 		m_sceneBoundingBox.min.z = std::min(mesh_reading_thread_result.mesh_bounding_box.min.z,m_sceneBoundingBox.min.z);
 
-		m_ModelData.meshInfo.faceCount += mesh_reading_thread_result.mesh_Information.faceCount;
-		m_ModelData.meshInfo.vertexCount += mesh_reading_thread_result.mesh_Information.vertexCount;
-		m_ModelData.meshInfo.triangleCount += mesh_reading_thread_result.mesh_Information.triangleCount;
+		m_ModelData.modelVertexCountData.faceCount += mesh_reading_thread_result.mesh_Information.faceCount;
+		m_ModelData.modelVertexCountData.vertexCount += mesh_reading_thread_result.mesh_Information.vertexCount;
+		m_ModelData.modelVertexCountData.triangleCount += mesh_reading_thread_result.mesh_Information.triangleCount;
 
 		mesh_vector_result->emplace_back(std::make_unique<VertexAttributeObject>(mesh_reading_thread_result.vertex_data_vector, mesh_reading_thread_result.index_data_vector),
 			mesh_reading_thread_result.mesh_material_ID);
@@ -98,9 +98,9 @@ std::unique_ptr<std::vector<OBJ_Viewer::Mesh>> OBJ_Viewer::ModelLoader::CreateMe
 	return mesh_vector_result;
 }
 
-OBJ_Viewer::ReadMeshData OBJ_Viewer::ModelLoader::ReadMesh(const aiMesh* assimpMesh,const glm::mat4 MeshTransform)
+OBJ_Viewer::ModelLoader::ReadMeshThreadResult OBJ_Viewer::ModelLoader::ReadMesh(const aiMesh* assimpMesh,const glm::mat4 MeshTransform)
 {
-	ReadMeshData mesh_data_result;
+	ReadMeshThreadResult mesh_data_result;
 	mesh_data_result.mesh_material_ID = assimpMesh->mMaterialIndex;
 
 	mesh_data_result.vertex_data_vector.resize(assimpMesh->mNumVertices);
@@ -199,7 +199,7 @@ std::vector<std::shared_ptr<OBJ_Viewer::Material>> OBJ_Viewer::ModelLoader::Load
 	auto AddTextureToMaterialDataIfValid = 
 		[](MaterialData& materialData,MaterialTextures_ textureEnumKey, std::shared_ptr<Texture> texture) {
 			if (texture)
-				materialData.m_materialTextures[textureEnumKey] = texture;
+				materialData.materialTextures[textureEnumKey] = texture;
 		};
 
 	for (size_t i =0; i < scene->mNumMaterials;i++)
@@ -263,6 +263,9 @@ std::shared_ptr<OBJ_Viewer::Texture> OBJ_Viewer::ModelLoader::ReadTexture(aiMate
 	TextureBuilder texture_builder;
 
 	TexturePixelReader texture_data_reader (resolved_texture_path.c_str());
+
+    if (!texture_data_reader.isTextureValid())
+        return std::shared_ptr<Texture>();
 
 	TextureFormat_ texture_format = texture_data_reader.GetTextureFormat();
 

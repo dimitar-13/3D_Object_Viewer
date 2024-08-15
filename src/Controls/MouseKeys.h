@@ -1,7 +1,9 @@
 #pragma once
 #include "pch.h"
 namespace OBJ_Viewer {
-
+    /**
+     * @brief Enum using the GLFW mouse key macros for type safety. 
+     */
 	enum MouseKey_ {
 		MouseKey_kLeftMouseButton = GLFW_MOUSE_BUTTON_1,
 		MouseKey_kRightMouseButton = GLFW_MOUSE_BUTTON_2,

@@ -25,8 +25,8 @@ OBJ_Viewer::ShaderClass::ShaderClass(const char* shader_file_path)
 
 void OBJ_Viewer::ShaderClass::BindUniformBufferToShader(const UniformBuffer& uniform_buffer)const
 {
-  const int uniform_buffer_index = glGetUniformBlockIndex(m_shaderHandle, uniform_buffer.GetBufferName().c_str());
-  glUniformBlockBinding(m_shaderHandle, uniform_buffer_index, uniform_buffer.GetBindingPoint());
+  const int kUniformBufferIndex = glGetUniformBlockIndex(m_shaderHandle, uniform_buffer.GetBufferName().c_str());
+  glUniformBlockBinding(m_shaderHandle, kUniformBufferIndex, uniform_buffer.GetBindingPoint());
 }
 
 std::vector<std::string> OBJ_Viewer::ShaderClass::GetShaderUniformList()const
@@ -49,7 +49,7 @@ std::vector<std::string> OBJ_Viewer::ShaderClass::GetShaderUniformList()const
     
 }
 
-std::unordered_map<OBJ_Viewer::ShaderSourceType_,std::string> OBJ_Viewer::ShaderClass::ReadShaderSource(const char* path)
+std::unordered_map<OBJ_Viewer::ShaderClass::ShaderSourceType_,std::string> OBJ_Viewer::ShaderClass::ReadShaderSource(const char* path)
 {
     std::fstream shader_source_file_stream;
     shader_source_file_stream.open(path);
@@ -58,7 +58,7 @@ std::unordered_map<OBJ_Viewer::ShaderSourceType_,std::string> OBJ_Viewer::Shader
         LOGGER_LOG_WARN("Was not able to open file at path:{0}", path);
     }
     std::string line;
-    std::unordered_map<OBJ_Viewer::ShaderSourceType_, std::string> shader_sources_result {};
+    std::unordered_map<OBJ_Viewer::ShaderClass::ShaderSourceType_, std::string> shader_sources_result {};
     ShaderSourceType_ currently_reading_shader_key {};
 
     std::string shaderPathNoFilename = path;
@@ -173,4 +173,5 @@ GLint OBJ_Viewer::ShaderClass::FindUniform(const char* name_of_uniform)const
        return this->m_uniformHash[name_of_uniform];
     }
     LOGGER_LOG_WARN("Failed to find uniform with name '{0}'", name_of_uniform);
+    return -1;
 }

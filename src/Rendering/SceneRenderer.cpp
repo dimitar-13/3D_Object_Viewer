@@ -28,10 +28,9 @@ OBJ_Viewer::SceneManager::SceneManager(Application& app) :
 	m_screenQuad(ModelGenerator::GeneratePlaneVAOStack()),
 	m_app(app)
 {
-    constexpr float kDefaultCameraZoom = 5.0f;
 	SetUpUniformBuffers();
 
-	m_sceneCamera = std::make_shared<Camera>(kDefaultCameraZoom, app.GetGlobalInputHandler(), app.GetSceneViewport());
+	m_sceneCamera = std::make_shared<Camera>(app.GetGlobalInputHandler(), app.GetSceneViewport());
 	m_app.AddEventListener(m_sceneCamera);
 
 	m_sceneModel = ModelGenerator::GenerateCubeModel();

@@ -57,6 +57,7 @@ namespace OBJ_Viewer
          * @return The current Euler angles stored in the helper.
          */
         EulerAngles GetEulerAngles()const { return m_EulerAngles; }
+        void SetEulerAngles(const EulerAngles& new_Euler_angles) { m_EulerAngles = new_Euler_angles; }
         /**
          * @brief A static cast from 1 data type to another since.
          *
@@ -131,12 +132,11 @@ namespace OBJ_Viewer
          * This constructor initializes the camera with the provided zoom level and input handler. It also sets up
          * the view and projection matrices based on the given `SceneViewport` and the specified camera zoom.
          *
-         * @param CameraZoom The initial zoom level for the camera.
          * @param application_inputHandlerRef A reference to the `InputHandler` used for processing user inputs.
          * @param kApplicationViewportManagerRef A reference to the `SceneViewport` that defines the viewport size and aspect ratio.
          *
          */
-		Camera(float CameraZoom,InputHandler& application_inputHandlerRef,const SceneViewport& kApplicationViewportManagerRef);
+		Camera(InputHandler& application_inputHandlerRef,const SceneViewport& kApplicationViewportManagerRef);
         /**
          * @brief Retrieves both the view and projection matrices separately.
          *

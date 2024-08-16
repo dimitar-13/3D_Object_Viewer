@@ -2,19 +2,20 @@
 #include "UI/UILayer.h"
 #include "Camera.h"
 #include "Controls/AppKeyBindings.h"
+#include <glm/gtc/quaternion.hpp>
 
 constexpr float kZfar = 100.0f;
 constexpr float kZnear = 0.1f;
 constexpr float kFieldOfView = 45.0f;
+constexpr float kDefaultCameraZoom = 5.0f;
 constexpr glm::vec3 kCameraDefaultOrigin = glm::vec3{0,1.0f,0};
 
-OBJ_Viewer::Camera::Camera(float camera_zoom,
-    InputHandler& application_inputHandlerRef, const SceneViewport& kApplicationViewportManagerRef):
+OBJ_Viewer::Camera::Camera(InputHandler& application_inputHandlerRef, const SceneViewport& kApplicationViewportManagerRef):
 
     m_ApplicationInputHandlerRef(application_inputHandlerRef),
     m_ApplicationSceneViewportRef(kApplicationViewportManagerRef),
     m_CameraLookAtPivot(kCameraDefaultOrigin),
-    m_CurrentCameraZoomAmount(camera_zoom)
+    m_CurrentCameraZoomAmount(kDefaultCameraZoom)
 {
     Size2D viewport_size = m_ApplicationSceneViewportRef.GetViewportSize();
 	m_ProjectionMatrix = glm::perspective(glm::radians(kFieldOfView), GetAspectRatio(viewport_size), kZnear, kZfar);
@@ -26,7 +27,40 @@ OBJ_Viewer::Camera::Camera(float camera_zoom,
 
 void OBJ_Viewer::Camera::CalculatePositionVector()
 {
-    const float kPitchAngleInRadians = glm::radians(this->m_EulerAngleHelper.GetEulerAngles().pitchAngle);
+    /**
+     * A little context:
+     *
+     * There is one problem with this 360 rotation style of camera.
+     * Because we use Euler angle to determine the camera position it is possible for the final position to be parallel to the world up vector
+     * this can happen in 2 scenarios(4 if you count negative angles):
+     * When the camera position is directly +/- 90 degrees(more specifically the pitch angle because it is the angle used to determine the Y vector.)
+     * When the camera position is directly +/- 270 degrees(more specifically the pitch angle because it is the angle used to determine the Y vector.)
+     *
+     *  C   ^    ^ U      |    C   ^    ^ U
+     *    \ |    |        |      \ |    |
+     * <---\|---> x axis  |   <---\|---> z axis  
+     *      |             |        |
+     *      | y axis      |        | y axis
+     *  
+     * In this "skillful" drawing where C(is the camera position) and U(World up vector.)
+     * You can see as we approach the Y axis(the axis parallel to the UP vector) the C and the U will have the same direction. This cause a weird snap
+     * effect.I am not sure if this is gimbles lock or if its just artifact of the camera in any case.
+     * To combat that we offset the angle if we detect is perpendicular to the X or Z axis(+/- 90 and +/- 270 degrees)
+     * The bigger the bias(angle offset) the more noticeable the angle skip is and the smaller the bias the more likely we are prom to get some
+     * precision errors.The current value seems to work pretty fine for now.
+     */
+
+    constexpr float kPitchOffsetBias = .00001f;
+    constexpr float kAngleThreshold = 0.01f;
+    float offset_pitch_angled = this->m_EulerAngleHelper.GetEulerAngles().pitchAngle;
+    bool is_pitch_angle_parallel_to_world_up_vector = abs(abs(offset_pitch_angled) - 90.0f) < kAngleThreshold ||
+        abs(abs(offset_pitch_angled) - 270.0f) < kAngleThreshold;
+    const float singed_pitch_angle_offset = offset_pitch_angled < 0 ? -kPitchOffsetBias : kPitchOffsetBias;
+    
+    offset_pitch_angled += is_pitch_angle_parallel_to_world_up_vector ?
+        singed_pitch_angle_offset : 0.0f;
+
+    const float kPitchAngleInRadians = glm::radians(offset_pitch_angled);
     const float kNegativeYawAngleInRadians = glm::radians(-this->m_EulerAngleHelper.GetEulerAngles().yawAngle);
 
 	m_CurrentCameraPosition.y = std::sin(kPitchAngleInRadians);
@@ -76,7 +110,6 @@ void OBJ_Viewer::Camera::onMousePositionChanged(MousePositionEvent& e)
             current_mouse_position.y - m_lastMouseMovementPosition.y };
        
         m_lastMouseMovementPosition = current_mouse_position;
-
         m_EulerAngleHelper.IncreaseEulerAngles(EulerAngleHelper::ConvertMousePositionToAngles(mouse_delta));
 
 		CalculatePositionVector();
@@ -168,22 +201,15 @@ void OBJ_Viewer::Camera::CalculateOthoProjection(Size2D viewport_size)
 
 bool OBJ_Viewer::Camera::IsCameraYVectorFlipped(float pitch_angle)
 {
-   // We check the current angle but because of floating point errors when current_angle_in_radiance = +/- 90 or +/- 270
-   // the cos function doesn't return 0 and leads to weird snapping when perfectly perpendicular
-   // that's why we check the next angle and decide if our vector is indeed flipped.
-
-   const float kNextAngleSignedOffsetBias = pitch_angle < 0 ? -1.0f : 1.0f;
    float current_angle_in_radiance = glm::radians(pitch_angle);
-   float next_angle_in_radiance = glm::radians(pitch_angle + kNextAngleSignedOffsetBias);
-
-   return std::cos(current_angle_in_radiance) < 0 && std::cos(next_angle_in_radiance) < 0;
+   return std::cos(current_angle_in_radiance) < 0;
 }
 
 void OBJ_Viewer::Camera::CalculateViewMatrix()
 {
 	glm::vec3 up_vector(0, 1, 0);
     up_vector.y *= IsCameraYVectorFlipped(this->m_EulerAngleHelper.GetEulerAngles().pitchAngle) ? -1 : 1;
-	m_ViewMatrix = glm::lookAt(m_CurrentCameraPosition * m_CurrentCameraZoomAmount + m_CameraLookAtPivot, m_CameraLookAtPivot, up_vector);
+	m_ViewMatrix = glm::lookAt(m_CurrentCameraPosition*m_CurrentCameraZoomAmount + m_CameraLookAtPivot, m_CameraLookAtPivot, up_vector);
 }
 
 void OBJ_Viewer::Camera::OnEvent(Event& e)

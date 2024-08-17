@@ -110,7 +110,7 @@ void main()
 {
     float minDist = min(distance.x,min(distance.y,distance.z));
     float mixVal = smoothstep(frameThickness - 1, frameThickness + 1, minDist );
-    vec3 FinalColor = vec3(mix( u_frameColor,
-    GetStudioShading(fs_in_studioData.FractLightSpacePos,fs_in_studioData.FractLightSpaceNormal,vec3(1)), mixVal ));
+    vec3 FinalColor = vec3(mix( u_frameColor,vec3(1), mixVal));
+	FinalColor = GetStudioShading(fs_in_studioData.FractLightSpacePos,fs_in_studioData.FractLightSpaceNormal,FinalColor);
     FragColor = vec4(FinalColor,1);
 }

@@ -80,7 +80,7 @@ namespace OBJ_Viewer {
          *
          * @return A reference to the `glm::mat3` matrix used for viewport transformations.
          */
-		glm::mat3& GetViewportMatrix() { return m_viewPortMatrix; }
+		glm::mat4& GetViewportMatrix() { return m_viewPortMatrix; }
         /**
          * @brief Gets a const reference to the viewport transformation matrix.
          *
@@ -88,7 +88,7 @@ namespace OBJ_Viewer {
          *
          * @return A const reference to the `glm::mat3` matrix used for viewport transformations.
          */
-		const glm::mat3& GetViewportMatrix()const { return m_viewPortMatrix; }
+		const glm::mat4& GetViewportMatrix()const { return m_viewPortMatrix; }
         /**
          * @brief Gets a const reference to the viewport struct.
          *
@@ -124,16 +124,22 @@ namespace OBJ_Viewer {
          */
 		void RecalculateViewportMatrix()
 		{
-			m_viewPortMatrix = glm::mat3(1);
+            constexpr float maxZ = 1.0f;
+            constexpr float minZ = 0.0f;
+            
+			m_viewPortMatrix = glm::mat4(1);
 
-			m_viewPortMatrix[0][0] = (float)m_viewport.width / 2.f;
-			m_viewPortMatrix[1][1] = (float)m_viewport.height / 2.f;
+            m_viewPortMatrix[0][0] = (float)m_viewport.width / 2.0f;
+            m_viewPortMatrix[1][1] = (float)m_viewport.height / 2.0f;
 
-			m_viewPortMatrix[2][0] = m_viewPortMatrix[0][0];
-			m_viewPortMatrix[2][1] = m_viewPortMatrix[1][1];
+            m_viewPortMatrix[3][0] = m_viewPortMatrix[0][0];
+            m_viewPortMatrix[3][1] = m_viewPortMatrix[1][1];
+
+            m_viewPortMatrix[2][2] = (maxZ - minZ) / 2.0f; 
+            m_viewPortMatrix[3][2] = (maxZ + minZ) / 2.0f;
 		}
 	private:
 		Viewport m_viewport;                       ///< The current viewport parameters (position and size).
-		glm::mat3 m_viewPortMatrix = glm::mat3(1); ///< The matrix used for transforming viewport coordinates.
+		glm::mat4 m_viewPortMatrix = glm::mat4(1); ///< The matrix used for transforming viewport coordinates.
 	};
 }

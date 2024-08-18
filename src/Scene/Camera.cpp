@@ -39,7 +39,7 @@ void OBJ_Viewer::Camera::CalculatePositionVector()
 
 void OBJ_Viewer::Camera::onScrollChanged(ScrollPositionChanged& e)
 {
-    constexpr float kMinScrollZoom = 0.2f;
+    constexpr float kMinScrollZoom = 0.15f;
     constexpr float kMaxScrollZoom = 20.0f;
     constexpr float kScrollRange = kMaxScrollZoom - kMinScrollZoom;
     constexpr float kAdjustableScrollSensitivityBias = .05f;

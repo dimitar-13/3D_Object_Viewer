@@ -14,6 +14,8 @@ m_FramebufferSize(size),m_IsMultiSample(isMultiSampleBuffer),m_SampleCount(sampl
 	this->m_FramebufferColorAttachmentTexture = 
 		builder.SetTextureFormat(TextureFormat_kRGBA).
 		SetTextureInternalFormat(TextureInternalFormat_kRGBA).
+        SetTextureWrapS(TextureWrap_kClampToEdge).
+        SetTextureWrapT(TextureWrap_kClampToEdge).
 		SetTextureSize(size).isTextureMultiSample(m_IsMultiSample).SetSampleCount(sampleCount)
 		.buildTexture();
 

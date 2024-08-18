@@ -3,6 +3,11 @@
 #include"Logging/App_Logger.h"
 OBJ_Viewer::ShaderClass::ShaderClass(const char* shader_file_path)
 {
+    std::string_view shader_path_string_view = shader_file_path;
+    size_t string_last_slash_position = shader_path_string_view.find_last_of('/') + 1;
+    m_ShaderName = 
+        shader_path_string_view.substr(string_last_slash_position, shader_path_string_view.size() - string_last_slash_position);
+
     std::unordered_map<ShaderSourceType_, std::string> shader_sources = ReadShaderSource(shader_file_path);
     std::vector<GLuint> shader_handles {};
     for (const auto& item : shader_sources)
@@ -116,18 +121,35 @@ std::string OBJ_Viewer::ShaderClass::ReadIncludedShaderFIle(const std::string& a
     return shader_file_source;
 }
 
-bool OBJ_Viewer::ShaderClass::IsShaderCompilerSuccessfully(const GLuint shader_gpu_handle)
+bool OBJ_Viewer::ShaderClass::IsShaderCompilerSuccessfully(const GLuint shader_gpu_handle,ShaderSourceType_ shader_type)
 {
     GLint shader_compilation_status;
     glGetShaderiv(shader_gpu_handle, GL_COMPILE_STATUS, &shader_compilation_status);
     if (!shader_compilation_status)
     {
+        auto GetShaderTypeString = [](ShaderSourceType_ type_of_shader)
+            {
+                switch (type_of_shader)
+                {
+                case OBJ_Viewer::ShaderClass::ShaderSourceType_kVertex:
+                    return "Vertex";
+                case OBJ_Viewer::ShaderClass::ShaderSourceType_kFragment:
+                    return "Fragment";
+                case OBJ_Viewer::ShaderClass::ShaderSourceType_kGeometry:
+                    return "Geometry";
+                default:
+                    return "Unknown";
+                }
+            };
+
         constexpr size_t kInfoLogMaxSize = 255;
 
         char info_log[kInfoLogMaxSize];
         GLsizei true_info_log_length {};
         glGetShaderInfoLog(shader_gpu_handle,sizeof(info_log),&true_info_log_length,&info_log[0]);
-        LOGGER_LOG_ERROR("Shader failed to compile with error:{0}", info_log);
+        LOGGER_LOG_ERROR(
+            "Shader source compilation error.\n Shader name:'{0}'. \n Shader source type:'{1}'. \n Compilation error:{2}.",
+           m_ShaderName,GetShaderTypeString(shader_type), info_log);
         return false;
     }
 
@@ -145,7 +167,9 @@ bool OBJ_Viewer::ShaderClass::IsProgramLinkedSuccessfully()const
         char error_info_log [kInfoLogMaxSize];
         GLsizei true_info_log_length;
         glGetProgramInfoLog(this->m_shaderHandle, sizeof(error_info_log), &true_info_log_length, &error_info_log[0]);
-        LOGGER_LOG_ERROR("Program failed to link with error:{0}", error_info_log);
+        LOGGER_LOG_ERROR(
+            "Shader program linking error \n Shader name:'{0}'. \n Linking error:'{1}'.", m_ShaderName, error_info_log);
+
         return false;
     }
     return true;
@@ -159,7 +183,7 @@ GLuint OBJ_Viewer::ShaderClass::CompileShader(const GLenum shader_type, const st
     glShaderSource(shader_gpu_handle, 1, &shader_opengl_const_cast, NULL);
     glCompileShader(shader_gpu_handle);
     //Avoids branching since false is 0 and 0 is a non valid handle.
-    return shader_gpu_handle * IsShaderCompilerSuccessfully(shader_gpu_handle);
+    return shader_gpu_handle * IsShaderCompilerSuccessfully(shader_gpu_handle,static_cast<ShaderSourceType_>(shader_type));
 }
 
 GLint OBJ_Viewer::ShaderClass::FindUniform(const char* name_of_uniform)const

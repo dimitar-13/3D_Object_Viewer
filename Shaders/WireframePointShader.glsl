@@ -33,7 +33,7 @@ void main()
 #version 330 core
 layout(triangles) in;
 layout(triangle_strip,max_vertices = 3) out;
-uniform mat3 viewportMatrix;
+uniform mat4 viewportMatrix;
 noperspective out vec3 pointDist;
 flat out vec3 vertex0;
 flat out vec3 vertex1;
@@ -52,9 +52,9 @@ out VS_OUT_STUDIO_DATA{
 void main()
 {     
 
-    vec3 p1 = (viewportMatrix * (gl_in[0].gl_Position.xyz/gl_in[0].gl_Position.w)).xyz;
-    vec3 p2 = (viewportMatrix * (gl_in[1].gl_Position.xyz/gl_in[1].gl_Position.w)).xyz;
-    vec3 p3 = (viewportMatrix * (gl_in[2].gl_Position.xyz/gl_in[2].gl_Position.w)).xyz;
+    vec3 p1 = (viewportMatrix * (gl_in[0].gl_Position.xyzw/gl_in[0].gl_Position.w)).xyz;
+    vec3 p2 = (viewportMatrix * (gl_in[1].gl_Position.xyzw/gl_in[1].gl_Position.w)).xyz;
+    vec3 p3 = (viewportMatrix * (gl_in[2].gl_Position.xyzw/gl_in[2].gl_Position.w)).xyz;
 
 	gl_Position = gl_in[0].gl_Position;
     pointDist = vec3(p1);

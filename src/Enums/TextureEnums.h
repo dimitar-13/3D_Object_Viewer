@@ -26,6 +26,13 @@ namespace OBJ_Viewer {
 		TextureFormat_kRGBA = GL_RGBA ///< Four-channel format, typically used for red, green, blue, and alpha, but can represent any four pixel components.
 	};
 
+    enum TextureMagMinFilters_
+    {
+        TextureMagMinFilters_kUnknown,              ///< For debugging
+        TextureMagMinFilters_kLinear = GL_LINEAR,    ///< Represents 'GL_LINEAR'.
+        TextureMagMinFilters_kNearest= GL_NEAREST,  ///< Represents 'GL_NEAREST'
+    };
+
     /**
       * @brief Enum representing internal formats for textures in GPU memory.
       *

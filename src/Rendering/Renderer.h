@@ -176,7 +176,7 @@ namespace OBJ_Viewer {
          */
 		void RenderSkybox(const ShaderClass& skyboxShader, const Skybox& skybox, bool is_camera_perspective);
 	private:
-		std::unique_ptr<Texture> CreateDummyTexture(const std::string& path);
+		std::unique_ptr<Texture> CreateDummyTexture(const unsigned char* textureData);
         /**
          * @brief Binds a material to the shader based on the provided MaterialRenderingFlags_. 
          * 

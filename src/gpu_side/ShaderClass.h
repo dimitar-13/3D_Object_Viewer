@@ -199,11 +199,12 @@ namespace OBJ_Viewer
          * compilation errors.
          *
          * @param shader_gpu_handle The GPU handle (ID) of the shader to check.
+         * @param shader_type Type of shader source. Used for logging information.
          * @return `true` if the shader was compiled successfully; `false` otherwise.
          *
          * @note Ensure that the shader handle provided is valid and corresponds to a compiled shader.
          */
-		bool IsShaderCompilerSuccessfully(const GLuint shader_gpu_handle);
+		bool IsShaderCompilerSuccessfully(const GLuint shader_gpu_handle,ShaderSourceType_ shader_type);
         /**
          * @brief Checks if the shader program was successfully linked.
          *
@@ -250,6 +251,7 @@ namespace OBJ_Viewer
 	private:
 		int m_shaderHandle;                                             ///< OpenGL shader handle/ID use this for shader related API calls.
 		mutable std::unordered_map<std::string, int> m_uniformHash;     ///< Shader uniform hash for faster searches.
+        std::string m_ShaderName;                                       ///< File name of shader.
 	};
 }
 

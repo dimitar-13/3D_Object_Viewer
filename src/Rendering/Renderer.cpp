@@ -17,24 +17,24 @@ void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const Vert
 
 void OBJ_Viewer::Renderer::RenderMeshWireframeLine(const ShaderClass& wireframe_shader,
     const VertexAttributeObject& mesh_VAO, const APP_SETTINGS::WireFrameSettings& wireframeAppSettings,
-    const glm::mat3& viewport_matrix)
+    const glm::mat4& viewport_matrix)
 {    
     wireframe_shader.UseShader();
     wireframe_shader.SetUniformSet3FloatVector("u_frameColor", wireframeAppSettings.lineColor);
     wireframe_shader.SetUniformSet1Float("frameThickness", wireframeAppSettings.lineThickness);
     
-    wireframe_shader.SetUniformSet3x3FloatMatrix("viewportMatrix", viewport_matrix);
+    wireframe_shader.SetUniformSet4x4FloatMatrix("viewportMatrix", viewport_matrix);
     this->RenderMesh(wireframe_shader, mesh_VAO);
 }
 
 void OBJ_Viewer::Renderer::RenderMeshWireframePoint(const ShaderClass& wireframe_point_shader,
     const VertexAttributeObject& mesh_VAO,
-   const APP_SETTINGS::WireFrameSettings& wireframeAppSettings, const glm::mat3& viewport_matrix)
+   const APP_SETTINGS::WireFrameSettings& wireframeAppSettings, const glm::mat4& viewport_matrix)
 {
     constexpr static float kPointSizeThicknessAdjustmentValue = 1.;
     wireframe_point_shader.UseShader();
     wireframe_point_shader.SetUniformSet3FloatVector("u_Color", wireframeAppSettings.lineColor);
-    wireframe_point_shader.SetUniformSet3x3FloatMatrix("viewportMatrix", viewport_matrix);
+    wireframe_point_shader.SetUniformSet4x4FloatMatrix("viewportMatrix", viewport_matrix);
     wireframe_point_shader.SetUniformSet1Float("pointSize", wireframeAppSettings.lineThickness + kPointSizeThicknessAdjustmentValue);
     this->RenderMesh(wireframe_point_shader, mesh_VAO);
 }

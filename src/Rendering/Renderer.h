@@ -50,7 +50,7 @@ namespace OBJ_Viewer {
          * @param viewport_matrix A matrix used by the wireframe shader.
          */
         void RenderMeshWireframeLine(const ShaderClass& wireframe_shader, const VertexAttributeObject& mesh_VAO,
-            const APP_SETTINGS::WireFrameSettings& wireframeAppSettings,const glm::mat3& viewport_matrix);
+            const APP_SETTINGS::WireFrameSettings& wireframeAppSettings,const glm::mat4& viewport_matrix);
         /**
           * @brief Sets up the necessary shader resources and renders the mesh in wireframe point mode.
           *
@@ -65,7 +65,7 @@ namespace OBJ_Viewer {
           * @param viewport_matrix A matrix used by the wireframe shader.
           */
         void RenderMeshWireframePoint(const ShaderClass& wireframe_point_shader, const VertexAttributeObject& mesh_VAO,
-            const APP_SETTINGS::WireFrameSettings& wireframeAppSettings, const glm::mat3& viewport_matrix);
+            const APP_SETTINGS::WireFrameSettings& wireframeAppSettings, const glm::mat4& viewport_matrix);
         /**
          * @brief Renders a mesh using a single texture.
          *

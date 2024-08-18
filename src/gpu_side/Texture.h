@@ -38,7 +38,8 @@ namespace OBJ_Viewer {
          */
 		Texture(const unsigned char* texture_pixel_data, TextureInternalFormat_ texture_internal_format,
 			TextureFormat_ texture_format, Size2D texture_size, GPUDataType_ texture_data_type, TextureWrap_ texture_wrapping_mode_on_S,
-			TextureWrap_ texture_wrapping_mode_on_T, bool is_texture_multi_sampled, uint8_t sample_count);
+			TextureWrap_ texture_wrapping_mode_on_T, TextureMagMinFilters_ magnification_filtering_mode,
+            TextureMagMinFilters_ minification_filtering_mode,bool is_texture_multi_sampled, uint8_t sample_count);
         /**
          * @brief Release the GPU-based texture resource. 
          */
@@ -105,6 +106,9 @@ namespace OBJ_Viewer {
 		bool m_isMultiSample;                                     ///< Flag indicating if the texture is a multi-sample texture (true if multi-sampled, false otherwise). 
 		uint8_t m_sampleCount;                                    ///< Number of samples per pixel in the texture. Used only if m_isMultiSample is true. 
 		GLuint m_textureHandle;                                   ///< OpenGL handle/ID representing the texture. Use this for texture related API calls.
+        TextureMagMinFilters_ m_MagnificationFilter;
+        TextureMagMinFilters_ m_MinificationFilter;
+
 	};
 
 
@@ -120,10 +124,11 @@ namespace OBJ_Viewer {
 		TextureBuilder& SetTexturePixelDataType(GPUDataType_ dataType) { this->texturePixelDataType = dataType; return *this; }
 		TextureBuilder& isTextureMultiSample(bool val) { isMultiSample = val;  return *this;}
 		TextureBuilder& SetSampleCount(uint8_t sampleCount) { texSampleCount = sampleCount;  return *this;}
-
+        TextureBuilder& SetMagFilter(TextureMagMinFilters_ filter) { magFilter = filter; return *this; }
+        TextureBuilder& SetMinFilter(TextureMagMinFilters_ filter) { minFilter = filter; return *this; }
 		std::unique_ptr<Texture> buildTexture()const
 		{ return std::make_unique<Texture>(data, textureInternalFormat, textureFormat, textureSize,
-			texturePixelDataType, textureWrapS, textureWrapT, isMultiSample, texSampleCount); }
+			texturePixelDataType, textureWrapS, textureWrapT, magFilter, minFilter, isMultiSample, texSampleCount); }
 	private:
 		TextureWrap_ textureWrapS = TextureWrap_::TextureWrap_kRepeat;
 		TextureWrap_ textureWrapT = TextureWrap_::TextureWrap_kRepeat;
@@ -131,6 +136,8 @@ namespace OBJ_Viewer {
 		TextureFormat_ textureFormat;
 		TextureInternalFormat_ textureInternalFormat;
 		GPUDataType_ texturePixelDataType = GPUDataType_::GPUDataType_kUnsignedByte;
+        TextureMagMinFilters_ magFilter = TextureMagMinFilters_kLinear;
+        TextureMagMinFilters_ minFilter = TextureMagMinFilters_kLinear;
 		const unsigned char* data = nullptr;
 		bool isMultiSample = false;
 		uint8_t texSampleCount = 4;

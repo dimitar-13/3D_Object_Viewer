@@ -153,7 +153,8 @@ namespace OBJ_Viewer {
 		Framebuffer m_UI_inputFramebuffer; ///< The scene input framebuffer(This might be moved in the coordinator and be passed as a parameter.) 
 		ImGuiWindowFlags m_imGuiWindowFlags;//< ImGUI window flags.
 		ImGuiDockNodeFlags m_imgGuiDockSpaceFlags;//< ImGUI docking flags.
-        bool m_isFirstFrame = true; ///< Is the currently rendering frame the first(This is reserved might be moved as a static variable.)
+        bool m_isFirstFrame = true; ///< Is the currently rendering frame the first(This is reserved might be moved as a static variable
+        std::unique_ptr<Texture> m_TextureNotPresent; ///< Texture used when another texture is not present.
         /**
          * @brief Currently used for the UI framebuffer resize. 
          */

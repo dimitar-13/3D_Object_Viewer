@@ -23,17 +23,24 @@ void main()
 #Shader:fragment
 #version 330 core
 
+#define TEXTURE_NOT_PRESENT_COLOR  vec4(1.0, 0.0, 1.0, 1.0)
 #include "ColorSpaceUtilityFunctions.glsl"
 
 out vec4 FragColor;
 in vec2 Frag_UV_Coords;
 uniform sampler2D textureToInspect;
+uniform bool isTexturePresent;
 uniform bool uIsTextureInSRGB;
 
 void main()
 {
-	vec4 sampledTexel = texture(textureToInspect,Frag_UV_Coords);
-	FragColor = uIsTextureInSRGB ? vec4(toLinear(sampledTexel)) : sampledTexel;
+	vec4 sampledTexel;
+	if(isTexturePresent)
+		sampledTexel = texture(textureToInspect,Frag_UV_Coords);
+	else
+		sampledTexel = TEXTURE_NOT_PRESENT_COLOR;
+
+	FragColor = !isTexturePresent || uIsTextureInSRGB ? vec4(toLinear(sampledTexel)) : sampledTexel;
 }
 
 

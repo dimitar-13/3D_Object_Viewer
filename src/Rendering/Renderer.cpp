@@ -3,8 +3,11 @@
 #include "Helpers/TextureHelpers.h"
 OBJ_Viewer::Renderer::Renderer()
 {
-	m_defaultWhiteTexture = CreateDummyTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/WhiteTexture.png");
-	m_defaultNormal = CreateDummyTexture("D:/c++/OpenGl/3D_Object_Viewer/3D_Object_Viewer/Resources/Normal_Map_dummy_texture.jpg");
+    const unsigned char kSingleWhitePixelData[] = { 255, 255, 255 };
+    const unsigned char kSingleBluePixelData[] = { 0, 0, 255 };
+
+	m_defaultWhiteTexture = CreateDummyTexture(&kSingleWhitePixelData[0]);
+	m_defaultNormal = CreateDummyTexture(&kSingleBluePixelData[0]);
 }
 void OBJ_Viewer::Renderer::RenderMesh(const ShaderClass& shaderToUse, const VertexAttributeObject& meshVAO)
 {
@@ -46,9 +49,11 @@ void OBJ_Viewer::Renderer::RenderMeshSingleTexture(const ShaderClass& single_tex
     single_texture_shader.UseShader();
     if (auto material = mesh_material.lock())
     {
+        bool isTexturePresent = material->GetMaterialTexture(material_texture_name).expired();
         if (auto texture = material->GetMaterialTexture(material_texture_name).lock())
             this->BindMaterialTextureToShader(single_texture_shader, *texture, GL_TEXTURE1, "textureToInspect");
         single_texture_shader.SetUniformSet1Int("uIsTextureInSRGB", material_texture_name == MaterialTextures_kAlbedo ? true : false);
+        single_texture_shader.SetUniformSet1Int("isTexturePresent", !isTexturePresent);
     }
     this->RenderMesh(single_texture_shader, mesh_to_render.GetMeshVAO());
 }
@@ -185,14 +190,12 @@ void OBJ_Viewer::Renderer::BindMaterialTextureToShader(const ShaderClass& shader
 	shaderToUse.SetUniformSet1Int(textureName, textureUnit - GL_TEXTURE0);
 }
 
-std::unique_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDummyTexture(const std::string& path)
+std::unique_ptr<OBJ_Viewer::Texture> OBJ_Viewer::Renderer::CreateDummyTexture(const unsigned char * textureData)
 {
-	TexturePixelReader reader(path.c_str());
 	TextureBuilder builder;
-	TextureFormat_ format = reader.GetTextureFormat();
 
-	return builder.SetTextureFormat(format).
-		SetTextureInternalFormat(static_cast<TextureInternalFormat_>(format)).SetTextureSize(reader.GetTextureSize()).
-		SetTexturePixelData(reader.GetTexturePixelData()).SetTextureWrapT(TextureWrap_kClampToEdge).
+	return builder.SetTextureFormat(TextureFormat_kRGB).
+		SetTextureInternalFormat(TextureInternalFormat_kRGB).SetTextureSize({1,1}).
+		SetTexturePixelData(textureData).SetTextureWrapT(TextureWrap_kClampToEdge).
 		SetTextureWrapS(TextureWrap_kClampToEdge).buildTexture();
 }

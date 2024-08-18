@@ -20,6 +20,20 @@ OBJ_Viewer::UILayer::UILayer(Application& application_ref):
 	m_applicationRef(application_ref),
 	m_UI_inputFramebuffer(application_ref.GetSceneViewport().GetViewportSize(), FramebufferAttachmentsFlags_kColorAttachment)
 {
+    unsigned char padding = 0;
+    const unsigned char kCheckboardTexture[] =
+    {
+        // Each pixel is 4 byte aligned 
+        255, 255, 255, padding, 0, 0, 0, //Texture row 1.                  
+        0, 0, 0,padding,255, 255, 255,   //Texture row 2.             
+    };
+    TextureBuilder builder;
+
+    m_TextureNotPresent = 
+        builder.SetTextureFormat(TextureFormat_kRGB).SetTextureInternalFormat(TextureInternalFormat_kRGB)
+        .SetTextureSize({2,2}).SetTexturePixelData(&kCheckboardTexture[0])
+        .SetMagFilter(TextureMagMinFilters_kNearest).SetMinFilter(TextureMagMinFilters_kNearest)
+        .SetTextureWrapT(TextureWrap_kRepeat).SetTextureWrapS(TextureWrap_kRepeat).buildTexture();
 
 	this->m_imgGuiDockSpaceFlags = ImGuiDockNodeFlags_None;
 	this->m_imGuiWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration;
@@ -659,20 +673,25 @@ void OBJ_Viewer::UILayer::RenderMaterial_LabelTexturePair(const std::shared_ptr<
      * 
      */
 
-	constexpr uint8_t RIGHT_SIDE_IMAGE_MARGIN = 10;
-	static constexpr GLuint TEXTURE_HANDLE_ID_NONE = 0;
-	static constexpr ImVec2 image_size = { 70,70 };
+	constexpr uint8_t kRightSideImageMargin = 10;
+	const GLuint kTextureHandleIDNone = m_TextureNotPresent->GetTextureHandle();
+    float kTextureUVScale;
+    bool is_texture_present;
+	constexpr ImVec2 image_size = { 70,70 };
 	const ImVec2 currentWindowSize = ImGui::GetWindowSize();
-	const float IMAGE_TEXT_INDEPENDENT_POSITION = currentWindowSize.x - image_size.x - RIGHT_SIDE_IMAGE_MARGIN;
+	const float kImageTextIndependentPosition = currentWindowSize.x - image_size.x - kRightSideImageMargin;
 #pragma endregion
 
 	ImGui::Text(textureLabelName);
-	ImGui::SameLine(IMAGE_TEXT_INDEPENDENT_POSITION);
+	ImGui::SameLine(kImageTextIndependentPosition);
+    is_texture_present = !material->GetMaterialTexture(textureType).expired();
 	GLuint textureID =
-		material->GetMaterialTexture(textureType).expired() ? TEXTURE_HANDLE_ID_NONE :
+        !is_texture_present ? kTextureHandleIDNone :
 		material->GetMaterialTexture(textureType).lock()->GetTextureHandle();
+    kTextureUVScale = is_texture_present ? 1.0f : 4.0f;
 
-	ImGui::Image((ImTextureID)textureID, image_size, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+
+	ImGui::Image((ImTextureID)textureID, image_size, ImVec2(0.0f, kTextureUVScale), ImVec2(kTextureUVScale, 0.0f));
 }
 
 void OBJ_Viewer::UILayer::RenderSkyboxSettings(std::weak_ptr<Skybox> scene_skybox)

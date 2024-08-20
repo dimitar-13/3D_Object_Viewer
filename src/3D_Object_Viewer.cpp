@@ -4,8 +4,13 @@
 #include "Rendering/RenderingCoordinator.h"
 #include "Logging/App_Logger.h"
 #include "Core/ProjectPathHelper.h"
+#include <winbase.h>
 
-
+#ifdef OBJ_VIEWER_LEVEL_DEBUG
+#define OBJ_VIEWER_ENTRY_POINT main()
+#else
+#define OBJ_VIEWER_ENTRY_POINT WINAPI WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)                                  
+#endif
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
 	GLsizei length, const char* message, const void* userParam);
@@ -21,7 +26,7 @@ enum ExitStatus_
 	ExitStatus_ApplicationExitSuccsess = ExitStatus_kOnApplicationCloses
 };
 
-int main()
+int OBJ_VIEWER_ENTRY_POINT
 {
 #pragma region Const startup app data
 

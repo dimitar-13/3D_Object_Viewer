@@ -250,32 +250,32 @@ void OBJ_Viewer::UILayer::RenderUI(APP_SETTINGS::SceneConfigurationSettings& sce
 	{
 		isAppWindowFocused(APP_FOCUS_REGIONS::kUI_Model_and_renderingSettingsWindowName);
 
-        if (std::shared_ptr<Model> current_scene_model = scene_model.lock())
-        {
-            static glm::vec3 position{};
-            static glm::vec3 scale{};
-            static glm::vec3 rotation{};
-            static glm::vec3 previous_scale{};
-            static bool is_scale_input_uniform = true;
-            current_scene_model->GetMatrixDecomposed(position, rotation, scale);
+        //if (std::shared_ptr<Model> current_scene_model = scene_model.lock())
+        //{
+        //    static glm::vec3 position{};
+        //    static glm::vec3 scale{};
+        //    static glm::vec3 rotation{};
+        //    static glm::vec3 previous_scale{};
+        //    static bool is_scale_input_uniform = true;
+        //    current_scene_model->GetMatrixDecomposed(position, rotation, scale);
 
-            previous_scale = scale;
+        //    previous_scale = scale;
 
-            ImGui::Text("Model view settings");
-            ImGui::InputFloat3("Position", &position[0]);
-            ImGui::InputFloat3("Rotation", &rotation[0]);
-            ImGui::InputFloat3("Scale", &scale[0]);
-            ImGui::Checkbox("Use uniform scale", &is_scale_input_uniform);
+        //    ImGui::Text("Model view settings");
+        //    ImGui::InputFloat3("Position", &position[0]);
+        //    ImGui::InputFloat3("Rotation", &rotation[0]);
+        //    ImGui::InputFloat3("Scale", &scale[0]);
+        //    ImGui::Checkbox("Use uniform scale", &is_scale_input_uniform);
 
-            if (is_scale_input_uniform)
-            {
-                float scaleValue = scale.x != previous_scale.x ? scale.x :
-                    scale.y != previous_scale.y ? scale.y : scale.z;
-                scale = glm::vec3(scaleValue);
-            }
-        }
+        //    if (is_scale_input_uniform)
+        //    {
+        //        float scaleValue = scale.x != previous_scale.x ? scale.x :
+        //            scale.y != previous_scale.y ? scale.y : scale.z;
+        //        scale = glm::vec3(scaleValue);
+        //    }
+        //}
 
-		ImGui::Separator();
+		//ImGui::Separator();
 		if (ImGui::BeginChild("Rendering modes"))
 		{
 #pragma region Rendering Modes 

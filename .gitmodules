@@ -1,0 +1,18 @@
+[submodule "Dependencies/glfw/glfw"]
+	path = Dependencies/glfw/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Dependencies/imgui/imgui"]
+	path = Dependencies/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Dependencies/glm/glm"]
+	path = Dependencies/glm/glm
+	url = https://github.com/icaven/glm.git
+[submodule "Dependencies/assimp/assimp"]
+	path = Dependencies/assimp/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "Dependencies/nativefiledialog/nativefiledialog"]
+	path = Dependencies/nativefiledialog/nativefiledialog
+	url = https://github.com/mlabbe/nativefiledialog.git
+[submodule "Dependencies/spdlog/spdlog"]
+	path = Dependencies/spdlog/spdlog
+	url = https://github.com/gabime/spdlog.git

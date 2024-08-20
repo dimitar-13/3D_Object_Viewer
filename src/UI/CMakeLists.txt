@@ -1,0 +1,9 @@
+set(INPUT_SOURCES
+UILayer.cpp
+)
+
+set(INPUT_HEADERS
+UILayer.h
+)
+
+target_sources(${PROJECT_NAME} PRIVATE ${INPUT_SOURCES} ${INPUT_HEADERS})

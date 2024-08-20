@@ -26,6 +26,9 @@ set_target_properties(${PROJECT_NAME}  PROPERTIES
 set_target_properties(${PROJECT_NAME}  PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/Release")
 
+    target_link_options(${PROJECT_NAME} PRIVATE	    "$<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>"
+												    "$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
+	)									   
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	 GLEW_STATIC
 	 "$<$<CONFIG:Debug>: OBJ_VIEWER_LEVEL_DEBUG>"

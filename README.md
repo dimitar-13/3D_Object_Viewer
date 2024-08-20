@@ -6,7 +6,7 @@ This is a simple application for viewing 3D model/scene files with different opt
 The project aims to give you more ways to inspect your 3D model with various shading 
 options and scene configurations. It's easy and fast to use if you just want to inspect
 your model and not make changes to it. Currently the project is working only on windows.
-You can download the pre-compiled binaries but I recommend building the project see inster buidung project
+You can download the pre-compiled binaries but I recommend building the project see [here](#how-to-build).
 
 ## Project Features
 
@@ -39,6 +39,18 @@ The project so far has these features:
 ![Project wireframe rendering image](/gitImages/Project_Image3.png?raw=true)
 ![Project wireframe rendering image](/gitImages/Project_Image4.png?raw=true)
 
+## Features to Add in the Future
+
+Some features I would like to add in the future include:
+
+- **Object selection:** You can select an object/mesh and interact with it.
+- **Hide all but selected object/mesh:** If one mesh is currently active/selected, by pressing a button, hide all of the other meshes and zoom in on the active one (similar to Blender when you select an object and press `/`).
+- **Scene graph:** A scene graph where you can hide, unhide, and check all of the selected meshes in an organized way.
+- **Scene saving:** A way to save the scene settings you’ve inputted (loaded file, skybox, etc.) and reopen them later.
+- **UV on top of texture:** When someone selects a texture from the UI, a window will open with the texture and the mesh UVs on top (again, like in Blender where you edit your UVs).
+- **Other:** There are other options that I can't think of right now.
+
+
 
 ## How to build
 First clone the project using the following command:
@@ -57,11 +69,12 @@ This will create a `build` folder where the Visual Studio project will be genera
 > [!IMPORTANT] 
 >
 > I haven't tested the build system on other compilers such as Clang and GCC, but I think it should work.  
-> When the build is done, you can launch your compiler or IDE and build the project in Release or Debug mode. The project binary will be in the `bin/Configuration` folder.
+
+When the build is done, you can launch your compiler or IDE and build the project in Release or Debug mode. The project binary will be in the `bin/Configuration` folder.
 
 ## How the Project Works
 
-The project has 4 main components/classes: `Application`, `RenderingCoordinator`, `UILayer`, and `SceneRenderer`.
+The project has 4 main ideas/classes: `Application`, `RenderingCoordinator`, `UILayer`, and `SceneRenderer`.
 
 - The `Application` class is the project’s global information class. Most of the other classes depend on the `Application` class.
 - The `RenderingCoordinator` class contains the rendering loop. This class is responsible for managing the rendering pipeline and establishing the connection between the two main rendering classes, `UILayer` and `SceneRenderer`.
@@ -77,14 +90,3 @@ The process of rendering a frame can be broken down into these simple steps:
 - Perform scene post-processing.
 
 At the start of every frame, we first render the UI. The `RenderingCoordinator` class calls the `RenderUI` function from the `UILayer` class and passes it a reference to a structure that represents the submitted user data. After the UI is rendered, the data that the user submitted is then passed to the `SceneRenderer` function `RenderScene`. In that function, we first render the model. If Anti-aliasing is enabled, we use the MSAA framebuffer. Based on the selected rendering mode, the `SceneRenderer` calls the `Renderer` class with the appropriate rendering function. After the model is rendered, we copy the MSAA buffer content into an intermediate framebuffer. Then we render the grid, if enabled, and finally, we render the skybox, if enabled (we don't use MSAA on the skybox and grid because they don't benefit from it). After everything is rendered, we use the intermediate framebuffer for post-processing. The post-processing consists of fast approximate anti-aliasing (FXAA) and then gamma correction at the end. If the `RenderScene` function is supplied with an output framebuffer, we use that to store the post-processed scene; if not, we use the default framebuffer.
-
-## Features to Add in the Future
-
-Some features I would like to add in the future include:
-
-- **Object selection:** You can select an object/mesh and interact with it.
-- **Hide all but selected object/mesh:** If one mesh is currently active/selected, by pressing a button, hide all of the other meshes and zoom in on the active one (similar to Blender when you select an object and press `/`).
-- **Scene graph:** A scene graph where you can hide, unhide, and check all of the selected meshes in an organized way.
-- **Scene saving:** A way to save the scene settings you’ve inputted (loaded file, skybox, etc.) and reopen them later.
-- **UV on top of texture:** When someone selects a texture from the UI, a window will open with the texture and the mesh UVs on top (again, like in Blender where you edit your UVs).
-- **Other:** There are other options that I can't think of right now.

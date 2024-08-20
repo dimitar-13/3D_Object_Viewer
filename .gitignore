@@ -363,3 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 build/
+
+*.sln
+*.vcxproj
+*.vcxproj.filters

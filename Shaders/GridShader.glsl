@@ -15,7 +15,9 @@ layout(std140) uniform Matrices
 	mat4 ModelMatrix;
 	mat4 NormalMatrix;
 };
-
+/**
+ * This grid shader is inspired from this post:https://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+ */
 vec3 unprojectPoint(vec4 point,mat4 viewMatrix,mat4 ProjectionMatrix)
 {
 	mat4 inverseView = inverse(viewMatrix);
@@ -99,6 +101,9 @@ void main()
 	
 	col.a *= 1 - smoothstep(0.,GRID_VANISH_POINT_VALUE, length(cameraPosition -fragPos3D ));
 	col.a *= t < 0 ? 0. :1.;
+    //The fast approximate anti-aliasing(FXAA) algorithm works with luma values. This is why if we have a transparent pixel
+    //we have to make sure that it doesn't have any color because the algorithm doesnt check for alpha values.
+	col = col.a == 0 ? vec4(0) : col; 
 	gl_FragDepth = GetFragDepth(fragPos3D);
 	FragColor = vec4(col);	
 }

@@ -173,8 +173,6 @@ add_custom_command(
 		${CMAKE_BINARY_DIR}/bin/$<CONFIG>/project
     COMMAND ${CMAKE_COMMAND} -E copy
 	   "${PROJECT_INFO_FOLDER}/imgui.ini"
-	   "${PROJECT_INFO_FOLDER}/LICENSE.txt"
-	   "${PROJECT_INFO_FOLDER}/README.md"
 
        ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/project/
     COMMENT "Creating Shaders directory and copying shader files to $<CONFIG> directory."

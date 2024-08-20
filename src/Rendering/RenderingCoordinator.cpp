@@ -33,7 +33,7 @@ void OBJ_Viewer::RenderingCoordinator::RenderLoop()
 
 void OBJ_Viewer::RenderingCoordinator::RenderScene()
 {
-	//We set the apha to 0 here in case we want to do blender with the grid.
+	//We set the alpha to 0 here in case we want to do blender with the grid.
 	glClearColor(0, 0, 0, 0);
 
 	if (m_application.IsUIHidden())
@@ -47,6 +47,9 @@ void OBJ_Viewer::RenderingCoordinator::RenderScene()
 
 void OBJ_Viewer::RenderingCoordinator::onEventTakeScreenshot(const ScreenshotEvent& e)
 {
+    if (m_saveImgResult.valid())
+        m_saveImgResult.wait();
+
     const ImgOutputData& kEventDataImageData = e.GetScreenshotEventData();
     //App state saving
     const bool kPreviousSkyboxEnableState = m_renderingConfigSettings.IsSkyboxOn;
